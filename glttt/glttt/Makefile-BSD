@@ -1,0 +1,18 @@
+# Makefile for Tic-Tac-Toe
+#
+# Chris Riley, April 2003
+#
+# This makefile is for FreeBSD.
+#
+
+
+LDFLAGS+= -pthread
+
+CFLAGS+= -Wall -DHAVE_ERRNO_H
+
+
+include ttt.mk
+
+
+clean:
+	rm -rf *.o ttt ttt.tar.gz

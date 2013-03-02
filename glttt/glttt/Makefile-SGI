@@ -1,0 +1,19 @@
+# Makefile for Tic-Tac-Toe
+#
+# Chris Riley, April 2003
+#
+# This makefile is for SGI IRIX64 (eg. sandcastle)
+#
+
+
+LDFLAGS= -lpthread -lglut -lGL -lGLU -lX11 -lXmu -lXext -lm
+
+CFLAGS= -O2 -DHAVE_ERRNO_H
+
+
+include ttt.mk
+
+
+clean:
+	rm -rf *.o ttt ttt.tar.gz
+
