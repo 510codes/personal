@@ -1,6 +1,9 @@
 #include "callbacks.h"
 #include "../../glttt_callbacks.h"
 
+#include "GL/glut.h"
+
+
 void kbfunc( unsigned char c, int x, int y )
 {
 	glttt_callbacks_kb( c );
@@ -18,7 +21,18 @@ void passivemotionfunc( int x, int y )
 
 void mousefunc( int b, int s, int xp, int yp )
 {
-	glttt_callback_mouse( b, s, xp, yp );
+	if (b==GLUT_LEFT_BUTTON && s==GLUT_DOWN)
+	{
+		glttt_callback_left_mouse_down( xp, yp );
+	}
+	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_DOWN)
+	{
+		glttt_callback_right_mouse_down( xp, yp );
+	}
+	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_UP)
+	{
+		glttt_callback_right_mouse_up( xp, yp );
+	}
 }
 
 void displayfunc()

@@ -61,45 +61,48 @@ void glttt_callback_passivemotion( int x, int y )
 	globals.my=vp[3]-(GLint)y-1;
 }
 
-void glttt_callback_mouse( int b, int s, int xp, int yp )
+void glttt_callback_left_mouse_down( int xp, int yp )
 {
-	if (b==GLUT_LEFT_BUTTON && s==GLUT_DOWN)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_NEW_GAME:
-			case GAMESTATE_MOVE_FIRST:
-				mouse_choose( xp, yp );
-				break;
+	switch (globals.game_state)
+	{
+		case GAMESTATE_NEW_GAME:
+		case GAMESTATE_MOVE_FIRST:
+			mouse_choose( xp, yp );
+			break;
 
-			case GAMESTATE_IN_GAME:
-				if (globals.peg_select != PEG_NONE && globals.human_turn)
-					do_turn(globals.peg_select);
-				break;
-		}
-	
-	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_DOWN)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
-				globals.repos_active=TRUE;
-				globals.xp=xp;
-				globals.yp=yp;
-				globals.new_rot=0;
-				globals.new_zoom=0;
-				break;
-		}
+		case GAMESTATE_IN_GAME:
+			if (globals.peg_select != PEG_NONE && globals.human_turn)
+				do_turn(globals.peg_select);
+			break;
+	}
+}
 
-	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_UP)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
-				globals.repos_active=FALSE;
-				globals.rot += globals.new_rot;
-				globals.zoom += globals.new_zoom;
-				globals.new_rot=0;
-				globals.new_zoom=0;
-				break;
-		}
+void glttt_callback_right_mouse_down( int xp, int yp )
+{
+	switch (globals.game_state)
+	{
+		case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
+			globals.repos_active=TRUE;
+			globals.xp=xp;
+			globals.yp=yp;
+			globals.new_rot=0;
+			globals.new_zoom=0;
+			break;
+	}
+}
+
+void glttt_callback_right_mouse_up( int xp, int yp )
+{
+	switch (globals.game_state)
+	{
+		case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
+			globals.repos_active=FALSE;
+			globals.rot += globals.new_rot;
+			globals.zoom += globals.new_zoom;
+			globals.new_rot=0;
+			globals.new_zoom=0;
+			break;
+	}
 }
 
 void glttt_callback_display()
@@ -121,8 +124,8 @@ void glttt_callback_display()
 			draw_game_screen();
 			break;
 	}
-	
-	glutSwapBuffers();
+
+	glttt_platform_display_callback_end();	
 }
 
 void glttt_callback_idle()
@@ -133,7 +136,7 @@ void glttt_callback_idle()
 	int sc;
 	int t;
 
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t = glttt_platform_time_in_millis_since_init();
 	
 	if (globals.game_state==GAMESTATE_IN_GAME)
 	{

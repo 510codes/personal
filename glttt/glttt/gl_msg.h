@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include <GL/gl.h>
-#include <GL/glut.h>
 
 
 typedef struct MSG_NODE

@@ -40,3 +40,23 @@ void glttt_platform_request_redraw()
 	glutPostRedisplay();
 }
 
+int glttt_platform_time_in_millis_since_init()
+{
+	return glutGet(GLUT_ELAPSED_TIME);
+}
+
+int glttt_platform_get_window_width()
+{
+	return glutGet(GLUT_WINDOW_WIDTH);
+}
+
+int glttt_platform_get_window_height()
+{
+	return glutGet(GLUT_WINDOW_HEIGHT);
+}
+
+void glttt_platform_display_callback_end()
+{
+	glutSwapBuffers();
+}
+

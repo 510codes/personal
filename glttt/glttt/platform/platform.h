@@ -20,6 +20,13 @@ void glttt_platform_draw_solid_sphere( int r );
 
 void glttt_platform_request_redraw();
 
+int glttt_platform_time_in_millis_since_init();
+
+int glttt_platform_get_window_width();
+
+int glttt_platform_get_window_height();
+
+void glttt_platform_display_callback_end();
 
 
 #endif

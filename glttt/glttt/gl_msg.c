@@ -1,4 +1,5 @@
 #include "gl_msg.h"
+#include "platform/platform.h"
 
 const int BASE_WIDTH=500;
 const int BASE_HEIGHT=500;
@@ -33,7 +34,7 @@ void glmsg_add( glmsgbox_t *msg_box, char *msg, GLdouble *col )
 	msg_node_t *node;
 	int t;
 
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t=glttt_platform_time_in_millis_since_init();
 	
 	node=(msg_node_t *)malloc(sizeof(msg_node_t));
 	node->msg=(char *)malloc(strlen(msg) + 1);
@@ -81,15 +82,15 @@ void print_stroke_msg( int xp, int yp, GLdouble scale, const char *msg )
 	glPushMatrix();
 	glLoadIdentity();
 
-	xsize=glutGet(GLUT_WINDOW_WIDTH);
-	ysize=glutGet(GLUT_WINDOW_HEIGHT);
+	xsize=glttt_platform_get_window_width();
+	ysize=glttt_platform_get_window_height();
 
-	gluOrtho2D( 0, xsize, ysize, 0 );
+	glOrtho( 0.0, xsize, ysize, 0.0, -1.0, 1.0 );
 	glTranslated( xp, yp, 1 );
 	glScaled( scale, -scale, scale );
 
 	for (x=0; x<strlen(msg); x++)
-		glutStrokeCharacter( GLUT_STROKE_ROMAN, msg[x] );
+		glttt_platform_draw_char( msg[x] );
 	
 	glPopMatrix();
 
@@ -123,8 +124,9 @@ void glmsgbox_draw( glmsgbox_t *msg_box )
 	int t;
 	GLdouble scale;
 	int width;
+	int xsize, ysize;
 
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t=glttt_platform_time_in_millis_since_init();
 	
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
@@ -140,7 +142,9 @@ void glmsgbox_draw( glmsgbox_t *msg_box )
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);			
 
-	gluOrtho2D( 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT), 0 );
+	xsize=glttt_platform_get_window_width();
+	ysize=glttt_platform_get_window_height();
+	glOrtho( 0.0, xsize, ysize, 0.0, -1.0, 1.0 );
 	glTranslated( 0, 0, 0 );
 
 	while (msg_box->first != NULL && t > msg_box->first->time + msg_box->timeout)
@@ -165,11 +169,11 @@ void glmsgbox_draw( glmsgbox_t *msg_box )
 		//printf("\n\n");
 	}
 	
-	width=glutGet(GLUT_WINDOW_WIDTH) * msg_box->width_pct;
-	xp1=(glutGet(GLUT_WINDOW_WIDTH) / 2) - (width / 2);
+	width=xsize * msg_box->width_pct;
+	xp1=(xsize / 2) - (width / 2);
 	xp2=xp1+width;
 
-	scale=(GLdouble)glutGet(GLUT_WINDOW_WIDTH) / (GLdouble)BASE_WIDTH;
+	scale=(GLdouble)xsize / (GLdouble)BASE_WIDTH;
 	
 	glColor4dv( msg_box->col );
 	glBegin(GL_POLYGON);
@@ -201,3 +205,4 @@ void glmsgbox_draw( glmsgbox_t *msg_box )
 	
 	glEnable(GL_DEPTH_TEST);
 }
+

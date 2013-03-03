@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "GL/gl.h"
+#include "GL/glu.h"
 
 #include "glttt.h"
 #include "gl_msg.h"
@@ -166,7 +167,7 @@ void draw_message( GLdouble sf, GLint xp, GLint yp, char *msg )
 
 	glDisable(GL_DEPTH_TEST);
 
-	gluOrtho2D(0,1000,0,1000);
+	glOrtho( 0.0, 1000.0, 0.0, 1000.0, -1.0, 1.0 );
 	glTranslated(xp,1000-yp,0);
 	glScalef(sf, sf, sf);
 
@@ -341,7 +342,7 @@ void draw_game_screen()
 	glEnd();
 
 	i=globals.row_queue->first;
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t=glttt_platform_time_in_millis_since_init();
 
 	while (i != NULL)
 	{
@@ -404,7 +405,7 @@ void draw_new_game()
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	gluOrtho2D( 0, 1000, 0, 1000 );
+	glOrtho( 0.0, 1000.0, 0.0, 1000.0, -1.0, 1.0 );
 
 	glMatrixMode( GL_MODELVIEW );
 	
@@ -432,7 +433,7 @@ void draw_move_first()
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	gluOrtho2D( 0, 1000, 0, 1000 );
+	glOrtho( 0.0, 1000.0, 0.0, 1000.0, -1.0, 1.0 );
 	
 	glMatrixMode( GL_MODELVIEW );
 
@@ -527,7 +528,7 @@ void add_vert_rows_to_queue( int oldmask, int newmask, peg_colour_t col )
 	row_t *r;
 
 	mask=newmask & ~oldmask;
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t=glttt_platform_time_in_millis_since_init();
 	
 	for (x=0; x<8; x++)
 		if (mask & (1 << x))
@@ -555,7 +556,7 @@ void add_horiz_rows_to_queue( int oldmask, int newmask, peg_colour_t col )
 	int t,x,y,n;
 	row_t *r;
 
-	t=glutGet(GLUT_ELAPSED_TIME);
+	t=glttt_platform_time_in_millis_since_init();
 	mask=newmask & ~oldmask;
 
 	for (x=0; x<6; x++)
@@ -617,7 +618,7 @@ void do_turn( peg_label_t peg )
 	if (cpu_sendmove( globals.cpu, peg ))
 	{
 		inc_move();
-		globals.human_move_time=glutGet(GLUT_ELAPSED_TIME);
+		globals.human_move_time = glttt_platform_time_in_millis_since_init();
 		globals.human_turn=FALSE;
 		if (globals.hum_old < cpu_score(globals.cpu,globals.colour))
 		{
