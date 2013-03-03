@@ -106,15 +106,18 @@ void glttt_callback_command_action_stop( int xp, int yp )
 
 void glttt_callback_rotate_action_start( int xp, int yp )
 {
-	switch (globals.game_state)
+	if (globals.peg_select_down == PEG_NONE)
 	{
-		case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
-			globals.repos_active=TRUE;
-			globals.xp=xp;
-			globals.yp=yp;
-			globals.new_rot=0;
-			globals.new_zoom=0;
-			break;
+		switch (globals.game_state)
+		{
+			case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
+				globals.repos_active=TRUE;
+				globals.xp=xp;
+				globals.yp=yp;
+				globals.new_rot=0;
+				globals.new_zoom=0;
+				break;
+		}
 	}
 }
 
