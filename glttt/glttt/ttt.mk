@@ -21,7 +21,7 @@ ttt.o: ttt.c cpu.o board.o $(COMMON_HEADERS)
 
 gl_msg.o: gl_msg.c gl_msg.h $(COMMON_HEADERS)
 
-glttt_callbacks.o: glttt_callbacks.c glttt_callbacks.h glttt.h $(COMMON_HEADERS)
+glttt_callbacks.o: glttt_callbacks.c glttt_callbacks.h glttt.h gl_msg.h $(COMMON_HEADERS)
 
 platform/glut/platform.o: platform/glut/platform.c platform/platform.h $(COMMON_HEADERS)
 
