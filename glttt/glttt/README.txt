@@ -60,7 +60,22 @@ COMPILING
 Windows
 -------
 
-To build the program on Windows, you must have MinGW (2.0.0 or higher) installed, as well as the OpenGL/GLUT headers and libraries.  See http://www.cosc.brocku.ca/~cr01ab/static.pl?page=opengl-mingw for details on how to do this.  Also, this program uses the Pthreads-Win32 package (http://sources.redhat.com/pthreads-win32/) for pthreads on Windows.  The applicable headers and libraries are distributed with the source.
+To build the program on Windows, you must have MinGW (2.0.0 or higher) installed, as well as the OpenGL/GLUT headers and libraries.
+
+GLUT setup instructions:
+
+- download and extract glut-3.7.6-bin.zip, from http://user.xmission.com/~nate/glut.html, for example
+- in the directory where the extracted files are, create a subdirectory called GL
+- move the file 'glut.h' into this subdirectory
+- from the MinGW windows command prompt, type the following (or else do the equivalents)
+-- set C_INCLUDE_PATH=<basedir>\glut-3.7.6-bin
+-- set LIBRARY_PATH=<basedir>\glut-3.7.6-bin
+-- set PATH=%PATH%;<basedir>\glut-3.7.6-bin
+
+note: replace <basedir> with wherever you downloaded/extratced glut, eg c:\downloads
+
+
+Also, this program uses the Pthreads-Win32 package (http://sources.redhat.com/pthreads-win32/) for pthreads on Windows.  The applicable headers and libraries are distributed with the source.
 
 MinGW is not necessarily _required_ to build the program, it's just how I do it.  You can probably use the Microsoft or the Intel compiler tools, for example.  I have not done this yet, perhaps in the future.
 
