@@ -23,19 +23,19 @@ void mousefunc( int b, int s, int xp, int yp )
 {
 	if (b==GLUT_LEFT_BUTTON && s==GLUT_DOWN)
 	{
-		glttt_callback_left_mouse_down( xp, yp );
+		glttt_callback_command_action_start( xp, yp );
 	}
 	else if (b==GLUT_LEFT_BUTTON && s==GLUT_UP)
 	{
-		glttt_callback_left_mouse_up( xp, yp );
+		glttt_callback_command_action_stop( xp, yp );
 	}
 	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_DOWN)
 	{
-		glttt_callback_right_mouse_down( xp, yp );
+		glttt_callback_rotate_action_start( xp, yp );
 	}
 	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_UP)
 	{
-		glttt_callback_right_mouse_up( xp, yp );
+		glttt_callback_rotate_action_stop( xp, yp );
 	}
 }
 

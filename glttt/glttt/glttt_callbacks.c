@@ -68,7 +68,7 @@ void glttt_callback_passivemotion( int x, int y )
 	reset_hover(x, y);
 }
 
-void glttt_callback_left_mouse_down( int xp, int yp )
+void glttt_callback_command_action_start( int xp, int yp )
 {
 	globals.mx_left_down = globals.mx_hover;
 	globals.my_left_down = globals.my_hover;
@@ -89,7 +89,7 @@ void glttt_callback_left_mouse_down( int xp, int yp )
 	}
 }
 
-void glttt_callback_left_mouse_up( int xp, int yp )
+void glttt_callback_command_action_stop( int xp, int yp )
 {
 	switch (globals.game_state)
 	{
@@ -104,7 +104,7 @@ void glttt_callback_left_mouse_up( int xp, int yp )
 	globals.peg_select_down = PEG_NONE;
 }
 
-void glttt_callback_right_mouse_down( int xp, int yp )
+void glttt_callback_rotate_action_start( int xp, int yp )
 {
 	switch (globals.game_state)
 	{
@@ -118,7 +118,7 @@ void glttt_callback_right_mouse_down( int xp, int yp )
 	}
 }
 
-void glttt_callback_right_mouse_up( int xp, int yp )
+void glttt_callback_rotate_action_stop( int xp, int yp )
 {
 	switch (globals.game_state)
 	{
