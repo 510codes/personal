@@ -19,9 +19,9 @@ cpu.o: cpu.h list.h cpu.c list.o board.o $(COMMON_HEADERS)
 
 ttt.o: ttt.c cpu.o board.o $(COMMON_HEADERS)
 
-gl_msg.o: gl_msg.c gl_msg.h $(COMMON_HEADERS)
+gl_msg.o: gl_msg.c gl_msg.h globals.h $(COMMON_HEADERS)
 
-glttt_callbacks.o: glttt_callbacks.c glttt_callbacks.h glttt.h gl_msg.h $(COMMON_HEADERS)
+glttt_callbacks.o: glttt_callbacks.c glttt_callbacks.h glttt.h gl_msg.h globals.h $(COMMON_HEADERS)
 
 platform/glut/platform.o: platform/glut/platform.c platform/platform.h $(COMMON_HEADERS)
 
@@ -29,7 +29,7 @@ platform/glut/callbacks.o: platform/glut/callbacks.c platform/glut/callbacks.h $
 
 game_settings.o: game_settings.c game_settings.h game_constants.h $(COMMON_HEADERS)
 
-glttt.o: glttt.c glttt.h platform/glut/platform.o glttt_callbacks.o game_settings.o cpu.o list.o board.o gl_msg.o $(COMMON_HEADERS)
+glttt.o: glttt.c glttt.h globals.h platform/glut/platform.o glttt_callbacks.o game_settings.o cpu.o list.o board.o gl_msg.o $(COMMON_HEADERS)
 
 glttt: glttt.o glttt_callbacks.o game_settings.o platform/glut/platform.o platform/glut/callbacks.o board.o cpu.o gl_msg.o list.o
 	$(CC) $(CFLAGS) -o $@ $? $(LDFLAGS)
