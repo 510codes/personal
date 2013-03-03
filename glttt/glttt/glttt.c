@@ -63,9 +63,12 @@ void global_init()
 	globals.new_zoom=0;
 	globals.repos_active=FALSE;
 
-	globals.mx=0;
-	globals.my=0;
-	globals.peg_select=PEG_NONE;
+	globals.mx_left_down=0;
+	globals.my_left_down=0;
+	globals.mx_hover=0;
+	globals.my_hover=0;
+	globals.peg_select_hover=PEG_NONE;
+	globals.peg_select_down=PEG_NONE;
 
 	globals.human_move_time=0;
 
@@ -233,15 +236,18 @@ void draw_game_screen()
 	int flashing;
 	list_node_t *i, *i2;
 	int t;
-	
+	int mx_shortdist, my_shortdist;
+
+	mx_shortdist = globals.mx_hover;
+	my_shortdist = globals.my_hover;
 	short_peg=0;
 	getWindowCoords( PEG_POS[0][0], 25, PEG_POS[0][1], &winx, &winy, &winz );
-	short_dist=sqrt( ((globals.mx - (GLint)winx)*(globals.mx - (GLint)winx)) + ((globals.my - (GLint)winy)*(globals.my - (GLint)winy)) );
+	short_dist=sqrt( ((mx_shortdist - (GLint)winx)*(mx_shortdist - (GLint)winx)) + ((my_shortdist - (GLint)winy)*(my_shortdist - (GLint)winy)) );
 
 	for (x=1; x<8; x++)
 	{
 		getWindowCoords( PEG_POS[x][0], 25, PEG_POS[x][1], &winx, &winy, &winz );
-		dist=sqrt( ((globals.mx - (GLint)winx)*(globals.mx - (GLint)winx)) + ((globals.my - (GLint)winy)*(globals.my - (GLint)winy)) );
+		dist=sqrt( ((mx_shortdist - (GLint)winx)*(mx_shortdist - (GLint)winx)) + ((my_shortdist - (GLint)winy)*(my_shortdist - (GLint)winy)) );
 		if (dist < short_dist)
 		{
 			short_dist=dist;
@@ -250,9 +256,9 @@ void draw_game_screen()
 	}
 
 	if (short_dist < PEG_SELECT_DIST)
-		globals.peg_select=short_peg;
+		globals.peg_select_hover=short_peg;
 	else
-		globals.peg_select=PEG_NONE;
+		globals.peg_select_hover=PEG_NONE;
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -305,6 +311,23 @@ void draw_game_screen()
 		{
 			if (x==short_peg && short_dist < PEG_SELECT_DIST)
 			{
+				if (globals.peg_select_hover == globals.peg_select_down)
+				{
+					glMaterialfv(GL_FRONT, GL_AMBIENT, peg_hover_select_ambient);
+					glMaterialfv(GL_FRONT, GL_DIFFUSE, peg_hover_select_diffuse);
+					glMaterialfv(GL_FRONT, GL_SPECULAR, peg_hover_select_specular);
+					glMaterialfv(GL_FRONT, GL_SHININESS, peg_hover_select_shininess);
+				}
+				else
+				{
+					glMaterialfv(GL_FRONT, GL_AMBIENT, peg_hover_ambient);
+					glMaterialfv(GL_FRONT, GL_DIFFUSE, peg_hover_diffuse);
+					glMaterialfv(GL_FRONT, GL_SPECULAR, peg_hover_specular);
+					glMaterialfv(GL_FRONT, GL_SHININESS, peg_hover_shininess);
+				}
+			}
+			else if (x == globals.peg_select_down)
+			{
 				glMaterialfv(GL_FRONT, GL_AMBIENT, peg_select_ambient);
 				glMaterialfv(GL_FRONT, GL_DIFFUSE, peg_select_diffuse);
 				glMaterialfv(GL_FRONT, GL_SPECULAR, peg_select_specular);
@@ -331,13 +354,10 @@ void draw_game_screen()
 			glVertex3f( PEG_POS[x][0]+PEG_THICK, 75, PEG_POS[x][1]-PEG_THICK );
 			glVertex3f( PEG_POS[x][0]+PEG_THICK, 0, PEG_POS[x][1]-PEG_THICK );
 
-			if (x==short_peg && short_dist < PEG_SELECT_DIST)
-			{
-				glMaterialfv(GL_FRONT, GL_AMBIENT, peg_normal_ambient);
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, peg_normal_diffuse);
-				glMaterialfv(GL_FRONT, GL_SPECULAR, peg_normal_specular);
-				glMaterialfv(GL_FRONT, GL_SHININESS, peg_normal_shininess);
-			}
+			glMaterialfv(GL_FRONT, GL_AMBIENT, peg_normal_ambient);
+			glMaterialfv(GL_FRONT, GL_DIFFUSE, peg_normal_diffuse);
+			glMaterialfv(GL_FRONT, GL_SPECULAR, peg_normal_specular);
+			glMaterialfv(GL_FRONT, GL_SHININESS, peg_normal_shininess);
 		}
 	glEnd();
 

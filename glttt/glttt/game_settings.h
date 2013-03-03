@@ -84,6 +84,16 @@ GLfloat peg_select_diffuse[4];
 GLfloat peg_select_specular[4];
 GLfloat peg_select_shininess[1];
 
+GLfloat peg_hover_ambient[4];
+GLfloat peg_hover_diffuse[4];
+GLfloat peg_hover_specular[4];
+GLfloat peg_hover_shininess[1];
+
+GLfloat peg_hover_select_ambient[4];
+GLfloat peg_hover_select_diffuse[4];
+GLfloat peg_hover_select_specular[4];
+GLfloat peg_hover_select_shininess[1];
+
 GLfloat letter_ambient[4];
 GLfloat letter_diffuse[4];
 GLfloat letter_specular[4];

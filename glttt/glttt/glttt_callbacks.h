@@ -11,6 +11,8 @@ void glttt_callback_passivemotion( int x, int y );
 
 void glttt_callback_left_mouse_down( int xp, int yp );
 
+void glttt_callback_left_mouse_up( int xp, int yp );
+
 void glttt_callback_right_mouse_down( int xp, int yp );
 
 void glttt_callback_right_mouse_up( int xp, int yp );

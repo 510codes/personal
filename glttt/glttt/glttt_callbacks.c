@@ -39,6 +39,15 @@ void glttt_callbacks_kb( unsigned char c )
 		}
 }
 
+void reset_hover( int x, int y )
+{
+	GLint vp[4];
+
+	glGetIntegerv( GL_VIEWPORT,vp );
+	globals.mx_hover=x;
+	globals.my_hover=vp[3]-(GLint)y-1;
+}
+
 void glttt_callback_motion( int x, int y )
 {
 	if (globals.repos_active)
@@ -50,19 +59,20 @@ void glttt_callback_motion( int x, int y )
 			globals.new_rot += 360;
 		globals.new_zoom = ((globals.yp-y) * MOUSE_ZOOM_FACT);
 	}
+
+	reset_hover(x, y);
 }
 
 void glttt_callback_passivemotion( int x, int y )
 {
-	GLint vp[4];
-
-	glGetIntegerv( GL_VIEWPORT,vp );
-	globals.mx=x;
-	globals.my=vp[3]-(GLint)y-1;
+	reset_hover(x, y);
 }
 
 void glttt_callback_left_mouse_down( int xp, int yp )
 {
+	globals.mx_left_down = globals.mx_hover;
+	globals.my_left_down = globals.my_hover;
+
 	switch (globals.game_state)
 	{
 		case GAMESTATE_NEW_GAME:
@@ -71,10 +81,27 @@ void glttt_callback_left_mouse_down( int xp, int yp )
 			break;
 
 		case GAMESTATE_IN_GAME:
-			if (globals.peg_select != PEG_NONE && globals.human_turn)
-				do_turn(globals.peg_select);
+			if (globals.peg_select_hover != PEG_NONE && globals.human_turn)
+			{
+				globals.peg_select_down = globals.peg_select_hover;
+			}
 			break;
 	}
+}
+
+void glttt_callback_left_mouse_up( int xp, int yp )
+{
+	switch (globals.game_state)
+	{
+		case GAMESTATE_IN_GAME:
+			if (globals.peg_select_hover == globals.peg_select_down && globals.peg_select_down != PEG_NONE && globals.human_turn)
+			{
+				do_turn(globals.peg_select_hover);
+			}
+			break;
+	}
+
+	globals.peg_select_down = PEG_NONE;
 }
 
 void glttt_callback_right_mouse_down( int xp, int yp )

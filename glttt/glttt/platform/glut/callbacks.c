@@ -25,6 +25,10 @@ void mousefunc( int b, int s, int xp, int yp )
 	{
 		glttt_callback_left_mouse_down( xp, yp );
 	}
+	else if (b==GLUT_LEFT_BUTTON && s==GLUT_UP)
+	{
+		glttt_callback_left_mouse_up( xp, yp );
+	}
 	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_DOWN)
 	{
 		glttt_callback_right_mouse_down( xp, yp );

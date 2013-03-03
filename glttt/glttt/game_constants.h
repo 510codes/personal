@@ -87,10 +87,20 @@
 #define GLTTT_peg_normal_specular_DEFAULT {0.8, 0.8, 0.8, 0.7}
 #define GLTTT_peg_normal_shininess_DEFAULT {0.90}
 
-#define GLTTT_peg_select_ambient_DEFAULT {0.1, 0.2, 0.9, 0.3}
-#define GLTTT_peg_select_diffuse_DEFAULT {0.4, 0.2, 0.1, 0.7}
-#define GLTTT_peg_select_specular_DEFAULT {0.5, 0.5, 0.5, 0.7}
+#define GLTTT_peg_hover_ambient_DEFAULT {0.1, 0.2, 0.9, 0.3}
+#define GLTTT_peg_hover_diffuse_DEFAULT {0.4, 0.2, 0.1, 0.7}
+#define GLTTT_peg_hover_specular_DEFAULT {0.5, 0.5, 0.5, 0.7}
+#define GLTTT_peg_hover_shininess_DEFAULT {0.70}
+
+#define GLTTT_peg_select_ambient_DEFAULT {0.6, 0.6, 0.3, 0.3}
+#define GLTTT_peg_select_diffuse_DEFAULT {0.7, 0.6, 0.05, 0.7}
+#define GLTTT_peg_select_specular_DEFAULT {0.625, 0.7, 0.1, 0.7}
 #define GLTTT_peg_select_shininess_DEFAULT {0.70}
+
+#define GLTTT_peg_hover_select_ambient_DEFAULT {0.7, 0.7, 0.4, 0.3}
+#define GLTTT_peg_hover_select_diffuse_DEFAULT {0.8, 0.7, 0.1, 0.7}
+#define GLTTT_peg_hover_select_specular_DEFAULT {0.85, 0.9, 0.2, 0.7}
+#define GLTTT_peg_hover_select_shininess_DEFAULT {0.70}
 
 #define GLTTT_letter_ambient_DEFAULT {0.4, 0.7, 0.4, 1.0}
 #define GLTTT_letter_diffuse_DEFAULT {0.4, 0.7, 0.4, 1.0}

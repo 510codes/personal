@@ -79,6 +79,16 @@ GLfloat peg_select_diffuse[] = GLTTT_peg_select_diffuse_DEFAULT;
 GLfloat peg_select_specular[] = GLTTT_peg_select_specular_DEFAULT;
 GLfloat peg_select_shininess[] = GLTTT_peg_select_shininess_DEFAULT;
 
+GLfloat peg_hover_ambient[] = GLTTT_peg_hover_ambient_DEFAULT;
+GLfloat peg_hover_diffuse[] = GLTTT_peg_hover_diffuse_DEFAULT;
+GLfloat peg_hover_specular[] = GLTTT_peg_hover_specular_DEFAULT;
+GLfloat peg_hover_shininess[] = GLTTT_peg_hover_shininess_DEFAULT;
+
+GLfloat peg_hover_select_ambient[] = GLTTT_peg_hover_select_ambient_DEFAULT;
+GLfloat peg_hover_select_diffuse[] = GLTTT_peg_hover_select_diffuse_DEFAULT;
+GLfloat peg_hover_select_specular[] = GLTTT_peg_hover_select_specular_DEFAULT;
+GLfloat peg_hover_select_shininess[] = GLTTT_peg_hover_select_shininess_DEFAULT;
+
 GLfloat letter_ambient[] = GLTTT_letter_ambient_DEFAULT;
 GLfloat letter_diffuse[] = GLTTT_letter_diffuse_DEFAULT;
 GLfloat letter_specular[] = GLTTT_letter_specular_DEFAULT;

@@ -28,12 +28,15 @@ typedef struct
 	int repos_active;
 	int xp;
 	int yp;
-	GLint mx;
-	GLint my;
+	GLint mx_left_down;
+	GLint my_left_down;
+	GLint mx_hover;
+	GLint my_hover;
 
 	list_t *row_queue;
 	
-	peg_label_t peg_select;
+	peg_label_t peg_select_hover;
+	peg_label_t peg_select_down;
 
 } global_t;
 
