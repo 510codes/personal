@@ -46,7 +46,7 @@ peg_colour_t whos_turn( peg_colour_t root_move_colour, int node_level )
 treenode_t *treenode_new( treenode_t *parent, board_t *board )
 {
 	treenode_t *newnode;
-	peg_colour_t x;
+	peg_label_t x;
 
 	newnode=(treenode_t *)malloc( sizeof(treenode_t) );
 	board_copy( &newnode->board, board );
@@ -464,7 +464,6 @@ void thread_cpu_buildtree( void *data )
 cpu_t *cpu_new( peg_colour_t first_move )
 {
 	cpu_t *cpu;
-	int retval;
 	board_t board;
 
 	board_init( &board );
@@ -485,7 +484,7 @@ cpu_t *cpu_new( peg_colour_t first_move )
 	pthread_cond_init( &cpu->cv_move, NULL );
 
 	MUTEX_LOCK( &cpu->mutex_message )
-	retval=pthread_create( &cpu->thread_id, NULL, (threadfunc_t)thread_cpu_buildtree, (void *)cpu );
+	pthread_create( &cpu->thread_id, NULL, (threadfunc_t)thread_cpu_buildtree, (void *)cpu );
 
 	COND_WAIT( &cpu->cv_message, &cpu->mutex_message )
 	MUTEX_UNLOCK( &cpu->mutex_message )

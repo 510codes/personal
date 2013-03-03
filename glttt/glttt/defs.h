@@ -34,4 +34,12 @@ typedef struct
 #define CPU_TREE_MIN_MOVE 4
 
 
+
+#define GAMESTATE_NEW_GAME 1
+#define GAMESTATE_IN_GAME 2
+#define GAMESTATE_MOVE_FIRST 3
+#define GAMESTATE_GAME_OVER 4
+
+
+
 #endif

@@ -1,5 +1,5 @@
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef __GLTTT_CPU_H__
+#define __GLTTT_CPU_H__
 
 #include <pthread.h>
 #include <stdio.h>

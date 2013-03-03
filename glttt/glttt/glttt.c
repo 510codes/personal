@@ -2,110 +2,18 @@
 #include <string.h>
 #include <math.h>
 
-#include <GL/gl.h>
-#include <GL/glut.h>
+#include "GL/gl.h"
 
+#include "glttt.h"
 #include "gl_msg.h"
 
 #include "cpu.h"
 #include "board.h"
 #include "defs.h"
+#include "globals.h"
+#include "game_settings.h"
+#include "platform/platform.h"
 
-const GLint MIN_ZOOM=50;
-const GLint ZOOM_FACTOR=10;
-const GLdouble ROTATE_FACTOR=2.0;
-const GLdouble MOUSE_ROT_FACT=0.5;
-const GLdouble MOUSE_ZOOM_FACT=1.5;
-
-const GLint PEG_SIZE=11;
-const GLint PEG_THICK=1;
-
-const GLdouble PEG_SELECT_DIST=100.0;
-
-const int PEG_FLASH_TIMEOUT=1250;
-
-const int CPU_WAIT_TO_MOVE=2000;
-//const int CPU_WAIT_TO_MOVE=0;
-
-const char *PEGNAME="ABCDEFGH";
-const char *SIG="Chris Riley - 2003";
-const char *VERSION_STRING="GLTicTacToe (20030622): C. Riley '03";
-
-const GLdouble PEG_LETTER_POS[][2]={	{-60,70},{-10,70},{40,70,},
-					{-50,10},{40, 10},
-					{-70,-70},{-10,-70},{50,-70} };
-								
-
-const GLdouble PEG_POS[][2]={	{-50,50},{0,50},{50,50},
-				{-25,0},{25,0},
-				{-50,-50},{0,-50},{50,-50} };
-
-
-const peg_label_t PEG_ROW[][3]={	{PEG_F, PEG_G, PEG_H},
-					{PEG_F, PEG_D, PEG_B},
-					{PEG_G, PEG_E, PEG_C},
-					{PEG_A, PEG_B, PEG_C},
-					{PEG_A, PEG_D, PEG_G},
-					{PEG_B, PEG_E, PEG_H} };
-
-const GLdouble COLOUR_WHITE[]={ 0.9, 0.9, 0.9 };
-const GLdouble COLOUR_RED[]={ 1.0, 0.0, 0.0 };
-
-GLdouble COLOUR_MSG_BOX[]={ 0.3,0.1,0.1,0.5 };
-GLdouble COLOUR_MSG_TEXT[]={ 0.9, 0.9, 0.9 };
-GLdouble COLOUR_VERSION_STRING[]={ 0.8, 1.0, 0.8 };
-
-GLdouble COLOUR_MSG_BACK[]={ 0.3,0.1,0.1,0.5 };
-
-GLfloat light_ambient[] = {0.5, 0.5, 0.5, 1.0};
-GLfloat light_diffuse[] = {0.5, 0.5, 0.5, 1.0};
-GLfloat light_specular[] = {0.5, 0.5, 0.5, 1.0};
-
-//GLfloat light_position0[] = {-100,100,-100, 0.0};
-GLfloat light_position0[] = {10,5000,10, 0.0};
-GLfloat light_position1[] = {100,100,100, 0.0};
-
-GLfloat redpeg_ambient[] = {0.9, 0.2, 0.2, 1.0};
-GLfloat redpeg_diffuse[] = {0.4, 0.2, 0.1, 1.0};
-GLfloat redpeg_specular[] = {0.5, 0.5, 0.5, 1.0};
-GLfloat redpeg_shininess[] = {0.30};
-
-GLfloat redpeg_flash_ambient[] = {0.4, 0.1, 0.1, 1.0};
-GLfloat redpeg_flash_diffuse[] = {0.4, 0.1, 0.1, 1.0};
-GLfloat redpeg_flash_specular[] = {0.4, 0.1, 0.1, 1.0};
-GLfloat redpeg_flash_shininess[] = {0.30};
-
-GLfloat whitepeg_ambient[] = {0.7, 0.7, 0.7, 1.0};
-GLfloat whitepeg_diffuse[] = {0.7, 0.7, 0.7, 1.0};
-GLfloat whitepeg_specular[] = {0.2, 0.2, 0.2, 1.0};
-GLfloat whitepeg_shininess[] = {0.30};
-
-GLfloat whitepeg_flash_ambient[] = {0.5, 0.5, 0.7, 1.0};
-GLfloat whitepeg_flash_diffuse[] = {0.5, 0.5, 0.7, 1.0};
-GLfloat whitepeg_flash_specular[] = {0.2, 0.2, 0.3, 1.0};
-GLfloat whitepeg_flash_shininess[] = {0.30};
-
-//GLfloat board_ambient[] = {0.2, 0.9, 0.2, 0.7};
-GLfloat board_ambient[] = {0.1, 0.2, 0.5, 1.0};
-GLfloat board_diffuse[] = {0.1, 0.1, 0.2, 1.0};
-GLfloat board_specular[] = {0.1, 0.1, 0.2, 1.0};
-GLfloat board_shininess[] = {0.0};
-
-//GLfloat peg_normal_ambient[] = {1.0, 1.0, 0.0, 0.3};
-GLfloat peg_normal_ambient[] = {0.55, 0.55, 0.48, 0.3};
-GLfloat peg_normal_diffuse[] = {0.7, 0.7, 0.7, 0.7};
-GLfloat peg_normal_specular[] = {0.8, 0.8, 0.8, 0.7};
-GLfloat peg_normal_shininess[] = {0.90};
-
-GLfloat peg_select_ambient[] = {0.1, 0.2, 0.9, 0.3};
-GLfloat peg_select_diffuse[] = {0.4, 0.2, 0.1, 0.7};
-GLfloat peg_select_specular[] = {0.5, 0.5, 0.5, 0.7};
-GLfloat peg_select_shininess[] = {0.70};
-
-GLfloat letter_ambient[] = {0.4, 0.7, 0.4, 1.0};
-GLfloat letter_diffuse[] = {0.4, 0.7, 0.4, 1.0};
-GLfloat letter_specular[] = {0.4, 0.7, 0.4, 1.0};
-GLfloat letter_shininess[] = {0.10};
 
 
 // random prototypes
@@ -113,12 +21,6 @@ GLfloat letter_shininess[] = {0.10};
 void do_turn( peg_label_t peg );
 void add_vert_rows_to_queue( int oldmask, int newmask, peg_colour_t col );
 void add_horiz_rows_to_queue( int oldmask, int newmask, peg_colour_t col );
-
-#define GAMESTATE_NEW_GAME 1
-#define GAMESTATE_IN_GAME 2
-#define GAMESTATE_MOVE_FIRST 3
-#define GAMESTATE_GAME_OVER 4
-
 
 typedef struct
 {
@@ -134,40 +36,9 @@ typedef struct
 } row_t;
 
 
-typedef struct
-{
-	cpu_t *cpu;
-	int game_state;
-	peg_colour_t colour;
-	int human_turn;
-	glmsgbox_t *msg_box;
-	int cpu_old;
-	int hum_old;
-	int move_count;
-	int human_move_time;
-
-	int mask_vert_cpu;
-	int mask_horiz_cpu;
-	int mask_vert_hum;
-	int mask_horiz_hum;
-	
-	GLdouble rot;
-	GLdouble new_rot;
-	GLint zoom;
-	GLint new_zoom;
-	int repos_active;
-	int xp;
-	int yp;
-	GLint mx;
-	GLint my;
-
-	list_t *row_queue;
-	
-	peg_label_t peg_select;
-
-} global_t;
 
 global_t globals;
+
 
 void global_init()
 {
@@ -209,7 +80,7 @@ void draw_char( GLdouble x, GLdouble z, char c )
 	glTranslatef( x, 1, z );
 	glScalef( 0.1, 0.1, 0.1 );
 	glRotatef( -90.0, 1.0, 0.0, 0.0 );
-	glutStrokeCharacter( GLUT_STROKE_ROMAN, c );
+	glttt_platform_draw_char( c );
 	glPopMatrix();
 }
 
@@ -275,7 +146,7 @@ void draw_peg( int x, int y, peg_colour_t col, int flashing )
 			}
 		glEnd();*/
 
-		glutSolidSphere( 10, 20, 20 );
+		glttt_platform_draw_solid_sphere( 10 );
 		
 		glPopMatrix();
 	}	
@@ -300,10 +171,10 @@ void draw_message( GLdouble sf, GLint xp, GLint yp, char *msg )
 	glScalef(sf, sf, sf);
 
 	for (x=0; x<strlen(msg); x++)
-		glutStrokeCharacter( GLUT_STROKE_ROMAN, msg[x] );
+		glttt_platform_draw_char( msg[x] );
 
 	glEnable(GL_DEPTH_TEST);
-	
+
 	glPopMatrix();
 
 	glMatrixMode(GL_MODELVIEW);
@@ -419,7 +290,7 @@ void draw_game_screen()
 	glRotatef( -90.0, 1.0, 0.0, 0.0 );
 
 	for (x=0; x<strlen(SIG); x++)
-		glutStrokeCharacter( GLUT_STROKE_ROMAN, SIG[x] );
+		glttt_platform_draw_char( SIG[x] );
 	
 	glPopMatrix();					
 	
@@ -588,84 +459,11 @@ void draw_move_first()
 	draw_message( 0.4, 560, 585, "No" );	
 }
 
-void display()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	switch(globals.game_state)
-	{
-		case GAMESTATE_NEW_GAME:
-			draw_new_game();
-			break;
-
-		case GAMESTATE_MOVE_FIRST:
-			draw_move_first();
-			break;
-
-		case GAMESTATE_IN_GAME:
-		case GAMESTATE_GAME_OVER:
-			draw_game_screen();
-			break;
-	}
-	
-	glutSwapBuffers();
-}
-
 void inc_move()
 {
 	globals.move_count++;
 	if (globals.move_count==24)
 		globals.game_state=GAMESTATE_GAME_OVER;
-}
-
-void idlefunc()
-{
-	peg_label_t move;
-	char buf[100];
-	peg_colour_t cpu_col;
-	int sc;
-	int t;
-
-	t=glutGet(GLUT_ELAPSED_TIME);
-	
-	if (globals.game_state==GAMESTATE_IN_GAME)
-	{
-		if (!globals.human_turn && cpu_ready(globals.cpu) && t > (globals.human_move_time + CPU_WAIT_TO_MOVE))
-		{
-			if (globals.colour==PC_RED)
-				cpu_col=PC_WHITE;
-			else
-				cpu_col=PC_RED;
-		
-			inc_move();
-			move=cpu_getmove(globals.cpu);
-			snprintf(buf,100,"CPU moves to peg %c.",PEGNAME[move]);
-			glmsg_add( globals.msg_box, buf, COLOUR_MSG_TEXT );
-			cpu_sendmove(globals.cpu,move);
-
-			sc=cpu_score(globals.cpu,cpu_col);
-			if (sc > globals.cpu_old)
-			{
-				snprintf(buf,100,"CPU scores %d rows!",sc-globals.cpu_old);
-				glmsg_add( globals.msg_box, buf, COLOUR_MSG_TEXT );
-				globals.cpu_old=sc;
-				
-				//printf("old horiz mask: %x, old vert mask: %x\n",globals.mask_horiz_cpu,globals.mask_vert_cpu);
-
-				add_vert_rows_to_queue( globals.mask_vert_cpu, board_get_vert_mask( &globals.cpu->root_node->board, cpu_col ), cpu_col );
-				add_horiz_rows_to_queue( globals.mask_horiz_cpu, board_get_horiz_mask( &globals.cpu->root_node->board, cpu_col ), cpu_col );
-			
-				globals.mask_horiz_cpu=board_get_horiz_mask( &globals.cpu->root_node->board, cpu_col );
-				globals.mask_vert_cpu=board_get_vert_mask( &globals.cpu->root_node->board, cpu_col );
-			
-				//printf("new horiz mask: %x, new vert mask: %x\n",globals.mask_horiz_cpu,globals.mask_vert_cpu);
-			}
-			
-			globals.human_turn=TRUE;
-		}
-	}
-	
-	glutPostRedisplay();
 }
 
 void mouse_choose( int x, int y )
@@ -720,70 +518,6 @@ void mouse_choose( int x, int y )
 			}
 		}
 	}
-}
-
-void motionfunc( int x, int y )
-{
-	if (globals.repos_active)
-	{
-		globals.new_rot = 0-((globals.xp-x) * MOUSE_ROT_FACT);
-		while (globals.new_rot > 360)
-			globals.new_rot -= 360;
-		while (globals.new_rot < 0)
-			globals.new_rot += 360;
-		globals.new_zoom = ((globals.yp-y) * MOUSE_ZOOM_FACT);
-	}
-}
-
-void passivemotionfunc( int x, int y )
-{
-	GLint vp[4];
-
-	glGetIntegerv( GL_VIEWPORT,vp );
-	globals.mx=x;
-	globals.my=vp[3]-(GLint)y-1;
-}
-
-
-void mousefunc( int b, int s, int xp, int yp )
-{
-	if (b==GLUT_LEFT_BUTTON && s==GLUT_DOWN)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_NEW_GAME:
-			case GAMESTATE_MOVE_FIRST:
-				mouse_choose( xp, yp );
-				break;
-
-			case GAMESTATE_IN_GAME:
-				if (globals.peg_select != PEG_NONE && globals.human_turn)
-					do_turn(globals.peg_select);
-				break;
-		}
-	
-	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_DOWN)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
-				globals.repos_active=TRUE;
-				globals.xp=xp;
-				globals.yp=yp;
-				globals.new_rot=0;
-				globals.new_zoom=0;
-				break;
-		}
-
-	else if (b==GLUT_RIGHT_BUTTON && s==GLUT_UP)
-		switch (globals.game_state)
-		{
-			case GAMESTATE_IN_GAME: case GAMESTATE_GAME_OVER:
-				globals.repos_active=FALSE;
-				globals.rot += globals.new_rot;
-				globals.zoom += globals.new_zoom;
-				globals.new_rot=0;
-				globals.new_zoom=0;
-				break;
-		}
 }
 
 void add_vert_rows_to_queue( int oldmask, int newmask, peg_colour_t col )
@@ -906,52 +640,9 @@ void do_turn( peg_label_t peg )
 		glmsg_add( globals.msg_box, "Invalid move.", COLOUR_MSG_TEXT );
 }
 
-void kbfunc( unsigned char c, int x, int y )
-{
-	if (globals.game_state==GAMESTATE_IN_GAME || globals.game_state==GAMESTATE_GAME_OVER)
-		switch (c)
-		{
-			case (char)27:
-				exit(1);
-			case '4':
-				globals.rot -= ROTATE_FACTOR;
-				break;
-
-			case '6':
-				globals.rot += ROTATE_FACTOR;
-				break;
-
-			case '8':
-				globals.zoom += ZOOM_FACTOR;
-				break;
-
-			case '2':
-				globals.zoom -= ZOOM_FACTOR;
-				if (globals.zoom < MIN_ZOOM)
-					globals.zoom=MIN_ZOOM;
-				break;
-
-			case 'a': case 'b': case 'c': case 'd':
-			case 'e': case 'f': case 'g': case 'h':
-				if (globals.human_turn)
-					do_turn((int)c - 'a');
-				break;
-		}
-}
-
 int main( int argc, char **argv )
 {
-	glutInit( &argc, argv );
-	glutInitWindowSize( 560, 560 );
-	glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-	glutCreateWindow( "GL TicTacToe" );
-
-	glutDisplayFunc(display);
-	glutKeyboardFunc(kbfunc);
-	glutIdleFunc(idlefunc);
-	glutMouseFunc(mousefunc);
-	glutMotionFunc(motionfunc);
-	glutPassiveMotionFunc(passivemotionfunc);
+	glttt_platform_init( &argc, argv, 560, 560, "GL TicTacToe" );
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -977,7 +668,7 @@ int main( int argc, char **argv )
 	global_init();
 	globals.msg_box=glmsgbox_new( COLOUR_MSG_BOX, 4, 0.7, 8000 );
 	
-	glutMainLoop();
+	glttt_platform_run();
 	
 	return 0;
 }

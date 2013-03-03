@@ -12,7 +12,7 @@ CC=gcc
 
 LDFLAGS= -lm -lpthreadGC -L$(WIN32_PTHREADS_LOC) -lopengl32 -lglu32 -lglut32
 
-CFLAGS= -Wall -I../win32-pthreads
+CFLAGS= -Wall -I../win32-pthreads -Werror
 
 
 include ttt.mk
@@ -22,3 +22,4 @@ clean:
 	if exist ttt.exe del ttt.exe
 	if exist glttt.exe del glttt.exe
 	if exist *.o del *.o
+	if exist platform\glut\*.o del platform\glut\*.o
