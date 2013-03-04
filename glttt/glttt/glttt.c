@@ -78,7 +78,7 @@ void global_init()
 	globals.row_queue=list_new();
 }
 
-void draw_char( GLdouble x, GLdouble z, char c )
+void draw_char( GLTTT_FP_TYPE x, GLTTT_FP_TYPE z, char c )
 {
 	glPushMatrix();
 	glTranslatef( x, 1, z );
@@ -156,7 +156,7 @@ void draw_peg( int x, int y, peg_colour_t col, int flashing )
 	}	
 }
 
-void draw_message( GLdouble sf, GLint xp, GLint yp, char *msg )
+void draw_message( GLTTT_FP_TYPE sf, GLint xp, GLint yp, char *msg )
 {
 	int x;
 
@@ -171,7 +171,7 @@ void draw_message( GLdouble sf, GLint xp, GLint yp, char *msg )
 	glDisable(GL_DEPTH_TEST);
 
 	glOrtho( 0.0, 1000.0, 0.0, 1000.0, -1.0, 1.0 );
-	glTranslated(xp,1000-yp,0);
+	GLTTT_GLTRANSLATE(xp,1000-yp,0);
 	glScalef(sf, sf, sf);
 
 	for (x=0; x<strlen(msg); x++)
@@ -185,14 +185,14 @@ void draw_message( GLdouble sf, GLint xp, GLint yp, char *msg )
 	glPopMatrix();
 }
 
-void getWindowCoords( GLdouble worldcx, GLdouble worldcy, GLdouble worldcz, GLdouble *winx, GLdouble *winy, GLdouble *winz )
+void getWindowCoords( GLTTT_FP_TYPE worldcx, GLTTT_FP_TYPE worldcy, GLTTT_FP_TYPE worldcz, GLTTT_FP_TYPE *winx, GLTTT_FP_TYPE *winy, GLTTT_FP_TYPE *winz )
 {
-	GLdouble matmodel[16], matproj[16];
+	GLTTT_FP_TYPE matmodel[16], matproj[16];
 	GLint vp[4];
 
 	glGetIntegerv( GL_VIEWPORT, vp );
-	glGetDoublev( GL_MODELVIEW_MATRIX, matmodel );
-	glGetDoublev( GL_PROJECTION_MATRIX, matproj );
+	GLTTT_GLGETFPTYPEV( GL_MODELVIEW_MATRIX, matmodel );
+	GLTTT_GLGETFPTYPEV( GL_PROJECTION_MATRIX, matproj );
 
 	gluProject( worldcx, worldcy, worldcz, matmodel, matproj, vp, winx, winy, winz );
 }
@@ -228,7 +228,7 @@ int peg_in_queue( list_t *queue, peg_label_t peg, int height )
 void draw_game_screen()
 {
 	int x, y;
-	GLdouble winx, winy, winz;
+	GLTTT_FP_TYPE winx, winy, winz;
 	int r,w;
 	char buf[100];
 	double dist, short_dist;
@@ -386,14 +386,14 @@ void draw_game_screen()
 	
 	r=cpu_score( globals.cpu, PC_RED);
 	w=cpu_score( globals.cpu, PC_WHITE);
-	glColor3dv( COLOUR_RED );
+	GLTTT_COLOR3V( COLOUR_RED );
 	if (globals.colour==PC_RED)
 		snprintf(buf,100,"YOU: %d",r);
 	else
 		snprintf(buf,100,"CPU: %d",r);
 	draw_message( 0.2, 20, 40, buf );
 
-	glColor3dv( COLOUR_WHITE );
+	GLTTT_COLOR3V( COLOUR_WHITE );
 	if (globals.colour==PC_RED)
 		snprintf(buf,100,"CPU: %d",w);
 	else
@@ -429,7 +429,7 @@ void draw_new_game()
 
 	glMatrixMode( GL_MODELVIEW );
 	
-	glColor3dv( COLOUR_WHITE );
+	GLTTT_COLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 250,300 );
 		glVertex2i( 250,500 );
@@ -437,7 +437,7 @@ void draw_new_game()
 		glVertex2i( 450,300 );
 	glEnd();
 
-	glColor3dv( COLOUR_RED );
+	GLTTT_COLOR3V( COLOUR_RED );
 	glBegin(GL_QUADS);
 		glVertex2i( 500,300 );
 		glVertex2i( 500,500 );
@@ -457,7 +457,7 @@ void draw_move_first()
 	
 	glMatrixMode( GL_MODELVIEW );
 
-	glColor3dv( COLOUR_WHITE );
+	GLTTT_COLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 250,300 );
 		glVertex2i( 250,500 );
@@ -465,10 +465,10 @@ void draw_move_first()
 		glVertex2i( 450,300 );
 	glEnd();
 
-	glColor3dv( COLOUR_RED );
+	GLTTT_COLOR3V( COLOUR_RED );
 	draw_message( 0.4, 300, 585, "Yes" );
 	
-	glColor3dv( COLOUR_WHITE );
+	GLTTT_COLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 500,300 );
 		glVertex2i( 500,500 );
@@ -476,7 +476,7 @@ void draw_move_first()
 		glVertex2i( 700,300 );
 	glEnd();
 	
-	glColor3dv( COLOUR_RED );
+	GLTTT_COLOR3V( COLOUR_RED );
 	draw_message( 0.4, 560, 585, "No" );	
 }
 

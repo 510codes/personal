@@ -1,21 +1,21 @@
 #ifndef __GLTTT_GAME_SETTINGS_H__
 #define __GLTTT_GAME_SETTINGS_H__
 
-#include "GL/gl.h"
+#include "glttt_opengl.h"
 
 #include "defs.h"
 
 extern const GLint MIN_ZOOM;
 extern const GLint ZOOM_FACTOR;
-extern const GLdouble ROTATE_FACTOR;
-extern const GLdouble MOUSE_ROT_FACT;
-extern const GLdouble MOUSE_ZOOM_FACT;
+extern const GLTTT_FP_TYPE ROTATE_FACTOR;
+extern const GLTTT_FP_TYPE MOUSE_ROT_FACT;
+extern const GLTTT_FP_TYPE MOUSE_ZOOM_FACT;
 
 
 extern const GLint PEG_SIZE;
 extern const GLint PEG_THICK;
 
-extern const GLdouble PEG_SELECT_DIST;
+extern const GLTTT_FP_TYPE PEG_SELECT_DIST;
 
 extern const int PEG_FLASH_TIMEOUT;
 
@@ -25,22 +25,22 @@ extern const char *PEGNAME;
 extern const char *SIG;
 extern char *VERSION_STRING;
 
-extern const GLdouble PEG_LETTER_POS[8][2];
+extern const GLTTT_FP_TYPE PEG_LETTER_POS[8][2];
 								
 
-extern const GLdouble PEG_POS[8][2];
+extern const GLTTT_FP_TYPE PEG_POS[8][2];
 
 
 extern const peg_label_t PEG_ROW[18][3];
 
-extern const GLdouble COLOUR_WHITE[3];
-extern const GLdouble COLOUR_RED[3];
+extern const GLTTT_FP_TYPE COLOUR_WHITE[3];
+extern const GLTTT_FP_TYPE COLOUR_RED[3];
 
-extern GLdouble COLOUR_MSG_BOX[4];
-extern GLdouble COLOUR_MSG_TEXT[3];
-extern GLdouble COLOUR_VERSION_STRING[3];
+extern GLTTT_FP_TYPE COLOUR_MSG_BOX[4];
+extern GLTTT_FP_TYPE COLOUR_MSG_TEXT[3];
+extern GLTTT_FP_TYPE COLOUR_VERSION_STRING[3];
 
-extern GLdouble COLOUR_MSG_BACK[4];
+extern GLTTT_FP_TYPE COLOUR_MSG_BACK[4];
 
 extern GLfloat light_ambient[4];
 extern GLfloat light_diffuse[4];
