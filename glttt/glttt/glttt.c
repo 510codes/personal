@@ -386,14 +386,14 @@ void draw_game_screen()
 	
 	r=cpu_score( globals.cpu, PC_RED);
 	w=cpu_score( globals.cpu, PC_WHITE);
-	GLTTT_COLOR3V( COLOUR_RED );
+	GLTTT_GLCOLOR3V( COLOUR_RED );
 	if (globals.colour==PC_RED)
 		snprintf(buf,100,"YOU: %d",r);
 	else
 		snprintf(buf,100,"CPU: %d",r);
 	draw_message( 0.2, 20, 40, buf );
 
-	GLTTT_COLOR3V( COLOUR_WHITE );
+	GLTTT_GLCOLOR3V( COLOUR_WHITE );
 	if (globals.colour==PC_RED)
 		snprintf(buf,100,"CPU: %d",w);
 	else
@@ -429,7 +429,7 @@ void draw_new_game()
 
 	glMatrixMode( GL_MODELVIEW );
 	
-	GLTTT_COLOR3V( COLOUR_WHITE );
+	GLTTT_GLCOLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 250,300 );
 		glVertex2i( 250,500 );
@@ -437,7 +437,7 @@ void draw_new_game()
 		glVertex2i( 450,300 );
 	glEnd();
 
-	GLTTT_COLOR3V( COLOUR_RED );
+	GLTTT_GLCOLOR3V( COLOUR_RED );
 	glBegin(GL_QUADS);
 		glVertex2i( 500,300 );
 		glVertex2i( 500,500 );
@@ -457,7 +457,7 @@ void draw_move_first()
 	
 	glMatrixMode( GL_MODELVIEW );
 
-	GLTTT_COLOR3V( COLOUR_WHITE );
+	GLTTT_GLCOLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 250,300 );
 		glVertex2i( 250,500 );
@@ -465,10 +465,10 @@ void draw_move_first()
 		glVertex2i( 450,300 );
 	glEnd();
 
-	GLTTT_COLOR3V( COLOUR_RED );
+	GLTTT_GLCOLOR3V( COLOUR_RED );
 	draw_message( 0.4, 300, 585, "Yes" );
 	
-	GLTTT_COLOR3V( COLOUR_WHITE );
+	GLTTT_GLCOLOR3V( COLOUR_WHITE );
 	glBegin(GL_QUADS);
 		glVertex2i( 500,300 );
 		glVertex2i( 500,500 );
@@ -476,7 +476,7 @@ void draw_move_first()
 		glVertex2i( 700,300 );
 	glEnd();
 	
-	GLTTT_COLOR3V( COLOUR_RED );
+	GLTTT_GLCOLOR3V( COLOUR_RED );
 	draw_message( 0.4, 560, 585, "No" );	
 }
 

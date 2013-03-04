@@ -21,12 +21,12 @@
 
 #ifdef GLTTT_USE_GLFLOAT
 #define GLTTT_FP_TYPE GLfloat
-#define GLTTT_COLOR3V glColor3df
+#define GLTTT_GLCOLOR3V glColor3df
 #define GLTTT_GLTRANSLATE glTranslatef
 #define GLTTT_GLGETFPTYPEV glGetFloatv
 #else
 #define GLTTT_FP_TYPE GLdouble
-#define GLTTT_COLOR3V glColor3dv
+#define GLTTT_GLCOLOR3V glColor3dv
 #define GLTTT_GLTRANSLATE glTranslated
 #define GLTTT_GLGETFPTYPEV glGetDoublev
 #endif
