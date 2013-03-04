@@ -661,9 +661,9 @@ void do_turn( peg_label_t peg )
 		glmsg_add( globals.msg_box, "Invalid move.", COLOUR_MSG_TEXT );
 }
 
-int main( int argc, char **argv )
+void glttt_start( int* argc, char **argv )
 {
-	glttt_platform_init( &argc, argv, 560, 560, "GL TicTacToe" );
+	glttt_platform_init( argc, argv, 560, 560, "GL TicTacToe" );
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -690,6 +690,5 @@ int main( int argc, char **argv )
 	globals.msg_box=glmsgbox_new( COLOUR_MSG_BOX, 4, 0.7, 8000 );
 	
 	glttt_platform_run();
-	
-	return 0;
 }
+

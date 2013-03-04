@@ -9,17 +9,28 @@ WIN32_PTHREADS_LOC= ../win32-pthreads/
 
 
 CC=gcc
+LD_LIB= ar
 
-LDFLAGS= -lm -lpthreadGC -L$(WIN32_PTHREADS_LOC) -lopengl32 -lglu32 -lglut32
+GLTTT_LIB= libglttt.a
 
-CFLAGS= -Wall -I../win32-pthreads -Werror
+LDFLAGS= -lm -lpthreadGC -lopengl32 -lglu32 -lglut32 -L$(WIN32_PTHREADS_LOC)
+
+LD_LIB_FLAGS= -rcs
+
+CFLAGS= -I../win32-pthreads -Werror
 
 
 include ttt.mk
 
 
+glttt_main.o: glttt_main.c
+
+glttt: glttt_main.o $(GLTTT_LIB)
+	$(CC) -o glttt.exe glttt_main.o -lglttt $(LDFLAGS) -L.
+
 clean:
 	if exist ttt.exe del ttt.exe
+	if exist $(GLTTT_LIB) del $(GLTTT_LIB)
 	if exist glttt.exe del glttt.exe
 	if exist *.o del *.o
 	if exist platform\glut\*.o del platform\glut\*.o

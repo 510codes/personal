@@ -31,8 +31,8 @@ game_settings.o: game_settings.c game_settings.h game_constants.h $(COMMON_HEADE
 
 glttt.o: glttt.c glttt.h globals.h platform/glut/platform.o glttt_callbacks.o game_settings.o cpu.o list.o board.o gl_msg.o $(COMMON_HEADERS)
 
-glttt: glttt.o glttt_callbacks.o game_settings.o platform/glut/platform.o platform/glut/callbacks.o board.o cpu.o gl_msg.o list.o
-	$(CC) $(CFLAGS) -o $@ $? $(LDFLAGS)
+$(GLTTT_LIB): glttt.o glttt_callbacks.o game_settings.o platform/glut/platform.o platform/glut/callbacks.o board.o cpu.o gl_msg.o list.o
+	$(LD_LIB) $(LD_LIB_FLAGS) $@ $?
 
 ttt: ttt.o board.o cpu.o
 	$(CC) $(CFLAGS) -o $@ $? $(LDFLAGS)

@@ -12,5 +12,7 @@ void inc_move();
 void add_vert_rows_to_queue( int oldmask, int newmask, peg_colour_t col );
 void add_horiz_rows_to_queue( int oldmask, int newmask, peg_colour_t col );
 
+void glttt_start( int* argc, char** argv );
+
 #endif
 
