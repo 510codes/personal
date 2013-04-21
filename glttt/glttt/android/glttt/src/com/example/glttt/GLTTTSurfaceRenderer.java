@@ -23,18 +23,16 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private int mColorHandle;
     private Shader shader;
 
-    private float[] mViewMatrix = new float[16];
-    private float[] mModelMatrix = new float[16];
-    private float[] mProjectionMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
-    
     private Resources resources;
+    
+    private Scene currentScene;
 
     public GLTTTSurfaceRenderer( Resources resources )
     {
     	super();
     	
     	this.resources = resources;
+    	this.currentScene = null;
     }
     
     @Override
@@ -68,7 +66,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         
     	GLES20.glUseProgram(shader.getProgram());
         
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
         
@@ -87,11 +85,11 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         final float upY = 1.0f;
         final float upZ = 0.0f;        
         
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);        
+        getCurrentScene().setLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);        
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height)
+    public void onSurfaceChanged(GL10 unused, int width, int height)
     {
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
@@ -105,18 +103,16 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
-
-        Matrix.setIdentityM(mProjectionMatrix, 0);
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
-        //Matrix.orthoM(mProjectionMatrix, 0, 0.0f, 1000.0f, 0.0f, 1000.0f, -1.0f, 1.0f );
+        
+        getCurrentScene().setFrustum( left, right, bottom, top, near, far );
     }
 
     @Override
-    public void onDrawFrame(GL10 gl)
+    public void onDrawFrame(GL10 unused)
     {
     	GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-    	Matrix.setIdentityM(mModelMatrix, 0);
-    	drawNewGame(gl);
+    	
+    	getCurrentScene().draw();
     }
 
     private void checkGlError(String op) {
@@ -126,50 +122,21 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
             throw new RuntimeException(op + ": glError " + error);
         }
     }
-
-    private void drawQuad(Quad quad)
+    
+    private Scene getCurrentScene()
     {
-    	float[] vertexData = quad.getVertexData();
-		ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
-		vertexBB.order(ByteOrder.nativeOrder());
-		FloatBuffer vertexFB = vertexBB.asFloatBuffer();
-		vertexFB.put(vertexData);
-
-		/*ByteBuffer indexBB = ByteBuffer.allocateDirect(indices.length * 2);
-		indexBB.order(ByteOrder.nativeOrder());
-		ShortBuffer indexSB = indexBB.asShortBuffer();
-		indexSB.put(indices);
-		indexSB.position(0);*/
-
-		vertexFB.position(0);
-		GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
-		GLES20.glEnableVertexAttribArray(mPositionHandle);
-		
-		vertexFB.position(3);
-		GLES20.glVertexAttribPointer(mColorHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
-	    GLES20.glEnableVertexAttribArray(mColorHandle);
-	    
-	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-	    // (which currently contains model * view).
-	    Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-	    
-	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-	    // (which now contains model * view * projection).
-	    Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-	    
-	    // Apply the projection and view transformation
-	    GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-
-	    //Draw the shape
-	    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-	    //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_SHORT, indexSB);
+    	if (currentScene == null)
+    	{
+    		currentScene = createNewGameScene();
+    	}
+    	
+    	return currentScene;
     }
     
-    private void drawNewGame(GL10 unused)
-    {    	
-		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
-		//draw_message( 0.5, 200, 200, "Select your colour:" );
-
+    private Scene createNewGameScene()
+    {
+    	Scene scene = new Scene(mPositionHandle, mColorHandle, mMVPMatrixHandle);
+    	
 		float whiteVertices0[] = {
 				250f, 300f, 0f,
 				250f, 500f, 0f,
@@ -194,16 +161,20 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 				700f, 300f, 0f				
 		};
 		
+		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
+		//draw_message( 0.5, 200, 200, "Select your colour:" );
+		
 		Quad whiteQuad0 = Quad.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
 		Quad whiteQuad1 = Quad.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
 		
 		Quad redQuad0 = Quad.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
 		Quad redQuad1 = Quad.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
 		
-		drawQuad(whiteQuad0);
-		drawQuad(whiteQuad1);
-		drawQuad(redQuad0);
-		drawQuad(redQuad1);
-	}
-    
+		scene.add( whiteQuad0 );
+		scene.add( whiteQuad1 );
+		scene.add( redQuad0 );
+		scene.add( redQuad1 );
+		
+    	return scene;
+    }
 }
