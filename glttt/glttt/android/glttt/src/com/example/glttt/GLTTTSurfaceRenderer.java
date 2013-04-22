@@ -158,16 +158,16 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 		//draw_message( 0.5, 200, 200, "Select your colour:" );
 		
-		Quad whiteQuad0 = Quad.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
-		Quad whiteQuad1 = Quad.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
+		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
+		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
 		
-		Quad redQuad0 = Quad.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
-		Quad redQuad1 = Quad.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
 		
-		scene.add( whiteQuad0 );
-		scene.add( whiteQuad1 );
-		scene.add( redQuad0 );
-		scene.add( redQuad1 );
+		scene.add( whiteTri0 );
+		scene.add( whiteTri1 );
+		scene.add( redTri0 );
+		scene.add( redTri1 );
 		
     	return scene;
     }

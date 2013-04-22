@@ -1,14 +1,14 @@
 package com.example.glttt;
 
-public class Quad
+public class Triangle
 {
 	private float[] vertexData;
 	
-	private Quad()
+	private Triangle()
 	{	
 	}
 	
-	private Quad( float[] vertexData )
+	private Triangle( float[] vertexData )
 	{
 		this.vertexData = vertexData;
 	}
@@ -18,7 +18,7 @@ public class Quad
 		return vertexData;
 	}
 	
-	public static Quad create( float[] vertices, float[] colour )
+	public static Triangle create( float[] vertices, float[] colour )
 	{
 		float[] vertexData = new float[21];
 		for (int i=0; i<3; ++i)
@@ -33,6 +33,6 @@ public class Quad
 			}
 		}
 		
-		return new Quad( vertexData );
+		return new Triangle( vertexData );
 	}
 }

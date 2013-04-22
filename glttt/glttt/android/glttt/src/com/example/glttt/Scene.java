@@ -10,7 +10,7 @@ import android.opengl.Matrix;
 
 public class Scene
 {
-	private ArrayList<Quad> quads;
+	private ArrayList<Triangle> triangles;
 	
 	private int positionHandle;
 	private int colourHandle;
@@ -23,7 +23,7 @@ public class Scene
 
 	private Scene()
 	{
-		this.quads = new ArrayList<Quad>();
+		this.triangles = new ArrayList<Triangle>();
 		
 		this.mvpMatrix = new float[16];
 		this.modelMatrix = new float[16];
@@ -39,18 +39,18 @@ public class Scene
 		this.mvpMatrixHandle = mvpMatrixHandle;
 	}
 	
-	public void add( Quad q )
+	public void add( Triangle t )
 	{
-		this.quads.add(q);
+		this.triangles.add(t);
 	}
 	
 	public void draw()
 	{
     	Matrix.setIdentityM(modelMatrix, 0);
 		
-		for (Quad q : quads)
+		for (Triangle t : triangles)
 		{
-			drawQuad(q);
+			drawTriangle(t);
 		}
 	}
 	
@@ -65,19 +65,13 @@ public class Scene
         Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);		
 	}
 	
-    private void drawQuad(Quad quad)
+    private void drawTriangle(Triangle tri)
     {
-    	float[] vertexData = quad.getVertexData();
+    	float[] vertexData = tri.getVertexData();
 		ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
 		vertexBB.order(ByteOrder.nativeOrder());
 		FloatBuffer vertexFB = vertexBB.asFloatBuffer();
 		vertexFB.put(vertexData);
-
-		/*ByteBuffer indexBB = ByteBuffer.allocateDirect(indices.length * 2);
-		indexBB.order(ByteOrder.nativeOrder());
-		ShortBuffer indexSB = indexBB.asShortBuffer();
-		indexSB.put(indices);
-		indexSB.position(0);*/
 
 		vertexFB.position(0);
 		GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
@@ -100,6 +94,5 @@ public class Scene
 
 	    //Draw the shape
 	    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-	    //GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_SHORT, indexSB);
     }	
 }
