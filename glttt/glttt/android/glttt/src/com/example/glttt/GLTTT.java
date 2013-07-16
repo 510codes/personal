@@ -6,12 +6,12 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -48,20 +48,9 @@ public class GLTTT extends Activity {
      */
     private SystemUiHider mSystemUiHider;
     
-    class GLTTTSurfaceView extends GLSurfaceView {
-
-        public GLTTTSurfaceView(Context context){
-            super(context);
-
-            // Create an OpenGL ES 2.0 context.
-            setEGLContextClientVersion(2);
-            setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
-            // Set the Renderer for drawing on the GLSurfaceView
-            setRenderer(new GLTTTSurfaceRenderer(getResources()));
-        }
-    }
-
     private GLTTTSurfaceView mSurfaceView;
+    
+    private GameController controller;
 
     protected void onResume()
     {
@@ -79,14 +68,15 @@ public class GLTTT extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSurfaceView = new GLTTTSurfaceView(this);
+        View contentView = getWindow().findViewById(Window.ID_ANDROID_CONTENT);
+        mSurfaceView = new GLTTTSurfaceView(this, new GameController(new GameModel(), this), contentView);
         Log.e("opengl", Boolean.toString(detectOpenGLES20()));
         
         setContentView(R.layout.activity_glttt);
 
         //final View contentView = findViewById(R.id.main_textureview);
 
-        setContentView(mSurfaceView);   
+        setContentView(mSurfaceView);
         
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
@@ -179,5 +169,15 @@ public class GLTTT extends Activity {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
         return (info.reqGlEsVersion >= 0x20000);
+    }
+    
+    public void setController( GameController controller )
+    {
+    	this.controller = controller;
+    }
+    
+    public void mouseChoose( int xp, int yp )
+    {
+    	Log.e("game", "mouseChoose( " + xp + ", " + yp + " )");
     }
 }

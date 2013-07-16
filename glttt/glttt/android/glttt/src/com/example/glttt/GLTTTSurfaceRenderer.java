@@ -13,7 +13,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public static final int FLOAT_BYTE_LENGTH = 4;
 
     private int mPositionHandle;
-    private int mMVPMatrixHandle;
+    private int mVPMatrixHandle;
     private int mColorHandle;
     private Shader shader;
 
@@ -37,7 +37,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         		resources.getString(R.string.fragment_shader)
         		);
         mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
+        mVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
         mColorHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
 
         mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
@@ -45,8 +45,8 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         {
         	throw new ShaderException("could not get position handle");
         }
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
-        if (mMVPMatrixHandle == -1)
+        mVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
+        if (mVPMatrixHandle == -1)
         {
         	throw new ShaderException("could not get MVP matrix handle");
         }
@@ -108,6 +108,11 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	
     	getCurrentScene().draw();
     }
+    
+    public ModelObject getClickedModelObject( int screenX, int screenY )
+    {
+    	return getCurrentScene().getClickedModelObject(screenX, screenY);
+    }
 
     private void checkGlError(String op) {
         int error;
@@ -129,7 +134,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     
     private Scene createNewGameScene()
     {
-    	Scene scene = new Scene(mPositionHandle, mColorHandle, mMVPMatrixHandle);
+    	Scene scene = new Scene(mPositionHandle, mColorHandle, mVPMatrixHandle);
     	
 		float whiteVertices0[] = {
 				250f, 300f, 0f,
@@ -155,19 +160,52 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 				700f, 300f, 0f				
 		};
 		
+		float newVertices0[] = {
+				0.25f, 0.3f, 0f,
+				0.25f, 0.5f, 0f,
+				0.45f, 0.5f, 0f
+		};
+		
+		float newVertices1[] = {
+				0.25f, 0.3f, 0f,
+				0.45f, 0.5f, 0f,
+				0.45f, 0.3f, 0f
+		};
+		
 		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 		//draw_message( 0.5, 200, 200, "Select your colour:" );
 		
-		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
-		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f});
+		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white0");
+		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white1");
 		
-		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
-		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, "red0");
+		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, "red1");
 		
-		scene.add( whiteTri0 );
-		scene.add( whiteTri1 );
-		scene.add( redTri0 );
-		scene.add( redTri1 );
+		Triangle newWhiteTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white0");
+		Triangle newWhiteTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white1");
+
+		Triangle newRedTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "red0");
+		Triangle newRedTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "red1");
+
+		ModelObject redSquare = new ModelObject();
+		redSquare.add( newRedTri0 );
+		redSquare.add( newRedTri1 );
+
+		ModelObject whiteSquare = new ModelObject();
+		redSquare.add( newWhiteTri0 );
+		redSquare.add( newWhiteTri1 );
+
+		redSquare.scale(1000.0f);
+		redSquare.translate(500.0f, 0.0f, 0.0f);
+		whiteSquare.scale(1000.0f);
+
+		scene.add(redSquare);
+		scene.add(whiteSquare);
+
+		//scene.add( whiteTri0 );
+		//scene.add( whiteTri1 );
+		//scene.add( redTri0 );
+		//scene.add( redTri1 );
 		
     	return scene;
     }

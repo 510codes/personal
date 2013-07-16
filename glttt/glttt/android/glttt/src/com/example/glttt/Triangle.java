@@ -8,9 +8,10 @@ public class Triangle
 	{	
 	}
 	
-	private Triangle( float[] vertexData )
+	private Triangle( float[] vertexData, String id )
 	{
 		this.vertexData = vertexData;
+		this.id = id;
 	}
 	
 	public float[] getVertexData()
@@ -18,7 +19,22 @@ public class Triangle
 		return vertexData;
 	}
 	
-	public static Triangle create( float[] vertices, float[] colour )
+	public float getX( int vertexNum )
+	{
+		return vertexData[(vertexNum*7)];
+	}
+	
+	public float getY( int vertexNum )
+	{
+		return vertexData[(vertexNum*7) + 1];
+	}
+	
+	public float getZ( int vertexNum )
+	{
+		return vertexData[(vertexNum*7) + 2];
+	}
+	
+	public static Triangle create( float[] vertices, float[] colour, String id )
 	{
 		float[] vertexData = new float[21];
 		for (int i=0; i<3; ++i)
@@ -33,6 +49,13 @@ public class Triangle
 			}
 		}
 		
-		return new Triangle( vertexData );
+		return new Triangle( vertexData, id );
 	}
+	
+	public String toString()
+	{
+		return id;
+	}
+	
+	private String id;
 }
