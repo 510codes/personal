@@ -15,7 +15,7 @@
 #define SCORE_LINE 1.0
 #define SCORE_OPP_LINE 0.9
 
-#ifdef __ANDROID_API__
+#ifdef ANDROID
 #define GLTTT_USE_GLFLOAT
 #endif
 

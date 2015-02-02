@@ -1,5 +1,6 @@
 #include "game_settings.h"
 #include "game_constants.h"
+#include "defs.h"
 
 const GLint MIN_ZOOM = GLTTT_MIN_ZOOM_DEFAULT;
 const GLint ZOOM_FACTOR = GLTTT_ZOOM_FACTOR_DEFAULT;
