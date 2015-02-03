@@ -168,7 +168,10 @@ public class GLTTT extends Activity {
     private boolean detectOpenGLES20() {
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
-        return (info.reqGlEsVersion >= 0x20000);
+        boolean retVal = (info.reqGlEsVersion >= 0x20000);
+        Log.e("game", "info.reqGlEsVersion: " + info.reqGlEsVersion + ", high:" + ((info.reqGlEsVersion & 0xFFFF0000) >> 16) + ", low:" + (0x0000FFFF & info.reqGlEsVersion));
+        Log.e("game", "detected opengles_2: " + retVal);
+        return retVal;
     }
     
     public void setController( GameController controller )

@@ -99,6 +99,9 @@ public class ModelObject
 		
 		vertexFB.position(3);
 		GLES20.glVertexAttribPointer(colourHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
-	    GLES20.glEnableVertexAttribArray(colourHandle);	    
+	    GLES20.glEnableVertexAttribArray(colourHandle);
+
+        //Draw the shape
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }	
 }

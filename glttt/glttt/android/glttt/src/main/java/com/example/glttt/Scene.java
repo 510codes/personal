@@ -96,8 +96,5 @@ public class Scene
 	    GLES20.glUniformMatrix4fv(vpMatrixHandle, 1, false, mvpMatrix, 0);
 
 	    modelObject.draw( positionHandle, colourHandle );
-
-	    //Draw the shape
-	    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-    }	
+    }
 }

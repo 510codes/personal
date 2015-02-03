@@ -63,21 +63,21 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-        
+
         // Position the eye behind the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
         final float eyeZ = 1.5f;
-     
+
         // We are looking toward the distance
         final float lookX = 0.0f;
         final float lookY = 0.0f;
         final float lookZ = -5.0f;
-     
+
         // Set our up vector. This is where our head would be pointing were we holding the camera.
         final float upX = 0.0f;
         final float upY = 1.0f;
-        final float upZ = 0.0f;        
+        final float upZ = 0.0f;
         
         getCurrentScene().setLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);        
     }
@@ -85,6 +85,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height)
     {
+        Log.d("game", "onSurfaceChanged(): width: " + width + ", height: " + height);
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
      
@@ -97,7 +98,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
-        
+
         getCurrentScene().setFrustum( left, right, bottom, top, near, far );
     }
 
@@ -105,7 +106,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 unused)
     {
     	GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-    	
+
     	getCurrentScene().draw();
     }
     
@@ -174,32 +175,39 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 		
 		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 		//draw_message( 0.5, 200, 200, "Select your colour:" );
-		
-		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white0");
-		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white1");
-		
-		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, "red0");
-		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, "red1");
-		
-		Triangle newWhiteTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white0");
-		Triangle newWhiteTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "white1");
 
-		Triangle newRedTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "red0");
-		Triangle newRedTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, "red1");
+        final float originalTriVertexDivisor = 500.0f;
+        final float newTriVertexDivisor = 1.0f;
+
+		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, originalTriVertexDivisor, "white0");
+		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, originalTriVertexDivisor, "white1");
+		
+		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, originalTriVertexDivisor, "red0");
+		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, originalTriVertexDivisor, "red1");
+		
+		Triangle newWhiteTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "white0");
+		Triangle newWhiteTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "white1");
+
+		Triangle newRedTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red0");
+		Triangle newRedTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red1");
 
 		ModelObject redSquare = new ModelObject();
-		redSquare.add( newRedTri0 );
-		redSquare.add( newRedTri1 );
+        //redSquare.add( newRedTri0 );
+        //redSquare.add( newRedTri1 );
+        redSquare.add( redTri1 );
+        redSquare.add( redTri0 );
 
 		ModelObject whiteSquare = new ModelObject();
-		redSquare.add( newWhiteTri0 );
-		redSquare.add( newWhiteTri1 );
+        //whiteSquare.add( newWhiteTri0 );
+        //whiteSquare.add( newWhiteTri1 );
+        whiteSquare.add( whiteTri1 );
+        whiteSquare.add( whiteTri0 );
 
-		redSquare.scale(1000.0f);
-		redSquare.translate(500.0f, 0.0f, 0.0f);
-		whiteSquare.scale(1000.0f);
+        //redSquare.scale(1000.0f);
+        //redSquare.translate(500.0f, 0.0f, 0.0f);
+        //whiteSquare.scale(1000.0f);
 
-		scene.add(redSquare);
+        scene.add(redSquare);
 		scene.add(whiteSquare);
 
 		//scene.add( whiteTri0 );
