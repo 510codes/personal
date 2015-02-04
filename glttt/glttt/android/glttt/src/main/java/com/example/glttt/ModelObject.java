@@ -4,11 +4,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import android.opengl.GLES20;
 import android.opengl.GLU;
 import android.opengl.Matrix;
-import android.util.Log;
+
+import com.example.glttt.shapes.Triangle;
 
 public class ModelObject
 {
@@ -29,12 +32,15 @@ public class ModelObject
 		return modelMatrix;
 	}
 
-	public void add( Triangle t )
-	{
-		triangles.add(t);
-	}
+    public void add( Triangle t ) {
+        triangles.add(t);
+    }
 
-	void scale( float factor )
+    public void add( Triangle[] tri ) {
+        triangles.addAll(Arrays.asList(tri));
+    }
+
+    void scale( float factor )
 	{
 		Matrix.scaleM(modelMatrix, 0, factor, factor, factor);
 	}

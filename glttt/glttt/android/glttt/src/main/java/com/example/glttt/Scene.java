@@ -72,6 +72,14 @@ public class Scene
         Matrix.setIdentityM(projectionMatrix, 0);
         Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);		
 	}
+
+    public void setPerspective( float fovY, float aspect, float zNear, float zFar ) {
+        final float pi = 3.1415926535897932384626433832795f;
+        float fW, fH;
+        fH = (float)(Math.tan( fovY / 360.0f * pi ) * zNear);
+        fW = fH * aspect;
+        setFrustum( -fW, fW, -fH, fH, zNear, zFar );
+    }
 	
     private void drawModelObject( ModelObject modelObject )
     {

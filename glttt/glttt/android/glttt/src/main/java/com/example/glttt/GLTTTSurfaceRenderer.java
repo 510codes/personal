@@ -8,9 +8,27 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import com.example.glttt.shapes.ShapeFactory;
+import com.example.glttt.shapes.Triangle;
+
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public static final int FLOAT_BYTE_LENGTH = 4;
+
+    private enum PegLabel {
+        PEG_A,
+        PEG_B,
+        PEG_C,
+        PEG_D,
+        PEG_E,
+        PEG_F,
+        PEG_G,
+        PEG_H,
+        PEG_NONE
+    }
+
+    private final float ORIGINAL_TRI_VERTEX_DIVISOR = 500.0f;
+    private final float NEW_TRI_VERTEX_DIVISOR = 1.0f;
 
     private int mPositionHandle;
     private int mVPMatrixHandle;
@@ -19,7 +37,9 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private Shader shader;
 
     private Resources resources;
-    
+
+    private ShapeFactory shapeFactory;
+
     private Scene currentScene;
 
     public GLTTTSurfaceRenderer( Resources resources )
@@ -28,6 +48,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	
     	this.resources = resources;
     	this.currentScene = null;
+        this.shapeFactory = new ShapeFactory();
         this.currentViewPort = new int[4];
     }
     
@@ -133,39 +154,52 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
     	if (currentScene == null)
     	{
-    		currentScene = createNewGameScene();
+            //currentScene = createNewGameScene();
+            currentScene = createGameBoardScene();
     	}
     	
     	return currentScene;
+    }
+
+    private Scene createGameBoardScene() {
+        Scene scene = new Scene(mPositionHandle, mColorHandle, mVPMatrixHandle);
+        scene.setPerspective( 35.0f, 1.0f, 10.0f, 1000.0f );
+        scene.setLookAt( 100.0f, /*globals.zoom*/250.0f + /*globals.new_zoom*/ 0.0f, 250.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
+
+        float boardVertices[] = {
+                -100.0f, 0.0f, -100.0f,
+                -100.0f, 0.0f, 100.0f,
+                100.0f, 0.0f, 100.0f,
+                100.0f, 0.0f, -100.0f
+        };
+
+        Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "board");
+
+        ModelObject obj = new ModelObject("board");
+        obj.add(boardTris);
+
+        scene.add(obj);
+
+        return scene;
     }
     
     private Scene createNewGameScene()
     {
     	Scene scene = new Scene(mPositionHandle, mColorHandle, mVPMatrixHandle);
     	
-		float whiteVertices0[] = {
+		float whiteVertices[] = {
 				250f, 300f, 0f,
 				250f, 500f, 0f,
-				450f, 500f, 0f
-		};
-		
-		float whiteVertices1[] = {
-				250f, 300f, 0f,
 				450f, 500f, 0f,
-				450f, 300f, 0f				
-		};
+                450f, 300f, 0f
+        };
 		
-		float redVertices0[] = {
+		float redVertices[] = {
 				500f, 300f, 0f,
 				500f, 500f, 0f,
-				700f, 500f, 0f
-		};
-		
-		float redVertices1[] = {
-				500f, 300f, 0f,
 				700f, 500f, 0f,
-				700f, 300f, 0f				
-		};
+                700f, 300f, 0f
+        };
 		
 		float newVertices0[] = {
 				0.25f, 0.3f, 0f,
@@ -182,32 +216,24 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 		//draw_message( 0.5, 200, 200, "Select your colour:" );
 
-        final float originalTriVertexDivisor = 500.0f;
-        final float newTriVertexDivisor = 1.0f;
+        Triangle[] whiteSquareTris = shapeFactory.createRectangle(whiteVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "white");
+        Triangle[] redSquareTris = shapeFactory.createRectangle(redVertices, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "red");
 
-		Triangle whiteTri0 = Triangle.create(whiteVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, originalTriVertexDivisor, "white0");
-		Triangle whiteTri1 = Triangle.create(whiteVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, originalTriVertexDivisor, "white1");
-		
-		Triangle redTri0 = Triangle.create(redVertices0, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, originalTriVertexDivisor, "red0");
-		Triangle redTri1 = Triangle.create(redVertices1, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, originalTriVertexDivisor, "red1");
-		
-		Triangle newWhiteTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "white0");
-		Triangle newWhiteTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "white1");
+		Triangle newWhiteTri0 = shapeFactory.createTriangle(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "white0");
+		Triangle newWhiteTri1 = shapeFactory.createTriangle(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "white1");
 
-		Triangle newRedTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red0");
-		Triangle newRedTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red1");
+		Triangle newRedTri0 = shapeFactory.createTriangle(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "red0");
+		Triangle newRedTri1 = shapeFactory.createTriangle(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "red1");
 
 		ModelObject redSquare = new ModelObject("redSquare");
         //redSquare.add( newRedTri0 );
         //redSquare.add( newRedTri1 );
-        redSquare.add( redTri1 );
-        redSquare.add( redTri0 );
+        redSquare.add( redSquareTris );
 
 		ModelObject whiteSquare = new ModelObject("whiteSquare");
         //whiteSquare.add( newWhiteTri0 );
         //whiteSquare.add( newWhiteTri1 );
-        whiteSquare.add( whiteTri1 );
-        whiteSquare.add( whiteTri0 );
+        whiteSquare.add( whiteSquareTris );
 
         //redSquare.scale(1000.0f);
         //redSquare.translate(500.0f, 0.0f, 0.0f);
