@@ -15,6 +15,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private int mPositionHandle;
     private int mVPMatrixHandle;
     private int mColorHandle;
+    private int[] currentViewPort;
     private Shader shader;
 
     private Resources resources;
@@ -27,6 +28,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	
     	this.resources = resources;
     	this.currentScene = null;
+        this.currentViewPort = new int[4];
     }
     
     @Override
@@ -88,6 +90,10 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         Log.d("game", "onSurfaceChanged(): width: " + width + ", height: " + height);
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
+        currentViewPort[0] = 0;
+        currentViewPort[1] = 0;
+        currentViewPort[2] = width;
+        currentViewPort[3] = height;
      
         // Create a new perspective projection matrix. The height will stay the same
         // while the width will vary as per aspect ratio.
@@ -112,7 +118,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     
     public ModelObject getClickedModelObject( int screenX, int screenY )
     {
-    	return getCurrentScene().getClickedModelObject(screenX, screenY);
+    	return getCurrentScene().getClickedModelObject(screenX, screenY, currentViewPort);
     }
 
     private void checkGlError(String op) {

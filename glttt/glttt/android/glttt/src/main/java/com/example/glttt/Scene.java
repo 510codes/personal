@@ -1,6 +1,5 @@
 package com.example.glttt;
 
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import android.opengl.GLES20;
@@ -47,20 +46,17 @@ public class Scene
 		}
 	}
 	
-	public ModelObject getClickedModelObject( int screenX, int screenY )
+	public ModelObject getClickedModelObject( int screenX, int screenY, int[] viewport )
 	{
-    	IntBuffer viewport = IntBuffer.allocate(4);
-    	GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport);
-    	
     	float xpos = screenX;
-    	float ypos = viewport.get(3);
+    	float ypos = viewport[3];
     	ypos -= screenY;
     	
     	Log.e("game", "xpos, ypos: ("+xpos+", "+ypos+")");
 
 		for (ModelObject modelObject : modelObjects)
 		{
-			if (modelObject.clickedOn((int)xpos, (int)ypos, viewMatrix, projectionMatrix, viewport.array()))
+			if (modelObject.clickedOn((int)xpos, (int)ypos, viewMatrix, projectionMatrix, viewport))
 			{
 				return modelObject;
 			}

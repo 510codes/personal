@@ -78,6 +78,7 @@ public class ModelObject
 			Log.e("game", t + ": [ ("+screen0[0]+", "+screen0[1]+"), ("+screen1[0]+", "+screen1[1]+"), ("+screen2[0]+", "+screen2[1]+") ]");
 			if (inside)
 			{
+                Log.e("game", "inside: " + t);
 				return true;
 			}			
 		}
