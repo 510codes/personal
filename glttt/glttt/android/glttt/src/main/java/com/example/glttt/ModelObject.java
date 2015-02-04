@@ -12,8 +12,9 @@ import android.util.Log;
 
 public class ModelObject
 {
-	public ModelObject()
+	public ModelObject( String id )
 	{
+        this.id = id;
 		this.modelMatrix = new float[16];
 		this.triangles = new ArrayList<Triangle>();
     	Matrix.setIdentityM(modelMatrix, 0);
@@ -21,6 +22,7 @@ public class ModelObject
 	
 	private float[] modelMatrix;
 	private ArrayList<Triangle> triangles;
+    private String id;
 
 	public float[] getModelMatrix()
 	{
@@ -78,10 +80,8 @@ public class ModelObject
 	
 			boolean inside = ((b1 == b2) && (b2 == b3));
 			
-			Log.e("game", t + ": [ ("+screen0[0]+", "+screen0[1]+"), ("+screen1[0]+", "+screen1[1]+"), ("+screen2[0]+", "+screen2[1]+") ]");
 			if (inside)
 			{
-                Log.e("game", "inside: " + t);
 				return true;
 			}			
 		}
@@ -89,23 +89,26 @@ public class ModelObject
 		return false;
 	}
 
-    private void drawTriangle(Triangle tri, int positionHandle, int colourHandle)
-    {
-    	float[] vertexData = tri.getVertexData();
-		ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
-		vertexBB.order(ByteOrder.nativeOrder());
-		FloatBuffer vertexFB = vertexBB.asFloatBuffer();
-		vertexFB.put(vertexData);
-		
-		vertexFB.position(0);
-		GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
-		GLES20.glEnableVertexAttribArray(positionHandle);
-		
-		vertexFB.position(3);
-		GLES20.glVertexAttribPointer(colourHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
-	    GLES20.glEnableVertexAttribArray(colourHandle);
+    private void drawTriangle(Triangle tri, int positionHandle, int colourHandle) {
+        float[] vertexData = tri.getVertexData();
+        ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
+        vertexBB.order(ByteOrder.nativeOrder());
+        FloatBuffer vertexFB = vertexBB.asFloatBuffer();
+        vertexFB.put(vertexData);
+
+        vertexFB.position(0);
+        GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
+        GLES20.glEnableVertexAttribArray(positionHandle);
+
+        vertexFB.position(3);
+        GLES20.glVertexAttribPointer(colourHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
+        GLES20.glEnableVertexAttribArray(colourHandle);
 
         //Draw the shape
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-    }	
+    }
+
+    public String toString() {
+        return id;
+    }
 }

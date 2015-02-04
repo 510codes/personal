@@ -181,6 +181,6 @@ public class GLTTT extends Activity {
     
     public void mouseChoose( int xp, int yp )
     {
-    	Log.e("game", "mouseChoose( " + xp + ", " + yp + " )");
+    	//Log.e("game", "mouseChoose( " + xp + ", " + yp + " )");
     }
 }

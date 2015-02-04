@@ -51,8 +51,6 @@ public class Scene
     	float ypos = viewport[3];
     	ypos -= screenY;
     	
-    	Log.e("game", "xpos, ypos: ("+xpos+", "+ypos+")");
-
 		for (ModelObject modelObject : modelObjects)
 		{
 			if (modelObject.clickedOn((int)xpos, (int)ypos, viewMatrix, projectionMatrix, viewport))

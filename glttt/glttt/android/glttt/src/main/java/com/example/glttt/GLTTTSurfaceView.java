@@ -34,13 +34,8 @@ public class GLTTTSurfaceView extends GLSurfaceView
     	float x = e.getRawX() - contentView.getLeft();
     	float y = e.getRawY() - contentView.getTop();
     	
-    	Log.e("game", "x: "+e.getX() + ", y: "+e.getY()+", rawX: "+e.getRawX()+", rawY: "+e.getRawY());
-    	Log.e("game", "contentView.getLeft(): "+contentView.getLeft() + ", contentView.getTop(): "+contentView.getTop());
-    	
-    	//Log.e("game", "onTouchEvent(): x: " + x + ", y: " + y);
-
     	ModelObject mo = surfaceRenderer.getClickedModelObject((int)x, (int)y);
-    	//Log.e("game", "clicked tri: " + t);
+    	Log.e("game", "clicked object: " + mo);
     	
     	switch (e.getAction())
     	{

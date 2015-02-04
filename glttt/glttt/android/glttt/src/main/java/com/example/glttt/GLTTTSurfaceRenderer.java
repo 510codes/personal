@@ -197,13 +197,13 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 		Triangle newRedTri0 = Triangle.create(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red0");
 		Triangle newRedTri1 = Triangle.create(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, newTriVertexDivisor, "red1");
 
-		ModelObject redSquare = new ModelObject();
+		ModelObject redSquare = new ModelObject("redSquare");
         //redSquare.add( newRedTri0 );
         //redSquare.add( newRedTri1 );
         redSquare.add( redTri1 );
         redSquare.add( redTri0 );
 
-		ModelObject whiteSquare = new ModelObject();
+		ModelObject whiteSquare = new ModelObject("whiteSquare");
         //whiteSquare.add( newWhiteTri0 );
         //whiteSquare.add( newWhiteTri1 );
         whiteSquare.add( whiteTri1 );
