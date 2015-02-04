@@ -2,7 +2,6 @@ package com.example.glttt;
 
 import java.util.ArrayList;
 
-import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -88,9 +87,6 @@ public class Scene
 	    // (which now contains model * view * projection).
 	    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
 	    
-	    // Apply the projection and view transformation
-	    GLES20.glUniformMatrix4fv(vpMatrixHandle, 1, false, mvpMatrix, 0);
-
-	    modelObject.draw( positionHandle, colourHandle );
+	    modelObject.draw( mvpMatrix, vpMatrixHandle, positionHandle, colourHandle );
     }
 }

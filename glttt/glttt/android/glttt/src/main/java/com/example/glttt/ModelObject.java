@@ -42,9 +42,12 @@ public class ModelObject
 		Matrix.translateM(modelMatrix, 0, x, y, z);
 	}
 
-	public void draw( int positionHandle, int colourHandle )
+	public void draw( float[] mvpMatrix, int vpMatrixHandle, int positionHandle, int colourHandle )
 	{
-		for (Triangle t : triangles)
+        // Apply the projection and view transformation
+        GLES20.glUniformMatrix4fv(vpMatrixHandle, 1, false, mvpMatrix, 0);
+
+        for (Triangle t : triangles)
 		{
 			drawTriangle( t, positionHandle, colourHandle );
 		}
