@@ -212,7 +212,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
         ModelObject obj = new ModelObject("board");
         obj.add(boardTris);
-        //obj.rotate(45.0f, 0.0f, 1.0f, 0.0f);
 
         scene.add(obj);
 
@@ -237,52 +236,21 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
                 700f, 300f, 0f
         };
 		
-		float newVertices0[] = {
-				0.25f, 0.3f, 0f,
-				0.25f, 0.5f, 0f,
-				0.45f, 0.5f, 0f
-		};
-		
-		float newVertices1[] = {
-				0.25f, 0.3f, 0f,
-				0.45f, 0.5f, 0f,
-				0.45f, 0.3f, 0f
-		};
-		
 		//gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 		//draw_message( 0.5, 200, 200, "Select your colour:" );
 
         Triangle[] whiteSquareTris = shapeFactory.createRectangle(whiteVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "white");
         Triangle[] redSquareTris = shapeFactory.createRectangle(redVertices, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "red");
 
-		Triangle newWhiteTri0 = shapeFactory.createTriangle(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "white0");
-		Triangle newWhiteTri1 = shapeFactory.createTriangle(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "white1");
-
-		Triangle newRedTri0 = shapeFactory.createTriangle(newVertices0, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "red0");
-		Triangle newRedTri1 = shapeFactory.createTriangle(newVertices1, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, NEW_TRI_VERTEX_DIVISOR, "red1");
-
 		ModelObject redSquare = new ModelObject("redSquare");
-        //redSquare.add( newRedTri0 );
-        //redSquare.add( newRedTri1 );
         redSquare.add( redSquareTris );
 
 		ModelObject whiteSquare = new ModelObject("whiteSquare");
-        //whiteSquare.add( newWhiteTri0 );
-        //whiteSquare.add( newWhiteTri1 );
         whiteSquare.add( whiteSquareTris );
-
-        //redSquare.scale(1000.0f);
-        //redSquare.translate(500.0f, 0.0f, 0.0f);
-        //whiteSquare.scale(1000.0f);
 
         scene.add(redSquare);
 		scene.add(whiteSquare);
 
-		//scene.add( whiteTri0 );
-		//scene.add( whiteTri1 );
-		//scene.add( redTri0 );
-		//scene.add( redTri1 );
-		
     	return scene;
     }
 }

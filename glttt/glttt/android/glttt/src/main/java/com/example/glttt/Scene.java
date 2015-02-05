@@ -98,10 +98,9 @@ public class Scene
 	    // (which currently contains model * view).
 	    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelObject.getModelMatrix(), 0);
 
-        float[] mTempMatrix = mvpMatrix.clone();
 	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
 	    // (which now contains model * view * projection).
-	    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mTempMatrix, 0);
+	    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
 	    
 	    modelObject.draw( mvpMatrix, mvpMatrixHandle, positionHandle, colourHandle );
     }
