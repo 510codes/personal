@@ -17,9 +17,9 @@ public class ShapeFactory {
         for (int i=0; i<3; ++i)
         {
             int k = vertexIndices[i];
-            vertexData[i*7] = (vertices[k] / vertexDivideFactor) - 1.0f;
-            vertexData[(i*7) + 1] = (vertices[k + 1] / vertexDivideFactor) - 1.0f;
-            vertexData[(i*7) + 2] = vertices[k + 2];
+            vertexData[i*7] = (vertices[k] / vertexDivideFactor);
+            vertexData[(i*7) + 1] = (vertices[k + 1] / vertexDivideFactor);
+            vertexData[(i*7) + 2] = (vertices[k + 2] / vertexDivideFactor);
 
             for (int j=0; j<4; ++j)
             {
@@ -42,7 +42,7 @@ public class ShapeFactory {
         indices[0] = 0;
         indices[1] = 6;
         indices[2] = 9;
-        t[1] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"0");
+        t[1] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"1");
 
         return t;
     }

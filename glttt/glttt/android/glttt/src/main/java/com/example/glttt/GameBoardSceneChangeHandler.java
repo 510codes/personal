@@ -40,6 +40,6 @@ public class GameBoardSceneChangeHandler implements ISceneChangeHandler {
         final float upY = 1.0f;
         final float upZ = 0.0f;
 
-        mScene.setLookAt(eyeX, eyeY + 1.0f, eyeZ + 110.0f, lookX, lookY, lookZ - 10.0f, upX, upY, upZ);
+        mScene.setLookAt(eyeX, eyeY + 5.0f, eyeZ + 15.0f, lookX, lookY, lookZ - 10.0f, upX, upY, upZ);
     }
 }

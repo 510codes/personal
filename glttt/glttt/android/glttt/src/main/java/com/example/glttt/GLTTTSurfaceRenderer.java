@@ -31,10 +31,21 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private final float NEW_TRI_VERTEX_DIVISOR = 1.0f;
     private final float BOARD_VERTEX_DIVISOR = 50.0f;
 
+    private final float[] PEG_COLOUR_NORMAL = {0.55f, 0.55f, 0.48f, 0.3f};
+
     private int mPositionHandle;
     private int mMVPMatrixHandle;
     private int mColorHandle;
     private Shader mShader;
+
+    private final int[][] PEG_POS = {
+            {-50,50},{0,50},{50,50},
+            {-25,0},{25,0},
+            {-50,-50},{0,-50},{50,-50}
+    };
+
+    private final int PEG_THICK = 1;
+
 
     private Resources resources;
 
@@ -145,8 +156,60 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
                 100.0f, 0.0f, -100.0f
         };
 
-        Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
+        for (int x=0; x<8; ++x) {
+            float[] pegVertices1 = {
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+            };
 
+            float[] pegVertices2 = {
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK
+            };
+
+            float[] pegVertices3 = {
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+            };
+
+            float[] pegVertices4 = {
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+            };
+
+            Triangle[] pegTris;
+            ModelObject peg;
+
+            pegTris = shapeFactory.createRectangle(pegVertices1, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
+            peg = new ModelObject("peg"+x+"_1");
+            peg.add(pegTris);
+            scene.add(peg);
+
+            pegTris = shapeFactory.createRectangle(pegVertices2, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
+            peg = new ModelObject("peg"+x+"_2");
+            peg.add(pegTris);
+            scene.add(peg);
+
+            pegTris = shapeFactory.createRectangle(pegVertices3, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
+            peg = new ModelObject("peg"+x+"_3");
+            peg.add(pegTris);
+            scene.add(peg);
+
+            pegTris = shapeFactory.createRectangle(pegVertices4, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
+            peg = new ModelObject("peg"+x+"_4");
+            peg.add(pegTris);
+            scene.add(peg);
+        }
+
+        Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
         ModelObject obj = new ModelObject("board");
         obj.add(boardTris);
         //obj.rotate(45.0f, 0.0f, 1.0f, 0.0f);

@@ -26,12 +26,12 @@ public class NewGameSceneChangeHandler implements ISceneChangeHandler {
     @Override
     public void preSceneDraw() {
         // Position the eye behind the origin.
-        final float eyeX = 0.0f;
+        final float eyeX = 1.0f;
         final float eyeY = 0.0f;
         final float eyeZ = 1.5f;
 
         // We are looking toward the distance
-        final float lookX = 0.0f;
+        final float lookX = 1.0f;
         final float lookY = 0.0f;
         final float lookZ = -5.0f;
 
