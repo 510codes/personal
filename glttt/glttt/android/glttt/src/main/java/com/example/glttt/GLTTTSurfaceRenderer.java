@@ -29,6 +29,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
     private final float ORIGINAL_TRI_VERTEX_DIVISOR = 500.0f;
     private final float NEW_TRI_VERTEX_DIVISOR = 1.0f;
+    private final float BOARD_VERTEX_DIVISOR = 50.0f;
 
     private int mPositionHandle;
     private int mMVPMatrixHandle;
@@ -127,8 +128,8 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
     	if (currentScene == null)
     	{
-            currentScene = createNewGameScene();
-            //currentScene = createGameBoardScene();
+            //currentScene = createNewGameScene();
+            currentScene = createGameBoardScene();
         }
     	
     	return currentScene;
@@ -144,11 +145,11 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
                 100.0f, 0.0f, -100.0f
         };
 
-        Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "board");
+        Triangle[] boardTris = shapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
 
         ModelObject obj = new ModelObject("board");
         obj.add(boardTris);
-        obj.rotate(45.0f, 0.0f, 1.0f, 0.0f);
+        //obj.rotate(45.0f, 0.0f, 1.0f, 0.0f);
 
         scene.add(obj);
 
