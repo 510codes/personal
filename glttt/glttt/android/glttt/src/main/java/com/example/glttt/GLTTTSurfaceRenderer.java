@@ -31,10 +31,9 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private final float NEW_TRI_VERTEX_DIVISOR = 1.0f;
 
     private int mPositionHandle;
-    private int mVPMatrixHandle;
+    private int mMVPMatrixHandle;
     private int mColorHandle;
-    private int[] currentViewPort;
-    private Shader shader;
+    private Shader mShader;
 
     private Resources resources;
 
@@ -49,31 +48,30 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	this.resources = resources;
     	this.currentScene = null;
         this.shapeFactory = new ShapeFactory();
-        this.currentViewPort = new int[4];
     }
     
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
-        shader = Shader.create(
+        mShader = Shader.create(
         		resources.getString(R.string.vertex_shader),
         		resources.getString(R.string.fragment_shader)
         		);
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        mVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
-        mColorHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
+        mPositionHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_position");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "u_MVPMatrix");
+        mColorHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "a_color");
 
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
+        mPositionHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_position");
         if (mPositionHandle == -1)
         {
         	throw new ShaderException("could not get position handle");
         }
-        mVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
-        if (mVPMatrixHandle == -1)
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "u_VPMatrix");
+        if (mMVPMatrixHandle == -1)
         {
         	throw new ShaderException("could not get MVP matrix handle");
         }
-        mColorHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_color");
+        mColorHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_color");
         if (mColorHandle == -1)
         {
         	throw new ShaderException("could not get color handle");
@@ -81,28 +79,11 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
         checkGlError("glGetUniformLocation");
         
-    	GLES20.glUseProgram(shader.getProgram());
+    	GLES20.glUseProgram(mShader.getProgram());
         
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-
-        // Position the eye behind the origin.
-        final float eyeX = 0.0f;
-        final float eyeY = 0.0f;
-        final float eyeZ = 1.5f;
-
-        // We are looking toward the distance
-        final float lookX = 0.0f;
-        final float lookY = 0.0f;
-        final float lookZ = -5.0f;
-
-        // Set our up vector. This is where our head would be pointing were we holding the camera.
-        final float upX = 0.0f;
-        final float upY = 1.0f;
-        final float upZ = 0.0f;
-        
-        getCurrentScene().setLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);        
     }
 
     @Override
@@ -111,35 +92,27 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         Log.d("game", "onSurfaceChanged(): width: " + width + ", height: " + height);
         // Set the OpenGL viewport to the same size as the surface.
         GLES20.glViewport(0, 0, width, height);
+
+        int[] currentViewPort = new int[4];
         currentViewPort[0] = 0;
         currentViewPort[1] = 0;
         currentViewPort[2] = width;
         currentViewPort[3] = height;
-     
-        // Create a new perspective projection matrix. The height will stay the same
-        // while the width will vary as per aspect ratio.
-        final float ratio = (float) width / height;
-        final float left = -ratio;
-        final float right = ratio;
-        final float bottom = -1.0f;
-        final float top = 1.0f;
-        final float near = 1.0f;
-        final float far = 10.0f;
 
-        getCurrentScene().setFrustum( left, right, bottom, top, near, far );
+        getCurrentScene().onViewportChanged(currentViewPort);
     }
 
     @Override
     public void onDrawFrame(GL10 unused)
     {
-    	GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
-    	getCurrentScene().draw();
+        getCurrentScene().draw();
     }
     
     public ModelObject getClickedModelObject( int screenX, int screenY )
     {
-    	return getCurrentScene().getClickedModelObject(screenX, screenY, currentViewPort);
+    	return getCurrentScene().getClickedModelObject(screenX, screenY);
     }
 
     private void checkGlError(String op) {
@@ -154,17 +127,15 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
     	if (currentScene == null)
     	{
-            //currentScene = createNewGameScene();
-            currentScene = createGameBoardScene();
-    	}
+            currentScene = createNewGameScene();
+            //currentScene = createGameBoardScene();
+        }
     	
     	return currentScene;
     }
 
     private Scene createGameBoardScene() {
-        Scene scene = new Scene(mPositionHandle, mColorHandle, mVPMatrixHandle);
-        scene.setPerspective( 35.0f, 1.0f, 10.0f, 1000.0f );
-        scene.setLookAt( 100.0f, /*globals.zoom*/250.0f + /*globals.new_zoom*/ 0.0f, 250.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
+        Scene scene = new Scene(mPositionHandle, mColorHandle, mMVPMatrixHandle, new GameBoardSceneChangeHandler());
 
         float boardVertices[] = {
                 -100.0f, 0.0f, -100.0f,
@@ -177,6 +148,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
         ModelObject obj = new ModelObject("board");
         obj.add(boardTris);
+        obj.rotate(45.0f, 0.0f, 1.0f, 0.0f);
 
         scene.add(obj);
 
@@ -185,7 +157,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     
     private Scene createNewGameScene()
     {
-    	Scene scene = new Scene(mPositionHandle, mColorHandle, mVPMatrixHandle);
+        Scene scene = new Scene(mPositionHandle, mColorHandle, mMVPMatrixHandle, new NewGameSceneChangeHandler());
     	
 		float whiteVertices[] = {
 				250f, 300f, 0f,

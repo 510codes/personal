@@ -11,25 +11,32 @@ public class Scene
 
 	private int positionHandle;
 	private int colourHandle;
-	private int vpMatrixHandle;
+	private int mvpMatrixHandle;
 
 	private float[] viewMatrix;
 	private float[] projectionMatrix;
 
-	private Scene()
+    private int[] mCurrentViewPort;
+
+    private ISceneChangeHandler mSceneChangeHandler;
+
+	private Scene( ISceneChangeHandler sceneChangeHandler )
 	{
 		this.modelObjects = new ArrayList<ModelObject>();
 
 		this.viewMatrix = new float[16];
 		this.projectionMatrix = new float[16];
+
+        this.mSceneChangeHandler = sceneChangeHandler;
+        sceneChangeHandler.setScene(this);
 	}
 
-	public Scene(int positionHandle, int colourHandle, int vpMatrixHandle)
+	public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler)
 	{
-		this();
+		this(viewportChangeHandler);
 		this.positionHandle = positionHandle;
 		this.colourHandle = colourHandle;
-		this.vpMatrixHandle = vpMatrixHandle;
+		this.mvpMatrixHandle = mvpMatrixHandle;
 	}
 	
 	public void add( ModelObject m )
@@ -39,21 +46,23 @@ public class Scene
 	
 	public void draw()
 	{
+        mSceneChangeHandler.preSceneDraw();
+
 		for (ModelObject modelObject : modelObjects)
 		{
 			drawModelObject(modelObject);
 		}
 	}
 	
-	public ModelObject getClickedModelObject( int screenX, int screenY, int[] viewport )
+	public ModelObject getClickedModelObject( int screenX, int screenY )
 	{
     	float xpos = screenX;
-    	float ypos = viewport[3];
+    	float ypos = mCurrentViewPort[3];
     	ypos -= screenY;
     	
 		for (ModelObject modelObject : modelObjects)
 		{
-			if (modelObject.clickedOn((int)xpos, (int)ypos, viewMatrix, projectionMatrix, viewport))
+			if (modelObject.clickedOn((int)xpos, (int)ypos, viewMatrix, projectionMatrix, mCurrentViewPort))
 			{
 				return modelObject;
 			}
@@ -70,15 +79,15 @@ public class Scene
 	public void setFrustum( float left, float right, float bottom, float top, float near, float far )
 	{
         Matrix.setIdentityM(projectionMatrix, 0);
-        Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);		
+        Matrix.frustumM(projectionMatrix, 0, left, right, bottom, top, near, far);
 	}
 
     public void setPerspective( float fovY, float aspect, float zNear, float zFar ) {
-        final float pi = 3.1415926535897932384626433832795f;
-        float fW, fH;
-        fH = (float)(Math.tan( fovY / 360.0f * pi ) * zNear);
+        final double pi = 3.1415926535897932384626433832795;
+        double fW, fH;
+        fH = Math.tan( fovY / 360.0 * pi ) * zNear;
         fW = fH * aspect;
-        setFrustum( -fW, fW, -fH, fH, zNear, zFar );
+        setFrustum( (float)-fW, (float)fW, (float)-fH, (float)fH, zNear, zFar );
     }
 	
     private void drawModelObject( ModelObject modelObject )
@@ -88,11 +97,20 @@ public class Scene
 	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
 	    // (which currently contains model * view).
 	    Matrix.multiplyMM(mvpMatrix, 0, viewMatrix, 0, modelObject.getModelMatrix(), 0);
-	    
+
+        float[] mTempMatrix = mvpMatrix.clone();
 	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
 	    // (which now contains model * view * projection).
-	    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvpMatrix, 0);
+	    Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mTempMatrix, 0);
 	    
-	    modelObject.draw( mvpMatrix, vpMatrixHandle, positionHandle, colourHandle );
+	    modelObject.draw( mvpMatrix, mvpMatrixHandle, positionHandle, colourHandle );
+    }
+
+    public void onViewportChanged( int[] currentViewPort ) {
+        mCurrentViewPort = currentViewPort;
+        int width = currentViewPort[2];
+        int height = currentViewPort[3];
+
+        mSceneChangeHandler.onViewportChanged(width, height);
     }
 }

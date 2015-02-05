@@ -50,10 +50,14 @@ public class ModelObject
 		Matrix.translateM(modelMatrix, 0, x, y, z);
 	}
 
-	public void draw( float[] mvpMatrix, int vpMatrixHandle, int positionHandle, int colourHandle )
+    void rotate( float angle, float x, float y, float z ) {
+        Matrix.rotateM(modelMatrix, 0, angle, x, y, z);
+    }
+
+	public void draw( float[] mvpMatrix, int mvpMatrixHandle, int positionHandle, int colourHandle )
 	{
         // Apply the projection and view transformation
-        GLES20.glUniformMatrix4fv(vpMatrixHandle, 1, false, mvpMatrix, 0);
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);
 
         for (Triangle t : triangles)
 		{
