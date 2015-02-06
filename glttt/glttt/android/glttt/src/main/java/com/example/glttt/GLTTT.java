@@ -50,8 +50,6 @@ public class GLTTT extends Activity {
     
     private GLTTTSurfaceView mSurfaceView;
     
-    private GameController controller;
-
     protected void onResume()
     {
     	super.onResume();
@@ -69,7 +67,7 @@ public class GLTTT extends Activity {
         super.onCreate(savedInstanceState);
 
         View contentView = getWindow().findViewById(Window.ID_ANDROID_CONTENT);
-        mSurfaceView = new GLTTTSurfaceView(this, new GameController(new GameModel(), this), contentView);
+        mSurfaceView = new GLTTTSurfaceView(this, contentView);
         Log.e("opengl", Boolean.toString(detectOpenGLES20()));
         
         setContentView(R.layout.activity_glttt);
@@ -172,15 +170,5 @@ public class GLTTT extends Activity {
         Log.e("game", "info.reqGlEsVersion: " + info.reqGlEsVersion + ", high:" + ((info.reqGlEsVersion & 0xFFFF0000) >> 16) + ", low:" + (0x0000FFFF & info.reqGlEsVersion));
         Log.e("game", "detected opengles_2: " + retVal);
         return retVal;
-    }
-    
-    public void setController( GameController controller )
-    {
-    	this.controller = controller;
-    }
-    
-    public void mouseChoose( int xp, int yp )
-    {
-    	//Log.e("game", "mouseChoose( " + xp + ", " + yp + " )");
     }
 }

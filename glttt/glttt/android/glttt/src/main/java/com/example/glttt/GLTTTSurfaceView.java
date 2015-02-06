@@ -1,48 +1,54 @@
 package com.example.glttt;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class GLTTTSurfaceView extends GLSurfaceView
+public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 {
-	private GameController controller;
-	private GLTTTSurfaceRenderer surfaceRenderer;
-	private View contentView;
+	private GLTTTSurfaceRenderer mSurfaceRenderer;
+	private View mContentView;
+    private GamePresenter mPresenter;
 
-    public GLTTTSurfaceView(Context context, GameController controller, View contentView)
+    public GLTTTSurfaceView(Context context, View contentView)
     {
         super(context);
         
-        this.contentView = contentView;
-        this.controller = controller;
+        mContentView = contentView;
+        mPresenter = new GamePresenter(this);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
-        this.surfaceRenderer = new GLTTTSurfaceRenderer(getResources()); 
-        setRenderer(surfaceRenderer);
+        this.mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), mPresenter.getCurrentScene());
+        setRenderer(mSurfaceRenderer);
     }
 
     public boolean onTouchEvent(MotionEvent e)
     {
-    	float x = e.getRawX() - contentView.getLeft();
-    	float y = e.getRawY() - contentView.getTop();
-    	
-    	ModelObject mo = surfaceRenderer.getClickedModelObject((int)x, (int)y);
-    	Log.e("game", "clicked object: " + mo);
-    	
-    	switch (e.getAction())
-    	{
-    		case MotionEvent.ACTION_DOWN:
-    			controller.actionStart((int)x, (int)y);
-    	}
-    	
-    	return true;
+        return mPresenter.onTouchEvent(e);
+    }
+
+    @Override
+    public float getContentViewLeft() {
+        return mContentView.getLeft();
+    }
+
+    @Override
+    public float getContentViewTop() {
+        return mContentView.getTop();
+    }
+
+    @Override
+    public ModelObject getClickedModelObject(int x, int y) {
+        return mSurfaceRenderer.getClickedModelObject(x, y);
+    }
+
+    @Override
+    public void setCurrentScene(SceneFactory.TYPE type) {
+        mSurfaceRenderer.setCurrentScene(type);
     }
 }
