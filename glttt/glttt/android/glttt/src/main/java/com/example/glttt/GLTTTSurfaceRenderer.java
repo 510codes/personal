@@ -122,4 +122,8 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
             mCurrentScene = mSceneFactory.create(mCurrentSceneType, mPositionHandle, mColourHandle, mMVPMatrixHandle);
         }
     }
+
+    public void setScaleFactor( float scaleFactor ) {
+        mCurrentScene.setZoomFactor(scaleFactor);
+    }
 }

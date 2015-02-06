@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
@@ -11,6 +12,8 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 	private GLTTTSurfaceRenderer mSurfaceRenderer;
 	private View mContentView;
     private GamePresenter mPresenter;
+    private float mScaleFactor = 1.f;
+    private ScaleGestureDetector mScaleDetector;
 
     public GLTTTSurfaceView(Context context, View contentView)
     {
@@ -18,6 +21,7 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
         
         mContentView = contentView;
         mPresenter = new GamePresenter(this);
+        mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
@@ -29,7 +33,7 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 
     public boolean onTouchEvent(MotionEvent e)
     {
-        return mPresenter.onTouchEvent(e);
+        return mPresenter.onTouchEvent(e, mScaleDetector);
     }
 
     @Override
@@ -50,5 +54,24 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
     @Override
     public void setCurrentScene(SceneFactory.TYPE type) {
         mSurfaceRenderer.setCurrentScene(type);
+    }
+
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+
+            // Don't let the object get too small or too large.
+            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
+
+            Log.e("game", "ScaleListener.onScale(): mScaleFactor: " + mScaleFactor);
+
+            mPresenter.onScaleChange(mScaleFactor);
+            return true;
+        }
+    }
+
+    public void setScaleFactor( float scaleFactor ) {
+        mSurfaceRenderer.setScaleFactor(scaleFactor);
     }
 }

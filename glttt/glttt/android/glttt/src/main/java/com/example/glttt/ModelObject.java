@@ -21,11 +21,13 @@ public class ModelObject
 		this.modelMatrix = new float[16];
 		this.triangles = new ArrayList<Triangle>();
     	Matrix.setIdentityM(modelMatrix, 0);
+        mScaleFactor = 1.0f;
 	}
 	
 	private float[] modelMatrix;
 	private ArrayList<Triangle> triangles;
     private String id;
+    private float mScaleFactor;
 
 	public float[] getModelMatrix()
 	{
@@ -40,9 +42,10 @@ public class ModelObject
         triangles.addAll(Arrays.asList(tri));
     }
 
-    void scale( float factor )
+    public void setScaleFactor( float factor )
 	{
-		Matrix.scaleM(modelMatrix, 0, factor, factor, factor);
+        mScaleFactor = factor;
+        recalculateModelMatrix();
 	}
 
 	void translate( float x, float y, float z )
@@ -52,6 +55,11 @@ public class ModelObject
 
     void rotate( float angle, float x, float y, float z ) {
         Matrix.rotateM(modelMatrix, 0, angle, x, y, z);
+    }
+
+    private void recalculateModelMatrix() {
+        Matrix.setIdentityM(modelMatrix, 0);
+        Matrix.scaleM(modelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
     }
 
 	public void draw( float[] mvpMatrix, int mvpMatrixHandle, int positionHandle, int colourHandle )
