@@ -59,12 +59,10 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= detector.getScaleFactor();
+            mScaleFactor *= Math.pow(detector.getScaleFactor(), 1.5);
 
             // Don't let the object get too small or too large.
             mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
-
-            Log.e("game", "ScaleListener.onScale(): mScaleFactor: " + mScaleFactor);
 
             mPresenter.onScaleChange(mScaleFactor);
             return true;
@@ -73,5 +71,10 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 
     public void setScaleFactor( float scaleFactor ) {
         mSurfaceRenderer.setScaleFactor(scaleFactor);
+    }
+
+    @Override
+    public void setRotation( float degrees ) {
+        mSurfaceRenderer.setRotation(degrees);
     }
 }

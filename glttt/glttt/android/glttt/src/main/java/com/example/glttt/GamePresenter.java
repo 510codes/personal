@@ -1,17 +1,20 @@
 package com.example.glttt;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+
+import com.example.glttt.physics.PhysicsManager;
 
 public class GamePresenter {
 
     private IGameView mGameView;
     private PointerTracker mPointerTracker;
+    private PhysicsManager mPhysicsManager;
 
     public GamePresenter( IGameView gameView ) {
         mGameView = gameView;
-        mPointerTracker = new PointerTracker();
+        mPointerTracker = new PointerTracker(this);
+        mPhysicsManager = new PhysicsManager();
     }
 
     /*public boolean onTouchEvent( MotionEvent e, ScaleGestureDetector gestureDetector ) {
@@ -65,5 +68,9 @@ public class GamePresenter {
 
     public void onScaleChange( float newScaleFactor ) {
         mGameView.setScaleFactor(newScaleFactor);
+    }
+
+    public void newSwipeMotion( long dTime, long dx, long dy ) {
+        mPhysicsManager.newSwipeMotion( dTime, dx, dy );
     }
 }

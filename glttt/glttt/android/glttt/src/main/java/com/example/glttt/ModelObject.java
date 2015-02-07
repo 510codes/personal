@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import android.opengl.GLES20;
 import android.opengl.GLU;
@@ -15,31 +14,33 @@ import com.example.glttt.shapes.Triangle;
 
 public class ModelObject
 {
+    private float[] mModelMatrix;
+    private ArrayList<Triangle> mTriangles;
+    private String mId;
+    private float mScaleFactor;
+    private float mYRotation;
+
 	public ModelObject( String id )
 	{
-        this.id = id;
-		this.modelMatrix = new float[16];
-		this.triangles = new ArrayList<Triangle>();
-    	Matrix.setIdentityM(modelMatrix, 0);
+        this.mId = id;
+		this.mModelMatrix = new float[16];
+		this.mTriangles = new ArrayList<Triangle>();
+    	Matrix.setIdentityM(mModelMatrix, 0);
         mScaleFactor = 1.0f;
+        mYRotation = 0.0f;
 	}
-	
-	private float[] modelMatrix;
-	private ArrayList<Triangle> triangles;
-    private String id;
-    private float mScaleFactor;
 
 	public float[] getModelMatrix()
 	{
-		return modelMatrix;
+		return mModelMatrix;
 	}
 
     public void add( Triangle t ) {
-        triangles.add(t);
+        mTriangles.add(t);
     }
 
     public void add( Triangle[] tri ) {
-        triangles.addAll(Arrays.asList(tri));
+        mTriangles.addAll(Arrays.asList(tri));
     }
 
     public void setScaleFactor( float factor )
@@ -48,18 +49,24 @@ public class ModelObject
         recalculateModelMatrix();
 	}
 
+    public void setYRotation( float degrees ) {
+        mYRotation = degrees;
+        recalculateModelMatrix();
+    }
+
 	void translate( float x, float y, float z )
 	{
-		Matrix.translateM(modelMatrix, 0, x, y, z);
+		Matrix.translateM(mModelMatrix, 0, x, y, z);
 	}
 
     void rotate( float angle, float x, float y, float z ) {
-        Matrix.rotateM(modelMatrix, 0, angle, x, y, z);
+        Matrix.rotateM(mModelMatrix, 0, angle, x, y, z);
     }
 
     private void recalculateModelMatrix() {
-        Matrix.setIdentityM(modelMatrix, 0);
-        Matrix.scaleM(modelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
+        Matrix.setIdentityM(mModelMatrix, 0);
+        rotate(mYRotation, 0.0f, 1.0f, 0.0f);
+        Matrix.scaleM(mModelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
     }
 
 	public void draw( float[] mvpMatrix, int mvpMatrixHandle, int positionHandle, int colourHandle )
@@ -67,7 +74,7 @@ public class ModelObject
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);
 
-        for (Triangle t : triangles)
+        for (Triangle t : mTriangles)
 		{
 			drawTriangle( t, positionHandle, colourHandle );
 		}
@@ -81,7 +88,7 @@ public class ModelObject
 
 	public boolean clickedOn( int xpos, int ypos, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
 	{
-		for (Triangle t : triangles)
+		for (Triangle t : mTriangles)
 		{
 			float[] screen0 = new float[3];
 			float[] screen1 = new float[3];
@@ -127,6 +134,6 @@ public class ModelObject
     }
 
     public String toString() {
-        return id;
+        return mId;
     }
 }

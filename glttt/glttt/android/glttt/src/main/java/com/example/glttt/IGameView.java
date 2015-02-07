@@ -6,4 +6,5 @@ public interface IGameView {
     public ModelObject getClickedModelObject( int x, int y );
     public void setCurrentScene( SceneFactory.TYPE type );
     public void setScaleFactor( float scaleFactor );
+    public void setRotation( float degrees );
 }

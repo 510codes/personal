@@ -15,7 +15,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private int mPositionHandle;
     private int mMVPMatrixHandle;
     private int mColourHandle;
-    private Shader mShader;
 
     private Resources mResources;
 
@@ -42,26 +41,26 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
-        mShader = Shader.create(
+        Shader shader = Shader.create(
                 mResources.getString(R.string.vertex_shader),
                 mResources.getString(R.string.fragment_shader)
         );
 
-        mPositionHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_position");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "u_MVPMatrix");
-        mColourHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "a_color");
+        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_MVPMatrix");
+        mColourHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
 
-        mPositionHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_position");
+        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
         if (mPositionHandle == -1)
         {
         	throw new ShaderException("could not get position handle");
         }
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mShader.getProgram(), "u_VPMatrix");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
         if (mMVPMatrixHandle == -1)
         {
         	throw new ShaderException("could not get MVP matrix handle");
         }
-        mColourHandle = GLES20.glGetAttribLocation(mShader.getProgram(), "a_color");
+        mColourHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_color");
         if (mColourHandle == -1)
         {
         	throw new ShaderException("could not get color handle");
@@ -69,7 +68,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
         checkGlError("glGetUniformLocation");
         
-    	GLES20.glUseProgram(mShader.getProgram());
+    	GLES20.glUseProgram(shader.getProgram());
         
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -125,5 +124,9 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
     public void setScaleFactor( float scaleFactor ) {
         mCurrentScene.setZoomFactor(scaleFactor);
+    }
+
+    public void setRotation( float degrees ) {
+        mCurrentScene.setYRotation(degrees);
     }
 }

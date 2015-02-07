@@ -17,8 +17,6 @@ public class Scene
 
     private int[] mCurrentViewPort;
 
-    private float mZoomFactor;
-
     private ISceneChangeHandler mSceneChangeHandler;
 
 	public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler)
@@ -30,8 +28,6 @@ public class Scene
 
         mViewMatrix = new float[16];
         mProjectionMatrix = new float[16];
-
-        mZoomFactor = 1.0f;
 
         this.mSceneChangeHandler = viewportChangeHandler;
         viewportChangeHandler.setScene(this);
@@ -115,6 +111,13 @@ public class Scene
         for (ModelObject modelObject : mModelObjects)
         {
             modelObject.setScaleFactor(zoomFactor);
+        }
+    }
+
+    public void setYRotation( float degrees ) {
+        for (ModelObject modelObject : mModelObjects)
+        {
+            modelObject.setYRotation(degrees);
         }
     }
 }
