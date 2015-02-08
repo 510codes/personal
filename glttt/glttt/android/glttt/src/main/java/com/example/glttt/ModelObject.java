@@ -14,7 +14,7 @@ import com.example.glttt.shapes.Triangle;
 
 public class ModelObject
 {
-    private float[] mModelMatrix;
+    private final float[] mModelMatrix;
     private ArrayList<Triangle> mTriangles;
     private String mId;
     private float mScaleFactor;
@@ -30,17 +30,20 @@ public class ModelObject
         mYRotation = 0.0f;
 	}
 
-	public float[] getModelMatrix()
-	{
-		return mModelMatrix;
-	}
-
     public void add( Triangle t ) {
         mTriangles.add(t);
     }
 
     public void add( Triangle[] tri ) {
         mTriangles.addAll(Arrays.asList(tri));
+    }
+
+    public float[] multiplyByModelMatrix( float[] matrix, int index ) {
+        float[] newMatrix = new float[16];
+        synchronized (mModelMatrix) {
+            Matrix.multiplyMM(newMatrix, 0, matrix, index, mModelMatrix, 0);
+        }
+        return newMatrix;
     }
 
     public void setScaleFactor( float factor )
@@ -56,17 +59,23 @@ public class ModelObject
 
 	void translate( float x, float y, float z )
 	{
-		Matrix.translateM(mModelMatrix, 0, x, y, z);
+        synchronized (mModelMatrix) {
+            Matrix.translateM(mModelMatrix, 0, x, y, z);
+        }
 	}
 
     void rotate( float angle, float x, float y, float z ) {
-        Matrix.rotateM(mModelMatrix, 0, angle, x, y, z);
+        synchronized(mModelMatrix) {
+            Matrix.rotateM(mModelMatrix, 0, angle, x, y, z);
+        }
     }
 
     private void recalculateModelMatrix() {
-        Matrix.setIdentityM(mModelMatrix, 0);
-        rotate(mYRotation, 0.0f, 1.0f, 0.0f);
-        Matrix.scaleM(mModelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
+        synchronized(mModelMatrix) {
+            Matrix.setIdentityM(mModelMatrix, 0);
+            rotate(mYRotation, 0.0f, 1.0f, 0.0f);
+            Matrix.scaleM(mModelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
+        }
     }
 
 	public void draw( float[] mvpMatrix, int mvpMatrixHandle, int positionHandle, int colourHandle )

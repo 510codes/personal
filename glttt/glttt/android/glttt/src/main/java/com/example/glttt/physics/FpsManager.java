@@ -54,4 +54,8 @@ class FpsManager {
 
         return nextStepTime;
     }
+
+    public long getCurrentTimeNanos() {
+        return mCurrentTimeNanos;
+    }
 }

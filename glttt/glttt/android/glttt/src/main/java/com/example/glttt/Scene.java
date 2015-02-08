@@ -90,7 +90,7 @@ public class Scene
     		    
 	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
 	    // (which currently contains model * view).
-	    Matrix.multiplyMM(mvpMatrix, 0, mViewMatrix, 0, modelObject.getModelMatrix(), 0);
+        mvpMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
 
 	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
 	    // (which now contains model * view * projection).

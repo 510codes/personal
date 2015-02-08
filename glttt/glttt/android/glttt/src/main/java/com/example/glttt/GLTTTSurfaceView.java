@@ -20,15 +20,17 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
         super(context);
         
         mContentView = contentView;
-        mPresenter = new GamePresenter(this);
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
-        this.mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), mPresenter.getCurrentScene());
+        this.mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources());
         setRenderer(mSurfaceRenderer);
+
+        mPresenter = new GamePresenter(this);
+        mSurfaceRenderer.setCurrentScene(mPresenter.getCurrentScene());
     }
 
     public boolean onTouchEvent(MotionEvent e)
@@ -76,5 +78,12 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
     @Override
     public void setRotation( float degrees ) {
         mSurfaceRenderer.setRotation(degrees);
+    }
+
+    @Override
+    public void waitUntilViewReady() throws InterruptedException {
+        synchronized (mSurfaceRenderer) {
+            mSurfaceRenderer.wait();
+        }
     }
 }

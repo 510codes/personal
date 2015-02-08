@@ -42,7 +42,7 @@ public class PointerTracker {
                 mLastTouchX = x;
                 mLastTouchY = y;
                 mActivePointerId = e.getPointerId(0);
-                Log.e("game", "ACTION_DOWN: mActivePointerReview: " + mActivePointerId);
+                Log.v("PointerTracker", "ACTION_DOWN: mActivePointerReview: " + mActivePointerId);
                 break;
             }
 
@@ -67,7 +67,7 @@ public class PointerTracker {
 
                     mPosX += dx;
                     mPosY += dy;
-                    Log.e("game", "ACTION_MOVE: xVel: " + xVel + ", yVel: " + yVel + ", ax: " + ax + ", ay: " + ay);
+                    Log.v("PointerTracker", "ACTION_MOVE: xVel: " + xVel + ", yVel: " + yVel + ", ax: " + ax + ", ay: " + ay);
 
                     mPresenter.newSwipeMotion(dTime, dx, dy);
 
@@ -83,7 +83,7 @@ public class PointerTracker {
 
             case MotionEvent.ACTION_UP: {
                 mActivePointerId = INVALID_POINTER_ID;
-                Log.e("game", "ACTION_UP");
+                Log.v("PointerTracker", "ACTION_UP");
                 break;
             }
 
@@ -103,7 +103,7 @@ public class PointerTracker {
                     mLastTouchX = e.getX(newPointerIndex);
                     mLastTouchY = e.getY(newPointerIndex);
                     mActivePointerId = e.getPointerId(newPointerIndex);
-                    Log.e("game", "ACTION_POINTER_UP: mLastTouchX: " + mLastTouchX + ", mLastTouchY:" + mLastTouchY);
+                    Log.v("PointerTracker", "ACTION_POINTER_UP: mLastTouchX: " + mLastTouchX + ", mLastTouchY:" + mLastTouchY);
                 }
                 break;
             }

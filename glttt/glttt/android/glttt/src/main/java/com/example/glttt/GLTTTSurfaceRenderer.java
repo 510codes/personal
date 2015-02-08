@@ -24,13 +24,13 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
     private boolean mSurfaceCreated;
 
-    public GLTTTSurfaceRenderer( Resources resources, SceneFactory.TYPE initialScene )
+    public GLTTTSurfaceRenderer( Resources resources )
     {
     	super();
     	
     	mResources = resources;
     	mCurrentScene = null;
-        mCurrentSceneType = initialScene;
+        mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
         mSceneFactory = new SceneFactory();
         mColourHandle = -1;
         mPositionHandle = -1;
@@ -41,41 +41,42 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
-        Shader shader = Shader.create(
-                mResources.getString(R.string.vertex_shader),
-                mResources.getString(R.string.fragment_shader)
-        );
+        synchronized (this) {
+            Shader shader = Shader.create(
+                    mResources.getString(R.string.vertex_shader),
+                    mResources.getString(R.string.fragment_shader)
+            );
 
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_MVPMatrix");
-        mColourHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
+            mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
+            mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_MVPMatrix");
+            mColourHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
 
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        if (mPositionHandle == -1)
-        {
-        	throw new ShaderException("could not get position handle");
+            mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
+            if (mPositionHandle == -1) {
+                throw new ShaderException("could not get position handle");
+            }
+            mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
+            if (mMVPMatrixHandle == -1) {
+                throw new ShaderException("could not get MVP matrix handle");
+            }
+            mColourHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_color");
+            if (mColourHandle == -1) {
+                throw new ShaderException("could not get color handle");
+            }
+
+            checkGlError("glGetUniformLocation");
+
+            GLES20.glUseProgram(shader.getProgram());
+
+            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+            GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+
+            mSurfaceCreated = true;
+            setCurrentScene(mCurrentSceneType);
+
+            notify();
         }
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
-        if (mMVPMatrixHandle == -1)
-        {
-        	throw new ShaderException("could not get MVP matrix handle");
-        }
-        mColourHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_color");
-        if (mColourHandle == -1)
-        {
-        	throw new ShaderException("could not get color handle");
-        }
-
-        checkGlError("glGetUniformLocation");
-        
-    	GLES20.glUseProgram(shader.getProgram());
-        
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-
-        mSurfaceCreated = true;
-        mCurrentScene = mSceneFactory.create(mCurrentSceneType, mPositionHandle, mColourHandle, mMVPMatrixHandle);
     }
 
     @Override
@@ -117,9 +118,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
 
     public void setCurrentScene( SceneFactory.TYPE type ) {
         mCurrentSceneType = type;
-        if (mSurfaceCreated) {
-            mCurrentScene = mSceneFactory.create(mCurrentSceneType, mPositionHandle, mColourHandle, mMVPMatrixHandle);
-        }
+        mCurrentScene = mSceneFactory.create(mCurrentSceneType, mPositionHandle, mColourHandle, mMVPMatrixHandle);
     }
 
     public void setScaleFactor( float scaleFactor ) {

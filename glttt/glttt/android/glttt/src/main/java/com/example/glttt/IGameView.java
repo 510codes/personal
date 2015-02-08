@@ -7,4 +7,5 @@ public interface IGameView {
     public void setCurrentScene( SceneFactory.TYPE type );
     public void setScaleFactor( float scaleFactor );
     public void setRotation( float degrees );
+    public void waitUntilViewReady() throws InterruptedException;
 }

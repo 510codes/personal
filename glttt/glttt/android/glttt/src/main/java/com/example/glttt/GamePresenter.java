@@ -14,7 +14,7 @@ public class GamePresenter {
     public GamePresenter( IGameView gameView ) {
         mGameView = gameView;
         mPointerTracker = new PointerTracker(this);
-        mPhysicsManager = new PhysicsManager();
+        mPhysicsManager = new PhysicsManager(this);
     }
 
     /*public boolean onTouchEvent( MotionEvent e, ScaleGestureDetector gestureDetector ) {
@@ -72,5 +72,13 @@ public class GamePresenter {
 
     public void newSwipeMotion( long dTime, long dx, long dy ) {
         mPhysicsManager.newSwipeMotion( dTime, dx, dy );
+    }
+
+    public void setSceneRotation( float degrees ) {
+        mGameView.setRotation(degrees);
+    }
+
+    public void waitForViewReady() throws InterruptedException {
+        mGameView.waitUntilViewReady();
     }
 }

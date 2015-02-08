@@ -48,11 +48,15 @@ public class SceneFactory {
 
         switch (type) {
             case NEW_GAME_SCENE:
-                scene = createNewGameScene( positionHandle, colourHandle, mvpMatrixHandle );
+                scene = createNewGameScene(positionHandle, colourHandle, mvpMatrixHandle);
                 break;
 
             case GAME_BOARD_SCENE:
                 scene = createGameBoardScene( positionHandle, colourHandle, mvpMatrixHandle );
+                break;
+
+            case NO_SCENE:
+                scene = createEmptyScene( positionHandle, colourHandle, mvpMatrixHandle );
                 break;
 
             default:
@@ -166,6 +170,12 @@ public class SceneFactory {
 
         scene.add(redSquare);
         scene.add(whiteSquare);
+
+        return scene;
+    }
+
+    private Scene createEmptyScene( int colourHandle, int positionHandle, int mvpMatrixHandle ) {
+        Scene scene = new Scene(colourHandle, positionHandle, mvpMatrixHandle, new NewGameSceneChangeHandler());
 
         return scene;
     }
