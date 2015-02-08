@@ -22,8 +22,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private SceneFactory.TYPE mCurrentSceneType;
     private Scene mCurrentScene;
 
-    private boolean mSurfaceCreated;
-
     public GLTTTSurfaceRenderer( Resources resources )
     {
     	super();
@@ -35,7 +33,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         mColourHandle = -1;
         mPositionHandle = -1;
         mMVPMatrixHandle = -1;
-        mSurfaceCreated = false;
     }
     
     @Override
@@ -72,7 +69,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
             GLES20.glEnable(GLES20.GL_DEPTH_TEST);
             GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
-            mSurfaceCreated = true;
             setCurrentScene(mCurrentSceneType);
 
             notify();

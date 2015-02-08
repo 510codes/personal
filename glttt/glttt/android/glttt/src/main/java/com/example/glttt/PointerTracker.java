@@ -18,8 +18,10 @@ public class PointerTracker {
     private float mLastXVel;
     private float mLastYVel;
     private int mActivePointerId = INVALID_POINTER_ID;
+    private boolean mWasMoving;
 
     public PointerTracker( GamePresenter presenter ) {
+        mWasMoving = false;
         mPresenter = presenter;
     }
 
@@ -48,6 +50,7 @@ public class PointerTracker {
             }
 
             case MotionEvent.ACTION_MOVE: {
+                mWasMoving = true;
                 final int pointerIndex = e.findPointerIndex(mActivePointerId);
                 final float x = e.getX(pointerIndex);
                 final float y = e.getY(pointerIndex);
@@ -83,8 +86,12 @@ public class PointerTracker {
             }
 
             case MotionEvent.ACTION_UP: {
+                if (mWasMoving == false) {
+                    mPresenter.newTapMotion((int)e.getX(), (int)e.getY());
+                }
                 mActivePointerId = INVALID_POINTER_ID;
                 Log.v("PointerTracker", "ACTION_UP");
+                mWasMoving = false;
                 break;
             }
 
@@ -110,7 +117,7 @@ public class PointerTracker {
             }
 
             case MotionEvent.ACTION_POINTER_DOWN: {
-                Log.d("PointerTracker", "ACTION_POINTER_DOWN: mLastTouchX: " + mLastTouchX + ", mLastTouchY:" + mLastTouchY);
+                Log.v("PointerTracker", "ACTION_POINTER_DOWN: mLastTouchX: " + mLastTouchX + ", mLastTouchY:" + mLastTouchY);
             }
         }
 

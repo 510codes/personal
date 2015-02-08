@@ -95,6 +95,21 @@ public class ModelObject
 		return f;
 	}
 
+    private float[] getTransformedPoint( float x, float y, float z ) {
+        float[] resultVec = new float[4];
+        float[] inputVec = new float[4];
+        inputVec[0] = x;
+        inputVec[1] = y;
+        inputVec[2] = z;
+        inputVec[3] = 1;
+
+        synchronized (mModelMatrix) {
+            Matrix.multiplyMV(resultVec, 0, mModelMatrix, 0, inputVec, 0);
+        }
+
+        return resultVec;
+    }
+
 	public boolean clickedOn( int xpos, int ypos, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
 	{
 		for (Triangle t : mTriangles)
@@ -102,9 +117,14 @@ public class ModelObject
 			float[] screen0 = new float[3];
 			float[] screen1 = new float[3];
 			float[] screen2 = new float[3];
-			GLU.gluProject(t.getX(0), t.getY(0), t.getZ(0), viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen0, 0);
-			GLU.gluProject(t.getX(1), t.getY(1), t.getZ(1), viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen1, 0);
-			GLU.gluProject(t.getX(2), t.getY(2), t.getZ(2), viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen2, 0);
+
+            float[] transformedPoint1 = getTransformedPoint( t.getX(0), t.getY(0), t.getZ(0) );
+            float[] transformedPoint2 = getTransformedPoint( t.getX(1), t.getY(1), t.getZ(1) );
+            float[] transformedPoint3 = getTransformedPoint( t.getX(2), t.getY(2), t.getZ(2) );
+
+			GLU.gluProject(transformedPoint1[0], transformedPoint1[1], transformedPoint1[2], viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen0, 0);
+			GLU.gluProject(transformedPoint2[0], transformedPoint2[1], transformedPoint2[2], viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen1, 0);
+			GLU.gluProject(transformedPoint3[0], transformedPoint3[1], transformedPoint3[2], viewMatrix, 0, projectionMatrix, 0, viewport, 0, screen2, 0);
 			
 			boolean b1, b2, b3;
 			

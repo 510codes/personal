@@ -73,7 +73,6 @@ class PhysicsThread extends Thread {
 
             float deltaDegrees = mVelocity * dTimeInS;
             mPosInDegrees += deltaDegrees;
-            //float degrees = ((curTime / (NANOS_PER_MS * 20))) % 360;
 
             mPresenter.setSceneRotation(mPosInDegrees);
 
