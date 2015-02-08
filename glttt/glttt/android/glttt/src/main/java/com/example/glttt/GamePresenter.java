@@ -70,8 +70,8 @@ public class GamePresenter {
         mGameView.setScaleFactor(newScaleFactor);
     }
 
-    public void newSwipeMotion( long dTime, long dx, long dy ) {
-        mPhysicsManager.newSwipeMotion( dTime, dx, dy );
+    public void newSwipeMotion( float dTimeInS, long dx, long dy ) {
+        mPhysicsManager.newSwipeMotion( dTimeInS, dx, dy );
     }
 
     public void setSceneRotation( float degrees ) {

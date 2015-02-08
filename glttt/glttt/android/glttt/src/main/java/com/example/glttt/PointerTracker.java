@@ -14,7 +14,7 @@ public class PointerTracker {
     private float mLastTouchY;
     private float mPosX;
     private float mPosY;
-    private long mLastEventTime;
+    private long mLastEventTimeInMs;
     private float mLastXVel;
     private float mLastYVel;
     private int mActivePointerId = INVALID_POINTER_ID;
@@ -28,12 +28,13 @@ public class PointerTracker {
         scaleDetector.onTouchEvent(e);
 
         final int action = e.getAction();
-        final long currentEventTime = e.getEventTime();
-        final long dTime = currentEventTime - mLastEventTime;
+        final long currentEventTimeInMs = e.getEventTime();
+        final long dTimeInMs_ = currentEventTimeInMs - mLastEventTimeInMs;
+        final float dTimeInS = (float)dTimeInMs_ / 1000.0f;
 
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
-                mLastEventTime = e.getEventTime();
+                mLastEventTimeInMs = e.getEventTime();
                 mLastXVel = 0.0f;
                 mLastXVel = 0.0f;
                 final float x = e.getX();
@@ -56,20 +57,20 @@ public class PointerTracker {
                     final long dx = (long)x - (long)mLastTouchX;
                     final long dy = (long)y - (long)mLastTouchY;
 
-                    final float xVel = dx / (float)dTime;
-                    final float yVel = dy / (float)dTime;
+                    final float xVel = dx / dTimeInS;
+                    final float yVel = dy / dTimeInS;
 
                     final float dxVel = xVel - mLastXVel;
                     final float dyVel = yVel - mLastYVel;
 
-                    final float ax = dxVel / (float)dTime;
-                    final float ay = dyVel / (float)dTime;
+                    final float ax = dxVel / dTimeInS;
+                    final float ay = dyVel / dTimeInS;
 
                     mPosX += dx;
                     mPosY += dy;
                     Log.v("PointerTracker", "ACTION_MOVE: xVel: " + xVel + ", yVel: " + yVel + ", ax: " + ax + ", ay: " + ay);
 
-                    mPresenter.newSwipeMotion(dTime, dx, dy);
+                    mPresenter.newSwipeMotion(dTimeInS, dx, dy);
 
                     mLastXVel = xVel;
                     mLastYVel = yVel;
@@ -107,9 +108,13 @@ public class PointerTracker {
                 }
                 break;
             }
+
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                Log.d("PointerTracker", "ACTION_POINTER_DOWN: mLastTouchX: " + mLastTouchX + ", mLastTouchY:" + mLastTouchY);
+            }
         }
 
-        mLastEventTime = currentEventTime;
+        mLastEventTimeInMs = currentEventTimeInMs;
 
         return true;
     }
