@@ -11,11 +11,13 @@ public class GamePresenter {
     private IGameView mGameView;
     private PointerTracker mPointerTracker;
     private PhysicsManager mPhysicsManager;
+    private ModelObject mTapDownObject;
 
     public GamePresenter( IGameView gameView ) {
         mGameView = gameView;
         mPointerTracker = new PointerTracker(this);
         mPhysicsManager = new PhysicsManager(this);
+        mTapDownObject = null;
     }
 
     /*public boolean onTouchEvent( MotionEvent e, ScaleGestureDetector gestureDetector ) {
@@ -72,12 +74,21 @@ public class GamePresenter {
     }
 
     public void newSwipeMotion( float dTimeInS, long dx, long dy ) {
-        mPhysicsManager.newSwipeMotion( dTimeInS, dx, dy );
+        mPhysicsManager.newSwipeMotion(dTimeInS, dx, dy);
     }
 
-    public void newTapMotion( int x, int y ) {
-        ModelObject o = mGameView.getClickedModelObject(x, y);
-        Log.d("GamePresenter", "x: " + x + ", y: " + y + ", tapped on: " + o);
+    public void tapDown( int x, int y ) {
+        mTapDownObject = mGameView.getClickedModelObject(x, y);
+    }
+
+    public void tapUp( int x, int y ) {
+        ModelObject tapUpObject = mGameView.getClickedModelObject(x, y);
+        if (mTapDownObject == tapUpObject && mTapDownObject != null) {
+            Log.d("GamePresenter", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
+        }
+        else {
+            Log.d("GamePresenter", "x: " + x + ", y: " + y + ", tapped on nothing");
+        }
     }
 
     public void setSceneRotation( float degrees ) {

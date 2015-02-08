@@ -21,9 +21,9 @@ public class Scene
 
 	public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler)
 	{
-		this.mPositionHandle = positionHandle;
-		this.mColourHandle = colourHandle;
-		this.mMvpMatrixHandle = mvpMatrixHandle;
+		mPositionHandle = positionHandle;
+		mColourHandle = colourHandle;
+		mMvpMatrixHandle = mvpMatrixHandle;
         mModelObjects = new ArrayList<ModelObject>();
 
         mViewMatrix = new float[16];
@@ -76,14 +76,6 @@ public class Scene
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 	}
 
-    public void setPerspective( float fovY, float aspect, float zNear, float zFar ) {
-        final double pi = 3.1415926535897932384626433832795;
-        double fW, fH;
-        fH = Math.tan( fovY / 360.0 * pi ) * zNear;
-        fW = fH * aspect;
-        setFrustum( (float)-fW, (float)fW, (float)-fH, (float)fH, zNear, zFar );
-    }
-	
     private void drawModelObject( ModelObject modelObject )
     {
     	float[] mvpMatrix = new float[16];

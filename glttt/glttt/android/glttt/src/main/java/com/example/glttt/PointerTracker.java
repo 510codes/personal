@@ -12,16 +12,10 @@ public class PointerTracker {
 
     private float mLastTouchX;
     private float mLastTouchY;
-    private float mPosX;
-    private float mPosY;
     private long mLastEventTimeInMs;
-    private float mLastXVel;
-    private float mLastYVel;
     private int mActivePointerId = INVALID_POINTER_ID;
-    private boolean mWasMoving;
 
     public PointerTracker( GamePresenter presenter ) {
-        mWasMoving = false;
         mPresenter = presenter;
     }
 
@@ -37,8 +31,6 @@ public class PointerTracker {
         switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
                 mLastEventTimeInMs = e.getEventTime();
-                mLastXVel = 0.0f;
-                mLastXVel = 0.0f;
                 final float x = e.getX();
                 final float y = e.getY();
 
@@ -46,11 +38,11 @@ public class PointerTracker {
                 mLastTouchY = y;
                 mActivePointerId = e.getPointerId(0);
                 Log.v("PointerTracker", "ACTION_DOWN: mActivePointerReview: " + mActivePointerId);
+                mPresenter.tapDown((int)x, (int)y);
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
-                mWasMoving = true;
                 final int pointerIndex = e.findPointerIndex(mActivePointerId);
                 final float x = e.getX(pointerIndex);
                 final float y = e.getY(pointerIndex);
@@ -60,23 +52,8 @@ public class PointerTracker {
                     final long dx = (long)x - (long)mLastTouchX;
                     final long dy = (long)y - (long)mLastTouchY;
 
-                    final float xVel = dx / dTimeInS;
-                    final float yVel = dy / dTimeInS;
-
-                    final float dxVel = xVel - mLastXVel;
-                    final float dyVel = yVel - mLastYVel;
-
-                    final float ax = dxVel / dTimeInS;
-                    final float ay = dyVel / dTimeInS;
-
-                    mPosX += dx;
-                    mPosY += dy;
-                    Log.v("PointerTracker", "ACTION_MOVE: xVel: " + xVel + ", yVel: " + yVel + ", ax: " + ax + ", ay: " + ay);
-
+                    Log.v("PointerTracker", "ACTION_MOVE: dx: " + dx + ", dy: " + dy);
                     mPresenter.newSwipeMotion(dTimeInS, dx, dy);
-
-                    mLastXVel = xVel;
-                    mLastYVel = yVel;
                 }
 
                 mLastTouchX = x;
@@ -86,12 +63,9 @@ public class PointerTracker {
             }
 
             case MotionEvent.ACTION_UP: {
-                if (mWasMoving == false) {
-                    mPresenter.newTapMotion((int)e.getX(), (int)e.getY());
-                }
+                mPresenter.tapUp((int)e.getX(), (int)e.getY());
                 mActivePointerId = INVALID_POINTER_ID;
                 Log.v("PointerTracker", "ACTION_UP");
-                mWasMoving = false;
                 break;
             }
 
