@@ -22,24 +22,4 @@ public class NewGameSceneChangeHandler implements ISceneChangeHandler {
     public void setScene(Scene scene) {
         mScene = scene;
     }
-
-    @Override
-    public void preSceneDraw() {
-        // Position the eye behind the origin.
-        final float eyeX = 1.0f;
-        final float eyeY = 0.0f;
-        final float eyeZ = 1.5f;
-
-        // We are looking toward the distance
-        final float lookX = 1.0f;
-        final float lookY = 0.0f;
-        final float lookZ = -5.0f;
-
-        // Set our up vector. This is where our head would be pointing were we holding the camera.
-        final float upX = 0.0f;
-        final float upY = 1.0f;
-        final float upZ = 0.0f;
-
-        mScene.setLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
-    }
 }

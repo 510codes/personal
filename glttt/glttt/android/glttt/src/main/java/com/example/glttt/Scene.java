@@ -30,7 +30,9 @@ public class Scene
 		mPositionHandle = positionHandle;
 		mColourHandle = colourHandle;
 		mMvpMatrixHandle = mvpMatrixHandle;
-        pulseReceiver.setScene(this);
+        if (pulseReceiver != null) {
+            pulseReceiver.setScene(this);
+        }
         mModelObjects = new ArrayList<ModelObject>();
 
         mViewMatrix = new float[16];
@@ -47,8 +49,6 @@ public class Scene
 	
 	public void draw()
 	{
-        mSceneChangeHandler.preSceneDraw();
-
 		for (ModelObject modelObject : mModelObjects)
 		{
 			drawModelObject(modelObject);

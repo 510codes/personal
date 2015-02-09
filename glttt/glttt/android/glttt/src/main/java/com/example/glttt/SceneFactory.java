@@ -144,6 +144,23 @@ public class SceneFactory {
 
         scene.add(obj);
 
+        // Position the eye behind the origin.
+        final float eyeX = 0.0f;
+        final float eyeY = 0.0f;
+        final float eyeZ = 1.5f;
+
+        // We are looking toward the distance
+        final float lookX = 0.0f;
+        final float lookY = 0.0f;
+        final float lookZ = -5.0f;
+
+        // Set our up vector. This is where our head would be pointing were we holding the camera.
+        final float upX = 0.0f;
+        final float upY = 1.0f;
+        final float upZ = 0.0f;
+
+        scene.setLookAt(eyeX, eyeY + 5.0f, eyeZ + 15.0f, lookX, lookY, lookZ - 10.0f, upX, upY, upZ);
+
         return scene;
     }
 
@@ -179,6 +196,23 @@ public class SceneFactory {
 
         scene.add(redSquare);
         scene.add(whiteSquare);
+
+        // Position the eye behind the origin.
+        final float eyeX = 1.0f;
+        final float eyeY = 0.0f;
+        final float eyeZ = 1.5f;
+
+        // We are looking toward the distance
+        final float lookX = 1.0f;
+        final float lookY = 0.0f;
+        final float lookZ = -5.0f;
+
+        // Set our up vector. This is where our head would be pointing were we holding the camera.
+        final float upX = 0.0f;
+        final float upY = 1.0f;
+        final float upZ = 0.0f;
+
+        scene.setLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         return scene;
     }
