@@ -2,40 +2,37 @@ package com.example.glttt;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.example.glttt.pulser.PulseManager;
+
 public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 {
-	private GLTTTSurfaceRenderer mSurfaceRenderer;
+    private static final int PHYSICS_FPS = 60;
+	private final GLTTTSurfaceRenderer mSurfaceRenderer;
 	private View mContentView;
+    private GestureManager mGestureManager;
     private GamePresenter mPresenter;
-    private float mScaleFactor = 1.f;
-    private ScaleGestureDetector mScaleDetector;
 
     public GLTTTSurfaceView(Context context, View contentView)
     {
         super(context);
         
         mContentView = contentView;
-        mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
-        this.mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources());
+        mGestureManager = new GestureManager(context);
+        SceneFactory sceneFactory = new SceneFactory(new PulseManager(PHYSICS_FPS), mGestureManager);
+        mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), sceneFactory);
         setRenderer(mSurfaceRenderer);
 
         mPresenter = new GamePresenter(this);
-        mSurfaceRenderer.setCurrentScene(mPresenter.getCurrentScene());
-    }
-
-    public boolean onTouchEvent(MotionEvent e)
-    {
-        return mPresenter.onTouchEvent(e, mScaleDetector);
+        mSurfaceRenderer.setCurrentScene(mPresenter.getCurrentSceneType());
     }
 
     @Override
@@ -58,19 +55,6 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
         mSurfaceRenderer.setCurrentScene(type);
     }
 
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= Math.pow(detector.getScaleFactor(), 1.5);
-
-            // Don't let the object get too small or too large.
-            mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
-
-            mPresenter.onScaleChange(mScaleFactor);
-            return true;
-        }
-    }
-
     public void setScaleFactor( float scaleFactor ) {
         mSurfaceRenderer.setScaleFactor(scaleFactor);
     }
@@ -81,9 +65,8 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
     }
 
     @Override
-    public void waitUntilViewReady() throws InterruptedException {
-        synchronized (mSurfaceRenderer) {
-            mSurfaceRenderer.wait();
-        }
+    public boolean onTouchEvent(MotionEvent e)
+    {
+        return mGestureManager.onTouchEvent(e);
     }
 }

@@ -30,7 +30,7 @@ public class ShapeFactory {
         return new Triangle( vertexData, id );
     }
 
-    public static Triangle[] createRectangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
+    public Triangle[] createRectangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
         Triangle[] t = new Triangle[2];
         int[] indices = new int[3];
 

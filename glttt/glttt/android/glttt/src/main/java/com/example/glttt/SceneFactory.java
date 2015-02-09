@@ -1,12 +1,12 @@
 package com.example.glttt;
 
+import com.example.glttt.pulser.PulseManager;
 import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.shapes.Triangle;
 
 public class SceneFactory {
 
     private static final float ORIGINAL_TRI_VERTEX_DIVISOR = 500.0f;
-    private static final float NEW_TRI_VERTEX_DIVISOR = 1.0f;
     private static final float BOARD_VERTEX_DIVISOR = 50.0f;
 
     private static final float[] PEG_COLOUR_NORMAL = {0.55f, 0.55f, 0.48f, 0.3f};
@@ -32,9 +32,13 @@ public class SceneFactory {
     private static final int PEG_THICK = 1;
 
     private ShapeFactory mShapeFactory;
+    private PulseManager mPulseManager;
+    private GestureManager mGestureManager;
 
-    public SceneFactory() {
+    public SceneFactory( PulseManager pulseManager, GestureManager gestureManager ) {
         mShapeFactory = new ShapeFactory();
+        mPulseManager = pulseManager;
+        mGestureManager = gestureManager;
     }
 
     public static enum TYPE {
@@ -67,7 +71,12 @@ public class SceneFactory {
     }
 
     private Scene createGameBoardScene( int positionHandle, int colourHandle, int mvpMatrixHandle ) {
-        Scene scene = new Scene(positionHandle, colourHandle, mvpMatrixHandle, new GameBoardSceneChangeHandler());
+        GameBoardInputReceiver inputReceiver = new GameBoardInputReceiver();
+        Scene scene = new Scene(positionHandle, colourHandle, mvpMatrixHandle,
+                new GameBoardSceneChangeHandler(),
+                inputReceiver);
+        mPulseManager.setPulseReceiver(inputReceiver);
+        mGestureManager.setGestureListener(inputReceiver);
 
         float boardVertices[] = {
                 -100.0f, 0.0f, -100.0f,

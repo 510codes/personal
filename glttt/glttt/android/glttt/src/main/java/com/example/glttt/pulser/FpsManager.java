@@ -1,6 +1,4 @@
-package com.example.glttt.physics;
-
-import android.util.Log;
+package com.example.glttt.pulser;
 
 class FpsManager {
     private static final long NANOS_PER_SECOND = 1000000000;

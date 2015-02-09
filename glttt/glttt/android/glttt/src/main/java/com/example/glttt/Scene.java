@@ -19,11 +19,16 @@ public class Scene
 
     private ISceneChangeHandler mSceneChangeHandler;
 
-	public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler)
+    public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler) {
+        this( positionHandle, colourHandle, mvpMatrixHandle, viewportChangeHandler, null);
+    }
+
+    public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
 	{
 		mPositionHandle = positionHandle;
 		mColourHandle = colourHandle;
 		mMvpMatrixHandle = mvpMatrixHandle;
+        pulseReceiver.setScene(this);
         mModelObjects = new ArrayList<ModelObject>();
 
         mViewMatrix = new float[16];
