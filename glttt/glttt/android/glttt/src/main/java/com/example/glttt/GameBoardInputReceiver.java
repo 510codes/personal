@@ -6,7 +6,7 @@ import com.example.glttt.pulser.IPulseReceiver;
 
 public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener {
     private static final long NANOS_PER_SECOND = 1000000000;
-    
+
     private static final float SWIPE_MASS = 1.0f;
 
     private static final float BOARD_MASS = 2.0f;
@@ -15,12 +15,16 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     private static final float EYE_MASS = 20.0f;
     private static final float EYE_DAMPING_ACCELERATION = 30.0f;
-    private static final float EYE_POS_MAX = 10.0f;
-    private static final float EYE_POS_MIN = 1.8f;
+    private static final float EYE_POS_Y_MAX = 15.0f;
+    private static final float EYE_POS_Y_MIN = 1.8f;
     private static final float EYE_VELOCITY_MIN = 0.5f;
+    private static final float EYE_POS_Z_MIN = 8.0f;
+    private static final float EYE_POS_Z_MAX = 20.0f;
+    private static final float EYE_LOOKAT_Z_MIN = -5.0f;
+    private static final float EYE_LOOKAT_Z_MAX = 5.0f;
 
     private static final float SCALE_FACTOR_MAX = 5.0f;
-    private static final float SCALE_FACTOR_MIN = 0.5f;
+    private static final float SCALE_FACTOR_MIN = 1.0f;
     private static final float SCALE_EXPONENT = 1.5f;
 
     private float mPosInDegrees;
@@ -29,6 +33,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     private float mScaleFactor;
     private Scene mScene;
     private float[] mEyePos;
+    private float[] mEyeLookAt;
     private ModelObject mTapDownObject;
 
     public GameBoardInputReceiver() {
@@ -37,6 +42,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         mEyeVelocity = 0.0f;
         mScene = null;
         mEyePos = null;
+        mEyeLookAt = null;
         mTapDownObject = null;
         mScaleFactor = 1.0f;
     }
@@ -45,6 +51,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     public void setScene( Scene scene ) {
         mScene = scene;
         mEyePos = scene.getEyePos();
+        mEyeLookAt = scene.getEyeLookAt();
     }
 
     @Override
@@ -88,16 +95,21 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
             float deltaPos = mEyeVelocity * dTimeInS;
             mEyePos[1] += deltaPos;
-            if (mEyePos[1] > EYE_POS_MAX) {
-                mEyePos[1] = EYE_POS_MAX;
+            if (mEyePos[1] > EYE_POS_Y_MAX) {
+                mEyePos[1] = EYE_POS_Y_MAX;
                 mEyeVelocity = 0.0f;
             }
-            if (mEyePos[1] < EYE_POS_MIN) {
-                mEyePos[1] = EYE_POS_MIN;
+            if (mEyePos[1] < EYE_POS_Y_MIN) {
+                mEyePos[1] = EYE_POS_Y_MIN;
                 mEyeVelocity = 0.0f;
             }
 
+            float fact = (mEyePos[1] - EYE_POS_Y_MIN) / (EYE_POS_Y_MAX - EYE_POS_Y_MIN);
+            mEyePos[2] = EYE_POS_Z_MAX - ((EYE_POS_Z_MAX - EYE_POS_Z_MIN) * fact);
+            mEyeLookAt[2] = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
+
             mScene.setEyePos(mEyePos);
+            mScene.setEyeLookAt(mEyeLookAt);
 
             Log.d("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
         }

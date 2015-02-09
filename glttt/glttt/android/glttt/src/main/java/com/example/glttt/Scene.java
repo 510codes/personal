@@ -116,6 +116,12 @@ public class Scene
         updateLookAt();
     }
 
+    public void setEyeLookAt( float[] pos ) {
+        mEyeLookAt = pos;
+
+        updateLookAt();
+    }
+
     private void updateLookAt() {
         Matrix.setLookAtM(mViewMatrix, 0, mEyePos[0], mEyePos[1], mEyePos[2], mEyeLookAt[0], mEyeLookAt[1], mEyeLookAt[2], mEyeUpVec[0], mEyeUpVec[1], mEyeUpVec[2]);
     }
@@ -165,5 +171,9 @@ public class Scene
 
     public float[] getEyePos() {
         return mEyePos;
+    }
+
+    public float[] getEyeLookAt() {
+        return mEyeLookAt;
     }
 }
