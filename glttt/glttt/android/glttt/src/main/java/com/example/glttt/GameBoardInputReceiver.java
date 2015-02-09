@@ -6,11 +6,22 @@ import com.example.glttt.pulser.IPulseReceiver;
 
 public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener {
     private static final long NANOS_PER_SECOND = 1000000000;
+    
     private static final float SWIPE_MASS = 1.0f;
+
     private static final float BOARD_MASS = 2.0f;
     private static final float BOARD_DAMPING_ACCELERATION = 400.0f;
+    private static final float BOARD_VELOCITY_MIN = 10.0f;
+
     private static final float EYE_MASS = 20.0f;
     private static final float EYE_DAMPING_ACCELERATION = 30.0f;
+    private static final float EYE_POS_MAX = 10.0f;
+    private static final float EYE_POS_MIN = 1.8f;
+    private static final float EYE_VELOCITY_MIN = 0.5f;
+
+    private static final float SCALE_FACTOR_MAX = 5.0f;
+    private static final float SCALE_FACTOR_MIN = 0.5f;
+    private static final float SCALE_EXPONENT = 1.5f;
 
     private float mPosInDegrees;
     private float mBoardVelocity;
@@ -43,7 +54,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     private void processBoardPulse( long dtInNanos ) {
-        if (Math.abs(mBoardVelocity) < 10.0f) {
+        if (Math.abs(mBoardVelocity) < BOARD_VELOCITY_MIN) {
             mBoardVelocity = 0.0f;
         }
         else {
@@ -59,12 +70,12 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
             mScene.setYRotation(mPosInDegrees);
 
-            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
+            Log.d("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
         }
     }
 
     private void processEyePulse( long dtInNanos ) {
-        if (Math.abs(mEyeVelocity) < 0.5f) {
+        if (Math.abs(mEyeVelocity) < EYE_VELOCITY_MIN) {
             mEyeVelocity = 0.0f;
         }
         else {
@@ -77,18 +88,18 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
             float deltaPos = mEyeVelocity * dTimeInS;
             mEyePos[1] += deltaPos;
-            if (mEyePos[1] > 7.0f) {
-                mEyePos[1] = 7.0f;
+            if (mEyePos[1] > EYE_POS_MAX) {
+                mEyePos[1] = EYE_POS_MAX;
                 mEyeVelocity = 0.0f;
             }
-            if (mEyePos[1] < 1.8f) {
-                mEyePos[1] = 1.8f;
+            if (mEyePos[1] < EYE_POS_MIN) {
+                mEyePos[1] = EYE_POS_MIN;
                 mEyeVelocity = 0.0f;
             }
 
             mScene.setEyePos(mEyePos);
 
-            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
+            Log.d("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
         }
     }
 
@@ -98,13 +109,13 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             float dvBoard = (float)dx;       // dx should be a CHANGE in velocity here, so not sure about this
             float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
 
-            Log.v("GameBoardInputReceiver", "new board force: " + forceBoard);
+            Log.d("GameBoardInputReceiver", "new board force: " + forceBoard);
             addBoardSpinForce(dTimeInS, forceBoard);
 
             float dvEye = (float)dy;        // dy should be a CHANGE in velocity here, so not sure about this
             float forceEye = (dvEye / dTimeInS) * SWIPE_MASS;
 
-            Log.v("GameBoardInputReceiver", "new eye force: " + forceEye);
+            Log.d("GameBoardInputReceiver", "new eye force: " + forceEye);
             addEyeMoveForce(dTimeInS, forceEye);
         }
     }
@@ -118,10 +129,10 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     public void tapUp( int x, int y ) {
         ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
-            Log.v("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
+            Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
         }
         else {
-            Log.v("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on nothing");
+            Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on nothing");
         }
 
         mTapDownObject = null;
@@ -129,11 +140,12 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public synchronized void newScaleGesture( float factor ) {
-        mScaleFactor *= Math.pow(factor, 1.5);
+        mScaleFactor *= Math.pow(factor, SCALE_EXPONENT);
 
         // Don't let the object get too small or too large.
-        mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
+        mScaleFactor = Math.max(SCALE_FACTOR_MIN, Math.min(mScaleFactor, SCALE_FACTOR_MAX));
 
+        Log.d("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
         mScene.setZoomFactor(mScaleFactor);
     }
 
