@@ -1,8 +1,5 @@
 package com.example.glttt.pulser;
 
-import com.example.glttt.GamePresenter;
-import com.example.glttt.IPulseReceiver;
-
 public class PulseManager {
 
     private PulseThread mPulseThread;

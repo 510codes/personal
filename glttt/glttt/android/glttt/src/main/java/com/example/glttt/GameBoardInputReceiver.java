@@ -2,6 +2,8 @@ package com.example.glttt;
 
 import android.util.Log;
 
+import com.example.glttt.pulser.IPulseReceiver;
+
 public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener {
     private static final long NANOS_PER_SECOND = 1000000000;
     private static final float BOARD_MASS = 2.0f;
@@ -88,7 +90,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         mScene.setZoomFactor(mScaleFactor);
     }
 
-    private void addForce( float dTimeInS, float force ) {
+    private synchronized void addForce( float dTimeInS, float force ) {
         float acc = force / BOARD_MASS;
         float dv = acc * dTimeInS;
         mBoardVelocity += dv;

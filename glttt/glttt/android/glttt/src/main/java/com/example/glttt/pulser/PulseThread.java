@@ -2,8 +2,6 @@ package com.example.glttt.pulser;
 
 import android.util.Log;
 
-import com.example.glttt.IPulseReceiver;
-
 class PulseThread extends Thread {
     private FpsManager mFpsManager;
     private IPulseReceiver mPulseReceiver;

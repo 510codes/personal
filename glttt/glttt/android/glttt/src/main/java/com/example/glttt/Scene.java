@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import android.opengl.Matrix;
 
+import com.example.glttt.pulser.IPulseReceiver;
+
 public class Scene
 {
 	private ArrayList<ModelObject> mModelObjects;

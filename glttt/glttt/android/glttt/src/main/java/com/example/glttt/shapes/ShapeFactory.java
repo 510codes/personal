@@ -1,7 +1,5 @@
 package com.example.glttt.shapes;
 
-import com.example.glttt.ModelObject;
-
 public class ShapeFactory {
 
     public static Triangle createTriangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
