@@ -16,6 +16,9 @@ public class Scene
 
 	private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
+    private float[] mEyePos;
+    private float[] mEyeLookAt;
+    private float[] mEyeUpVec;
 
     private int[] mCurrentViewPort;
 
@@ -30,16 +33,34 @@ public class Scene
 		mPositionHandle = positionHandle;
 		mColourHandle = colourHandle;
 		mMvpMatrixHandle = mvpMatrixHandle;
-        if (pulseReceiver != null) {
-            pulseReceiver.setScene(this);
-        }
         mModelObjects = new ArrayList<ModelObject>();
 
         mViewMatrix = new float[16];
         mProjectionMatrix = new float[16];
+        mEyePos = new float[4];
+        mEyeLookAt = new float[4];
+        mEyeUpVec = new float[4];
+
+        mEyePos[0] = 0.0f;
+        mEyePos[1] = 0.0f;
+        mEyePos[2] = 0.0f;
+        mEyePos[3] = 1.0f;      // 4th coord of point == 1, vector == 0
+
+        mEyeLookAt[0] = 0.0f;
+        mEyeLookAt[1] = 0.0f;
+        mEyeLookAt[2] = 0.0f;
+        mEyeLookAt[3] = 1.0f;      // 4th coord of point == 1, vector == 0
+
+        mEyeUpVec[0] = 0.0f;
+        mEyeUpVec[1] = 1.0f;
+        mEyeUpVec[2] = 0.0f;
+        mEyeUpVec[3] = 0.0f;      // 4th coord of point == 1, vector == 0
 
         this.mSceneChangeHandler = viewportChangeHandler;
         viewportChangeHandler.setScene(this);
+        if (pulseReceiver != null) {
+            pulseReceiver.setScene(this);
+        }
 	}
 	
 	public void add( ModelObject m )
@@ -74,8 +95,30 @@ public class Scene
 	
 	public void setLookAt( float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ )
 	{
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
-	}
+        mEyePos[0] = eyeX;
+        mEyePos[1] = eyeY;
+        mEyePos[2] = eyeZ;
+
+        mEyeLookAt[0] = lookX;
+        mEyeLookAt[1] = lookY;
+        mEyeLookAt[2] = lookZ;
+
+        mEyeUpVec[0] = upX;
+        mEyeUpVec[1] = upY;
+        mEyeUpVec[2] = upZ;
+
+        updateLookAt();
+    }
+
+    public void setEyePos( float[] pos ) {
+        mEyePos = pos;
+
+        updateLookAt();
+    }
+
+    private void updateLookAt() {
+        Matrix.setLookAtM(mViewMatrix, 0, mEyePos[0], mEyePos[1], mEyePos[2], mEyeLookAt[0], mEyeLookAt[1], mEyeLookAt[2], mEyeUpVec[0], mEyeUpVec[1], mEyeUpVec[2]);
+    }
 	
 	public void setFrustum( float left, float right, float bottom, float top, float near, float far )
 	{
@@ -118,5 +161,9 @@ public class Scene
         {
             modelObject.setYRotation(degrees);
         }
+    }
+
+    public float[] getEyePos() {
+        return mEyePos;
     }
 }
