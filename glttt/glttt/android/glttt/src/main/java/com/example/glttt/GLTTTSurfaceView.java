@@ -46,11 +46,6 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
     }
 
     @Override
-    public ModelObject getClickedModelObject(int x, int y) {
-        return mSurfaceRenderer.getClickedModelObject(x, y);
-    }
-
-    @Override
     public void setCurrentScene(SceneFactory.TYPE type) {
         mSurfaceRenderer.setCurrentScene(type);
     }
