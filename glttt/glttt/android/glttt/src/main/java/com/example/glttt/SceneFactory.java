@@ -80,38 +80,38 @@ public class SceneFactory {
 
         float boardVertices[] = {
                 -100.0f, 0.0f, -100.0f,
-                -100.0f, 0.0f, 100.0f,
+                100.0f, 0.0f, -100.0f,
                 100.0f, 0.0f, 100.0f,
-                100.0f, 0.0f, -100.0f
+                -100.0f, 0.0f, 100.0f
         };
 
         for (int x=0; x<8; ++x) {
             float[] pegVertices1 = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK
             };
 
             float[] pegVertices2 = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
             };
 
             float[] pegVertices3 = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
             };
 
             float[] pegVertices4 = {
                     PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
             };
 
             Triangle[] pegTris;
@@ -170,16 +170,16 @@ public class SceneFactory {
 
         float whiteVertices[] = {
                 250f, 300f, 0f,
-                250f, 500f, 0f,
+                450f, 300f, 0f,
                 450f, 500f, 0f,
-                450f, 300f, 0f
+                250f, 500f, 0f
         };
 
         float redVertices[] = {
                 500f, 300f, 0f,
-                500f, 500f, 0f,
+                700f, 300f, 0f,
                 700f, 500f, 0f,
-                700f, 300f, 0f
+                500f, 500f, 0f
         };
 
         //gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
