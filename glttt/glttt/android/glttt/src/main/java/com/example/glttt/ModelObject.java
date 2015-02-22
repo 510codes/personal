@@ -75,9 +75,9 @@ public class ModelObject
         }
     }
 
-	public void draw( float[] mvpMatrix, IShader shader )
+	public void draw( float[] mvMatrix, float[] mvpMatrix, IShader shader )
 	{
-        shader.draw( mvpMatrix, mTriangles );
+        shader.draw( mvMatrix, mvpMatrix, mTriangles );
 	}
 
 	private static float sign( float p1x, float p1y, float p2x, float p2y, float p3x, float p3y )

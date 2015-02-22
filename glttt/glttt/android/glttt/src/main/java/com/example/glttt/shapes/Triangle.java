@@ -2,12 +2,14 @@ package com.example.glttt.shapes;
 
 public class Triangle
 {
-	private float[] vertexData;
+	private final float[] vertexData;
+    private final int mStride;
 	
-	Triangle( float[] vertexData, String id )
+	Triangle( float[] vertexData, String id, int stride )
 	{
 		this.vertexData = vertexData;
 		this.id = id;
+        mStride = stride;
 	}
 	
 	public float[] getVertexData()
@@ -17,17 +19,17 @@ public class Triangle
 	
 	public float getX( int vertexNum )
 	{
-		return vertexData[(vertexNum*7)];
+		return vertexData[(vertexNum * mStride)];
 	}
 	
 	public float getY( int vertexNum )
 	{
-		return vertexData[(vertexNum*7) + 1];
+		return vertexData[(vertexNum * mStride) + 1];
 	}
 	
 	public float getZ( int vertexNum )
 	{
-		return vertexData[(vertexNum*7) + 2];
+		return vertexData[(vertexNum * mStride) + 2];
 	}
 
     @Override

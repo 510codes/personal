@@ -36,8 +36,8 @@ public class SceneFactory {
     private PulseManager mPulseManager;
     private GestureManager mGestureManager;
 
-    public SceneFactory( PulseManager pulseManager, GestureManager gestureManager ) {
-        mShapeFactory = new ShapeFactory();
+    public SceneFactory( PulseManager pulseManager, GestureManager gestureManager, boolean includeNormalData ) {
+        mShapeFactory = new ShapeFactory(includeNormalData);
         mPulseManager = pulseManager;
         mGestureManager = gestureManager;
     }
@@ -85,28 +85,28 @@ public class SceneFactory {
         };
 
         for (int x=0; x<8; ++x) {
-            float[] pegVertices1 = {
+            float[] pegVerticesFront = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK
             };
 
-            float[] pegVertices2 = {
+            float[] pegVerticesBack = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK
             };
 
-            float[] pegVertices3 = {
+            float[] pegVerticesLeft = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
                     PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
+                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
             };
 
-            float[] pegVertices4 = {
+            float[] pegVerticesRight = {
                     PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
@@ -116,23 +116,23 @@ public class SceneFactory {
             Triangle[] pegTris;
             ModelObject peg;
 
-            pegTris = mShapeFactory.createRectangle(pegVertices1, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
-            peg = new ModelObject("peg"+x+"_1");
+            pegTris = mShapeFactory.createRectangle(pegVerticesFront, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_front");
+            peg = new ModelObject("peg"+x+"_front_1");
             peg.add(pegTris);
             scene.add(peg);
 
-            pegTris = mShapeFactory.createRectangle(pegVertices2, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
-            peg = new ModelObject("peg"+x+"_2");
+            pegTris = mShapeFactory.createRectangle(pegVerticesBack, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_back");
+            peg = new ModelObject("peg"+x+"_back_2");
             peg.add(pegTris);
             scene.add(peg);
 
-            pegTris = mShapeFactory.createRectangle(pegVertices3, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
-            peg = new ModelObject("peg"+x+"_3");
+            pegTris = mShapeFactory.createRectangle(pegVerticesLeft, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_left");
+            peg = new ModelObject("peg"+x+"_left_3");
             peg.add(pegTris);
             scene.add(peg);
 
-            pegTris = mShapeFactory.createRectangle(pegVertices4, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x);
-            peg = new ModelObject("peg"+x+"_4");
+            pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_right");
+            peg = new ModelObject("peg"+x+"_right_4");
             peg.add(pegTris);
             scene.add(peg);
         }

@@ -7,6 +7,8 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.example.glttt.pulser.PulseManager;
+import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ShaderFactory;
 
 public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
 {
@@ -27,8 +29,10 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
         setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
         mGestureManager = new GestureManager(context);
-        SceneFactory sceneFactory = new SceneFactory(new PulseManager(PHYSICS_FPS), mGestureManager);
-        mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), sceneFactory);
+        ShaderFactory shaderFactory = new ShaderFactory(getResources());
+        IShader shader = shaderFactory.createPerFragShader();
+        SceneFactory sceneFactory = new SceneFactory(new PulseManager(PHYSICS_FPS), mGestureManager, shader.requiresNormalData());
+        mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), sceneFactory, shader);
         setRenderer(mSurfaceRenderer);
 
         mPresenter = new GamePresenter(this);

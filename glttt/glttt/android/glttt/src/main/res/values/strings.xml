@@ -23,4 +23,71 @@
         }
     </string>
 
+    <string name="perfrag_vertex_shader">
+        uniform mat4 u_MVPMatrix;
+        uniform mat4 u_MVMatrix;
+
+        attribute vec4 a_position;
+        attribute vec4 a_colour;
+        attribute vec3 a_normal;
+
+        varying vec3 v_position;
+        varying vec4 v_colour;
+        varying vec3 v_normal;
+
+        void main()
+        {
+            v_position = vec3(u_MVMatrix * a_position);
+            v_colour = a_colour;
+            v_normal = vec3(u_MVMatrix * vec4(a_normal, 0.0));
+            gl_Position = u_MVPMatrix * a_position;
+        }
+    </string>
+
+    <string name="perfrag_fragment_shader_1">
+        precision mediump float;
+        uniform vec3 u_lightPos;
+
+        varying vec3 v_position;
+        varying vec4 v_colour;
+        varying vec3 v_normal;
+
+        void main()
+        {
+            float distance = length(u_lightPos - v_position);
+            vec3 lightVector = normalize(u_lightPos - v_position);
+            float diffuse = max(dot(v_normal, lightVector), 0.1);
+            diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance)));
+            gl_FragColor = v_colour * diffuse;
+        }
+    </string>
+
+    <string name="perfrag_fragment_shader_2">
+        precision mediump float;
+
+        uniform vec3 u_lightPos;
+
+        varying vec3 v_position;
+        varying vec4 v_colour;
+        varying vec3 v_normal;
+
+        void main()
+        {
+            float distance = length(u_lightPos - v_position);
+            vec3 lightVector = normalize(u_lightPos - v_position);
+            float diffuse;
+
+            if (gl_FrontFacing) {
+                diffuse = max(dot(v_normal, lightVector), 0.0);
+            } else {
+                diffuse = max(dot(-v_normal, lightVector), 0.0);
+            }
+
+            /*diffuse = diffuse * (1.0 / (1.0 + (0.10 * distance)));*/
+            diffuse = diffuse * (1.0 / (1.0 + (0.01 * distance)));
+            diffuse = diffuse + 0.3;
+            gl_FragColor = (v_colour * diffuse);
+        }
+    </string>
+
 </resources>

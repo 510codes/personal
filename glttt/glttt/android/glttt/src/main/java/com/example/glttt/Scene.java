@@ -132,13 +132,14 @@ public class Scene
     {
 	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
 	    // (which currently contains model * view).
-        float[] mvpMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
+        float[] mvMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
 
+        float[] mvpMatrix = new float[16];
 	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
 	    // (which now contains model * view * projection).
-	    Matrix.multiplyMM(mvpMatrix, 0, mProjectionMatrix, 0, mvpMatrix, 0);
+	    Matrix.multiplyMM(mvpMatrix, 0, mProjectionMatrix, 0, mvMatrix, 0);
 	    
-	    modelObject.draw( mvpMatrix, mShader);
+	    modelObject.draw( mvMatrix, mvpMatrix, mShader);
     }
 
     public void onViewportChanged( int[] currentViewPort ) {

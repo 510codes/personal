@@ -22,7 +22,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     private SceneFactory.TYPE mCurrentSceneType;
     private Scene mCurrentScene;
 
-    public GLTTTSurfaceRenderer( Resources resources, SceneFactory sceneFactory )
+    public GLTTTSurfaceRenderer( Resources resources, SceneFactory sceneFactory, IShader shader )
     {
     	super();
     	
@@ -30,14 +30,14 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	mCurrentScene = null;
         mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
         mSceneFactory = sceneFactory;
+        mShader = shader;
     }
     
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
-        mShader = ShaderFactory.createSimpleShader(mResources);
-
-        GLES20.glUseProgram(mShader.getProgram());
+        mShader.initialize();
+        GLES20.glUseProgram(mShader.getProgramHandle());
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);

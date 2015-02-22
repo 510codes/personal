@@ -2,7 +2,13 @@ package com.example.glttt.shapes;
 
 public class ShapeFactory {
 
-    public static Triangle createTriangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
+    private final boolean mIncludeNormalData;
+
+    public ShapeFactory( boolean includeNormalData ) {
+        mIncludeNormalData = includeNormalData;
+    }
+
+    public Triangle createTriangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
         int[] indices = new int[3];
         indices[0] = 0;
         indices[1] = 3;
@@ -10,22 +16,52 @@ public class ShapeFactory {
         return createTriangle( vertices, indices, colour, vertexDivideFactor, id );
     }
 
-    public static Triangle createTriangle( float[] vertices, int[] vertexIndices, float[] colour, float vertexDivideFactor, String id ) {
-        float[] vertexData = new float[21];
+    public Triangle createTriangle( float[] vertices, int[] vertexIndices, float[] colour, float vertexDivideFactor, String id ) {
+        int stride = (mIncludeNormalData ? 10 : 7);
+        float[] vertexData = new float[stride * 3];
+
+        float nvx = 0f, nvy = 0f, nvz = 0f;
+
         for (int i=0; i<3; ++i)
         {
             int k = vertexIndices[i];
-            vertexData[i*7] = (vertices[k] / vertexDivideFactor);
-            vertexData[(i*7) + 1] = (vertices[k + 1] / vertexDivideFactor);
-            vertexData[(i*7) + 2] = (vertices[k + 2] / vertexDivideFactor);
+            vertexData[i*stride] = (vertices[k] / vertexDivideFactor);
+            vertexData[(i*stride) + 1] = (vertices[k + 1] / vertexDivideFactor);
+            vertexData[(i*stride) + 2] = (vertices[k + 2] / vertexDivideFactor);
 
             for (int j=0; j<4; ++j)
             {
-                vertexData[(i*7) + 3 + j] = colour[j];
+                vertexData[(i*stride) + 3 + j] = colour[j];
+            }
+
+            if (i == 2 && mIncludeNormalData) {
+                float v1x = vertexData[1*stride] - vertexData[0*stride];
+                float v1y = vertexData[(1*stride) + 1] - vertexData[(0*stride) + 1];
+                float v1z = vertexData[(1*stride) + 2] - vertexData[(0*stride) + 2];
+
+                float v2x = vertexData[2*stride] - vertexData[0*stride];
+                float v2y = vertexData[(2*stride) + 1] - vertexData[(0*stride) + 1];
+                float v2z = vertexData[(2*stride) + 2] - vertexData[(0*stride) + 2];
+
+                float vx = v1y * v2z - v1z * v2y;
+                float vy = v1z * v2x - v1x * v2z;
+                float vz = v1x * v2y - v1y * v2x;
+
+                float l = (float)Math.sqrt( (vx*vx) + (vy*vy) + (vz*vz));
+
+                nvx = vx / l;
+                nvy = vy / l;
+                nvz = vz / l;
+
+                for (int j=0; j<3; ++j) {
+                    vertexData[(j * stride) + 7] = nvx;
+                    vertexData[(j * stride) + 8] = nvy;
+                    vertexData[(j * stride) + 9] = nvz;
+                }
             }
         }
 
-        return new Triangle( vertexData, id );
+        return new Triangle( vertexData, id, stride );
     }
 
     public Triangle[] createRectangle( float[] vertices, float[] colour, float vertexDivideFactor, String id ) {
@@ -35,12 +71,12 @@ public class ShapeFactory {
         indices[0] = 0;
         indices[1] = 3;
         indices[2] = 6;
-        t[0] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"0");
+        t[0] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"_0");
 
         indices[0] = 0;
         indices[1] = 6;
         indices[2] = 9;
-        t[1] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"1");
+        t[1] = createTriangle(vertices, indices, colour, vertexDivideFactor, id+"_1");
 
         return t;
     }
