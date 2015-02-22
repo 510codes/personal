@@ -16,9 +16,6 @@ public class SimpleShader implements IShader {
 
     SimpleShader( int program ) {
         mProgram = program;
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "a_position");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "u_MVPMatrix");
-        mColourHandle = GLES20.glGetUniformLocation(mProgram, "a_color");
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "a_position");
         if (mPositionHandle == -1) {
