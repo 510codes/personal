@@ -1,15 +1,12 @@
 package com.example.glttt;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import android.opengl.GLES20;
 import android.opengl.GLU;
 import android.opengl.Matrix;
 
+import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.Triangle;
 
 public class ModelObject
@@ -78,15 +75,9 @@ public class ModelObject
         }
     }
 
-	public void draw( float[] mvpMatrix, int mvpMatrixHandle, int positionHandle, int colourHandle )
+	public void draw( float[] mvpMatrix, IShader shader )
 	{
-        // Apply the projection and view transformation
-        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0);
-
-        for (Triangle t : mTriangles)
-		{
-			drawTriangle( t, positionHandle, colourHandle );
-		}
+        shader.draw( mvpMatrix, mTriangles );
 	}
 
 	private static float sign( float p1x, float p1y, float p2x, float p2y, float p3x, float p3y )
@@ -142,25 +133,6 @@ public class ModelObject
 		
 		return false;
 	}
-
-    private void drawTriangle(Triangle tri, int positionHandle, int colourHandle) {
-        float[] vertexData = tri.getVertexData();
-        ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
-        vertexBB.order(ByteOrder.nativeOrder());
-        FloatBuffer vertexFB = vertexBB.asFloatBuffer();
-        vertexFB.put(vertexData);
-
-        vertexFB.position(0);
-        GLES20.glVertexAttribPointer(positionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
-        GLES20.glEnableVertexAttribArray(positionHandle);
-
-        vertexFB.position(3);
-        GLES20.glVertexAttribPointer(colourHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
-        GLES20.glEnableVertexAttribArray(colourHandle);
-
-        //Draw the shape
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
-    }
 
     public String toString() {
         return mId;

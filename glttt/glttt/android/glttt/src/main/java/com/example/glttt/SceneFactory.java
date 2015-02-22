@@ -1,6 +1,7 @@
 package com.example.glttt;
 
 import com.example.glttt.pulser.PulseManager;
+import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.shapes.Triangle;
 
@@ -47,20 +48,20 @@ public class SceneFactory {
         GAME_BOARD_SCENE
     }
 
-    public Scene create( TYPE type, int positionHandle, int colourHandle, int mvpMatrixHandle ) {
+    public Scene create( TYPE type, IShader shader ) {
         Scene scene;
 
         switch (type) {
             case NEW_GAME_SCENE:
-                scene = createNewGameScene(positionHandle, colourHandle, mvpMatrixHandle);
+                scene = createNewGameScene(shader);
                 break;
 
             case GAME_BOARD_SCENE:
-                scene = createGameBoardScene( positionHandle, colourHandle, mvpMatrixHandle );
+                scene = createGameBoardScene(shader);
                 break;
 
             case NO_SCENE:
-                scene = createEmptyScene( positionHandle, colourHandle, mvpMatrixHandle );
+                scene = createEmptyScene(shader);
                 break;
 
             default:
@@ -70,11 +71,9 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createGameBoardScene( int positionHandle, int colourHandle, int mvpMatrixHandle ) {
+    private Scene createGameBoardScene( IShader shader ) {
         GameBoardInputReceiver inputReceiver = new GameBoardInputReceiver();
-        Scene scene = new Scene(positionHandle, colourHandle, mvpMatrixHandle,
-                new GameBoardSceneChangeHandler(),
-                inputReceiver);
+        Scene scene = new Scene(shader, new GameBoardSceneChangeHandler(), inputReceiver);
         mPulseManager.setPulseReceiver(inputReceiver);
         mGestureManager.setGestureListener(inputReceiver);
 
@@ -164,9 +163,9 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createNewGameScene( int colourHandle, int positionHandle, int mvpMatrixHandle )
+    private Scene createNewGameScene( IShader shader )
     {
-        Scene scene = new Scene(colourHandle, positionHandle, mvpMatrixHandle, new NewGameSceneChangeHandler());
+        Scene scene = new Scene(shader, new NewGameSceneChangeHandler());
 
         float whiteVertices[] = {
                 250f, 300f, 0f,
@@ -217,8 +216,8 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createEmptyScene( int colourHandle, int positionHandle, int mvpMatrixHandle ) {
-        Scene scene = new Scene(colourHandle, positionHandle, mvpMatrixHandle, new NewGameSceneChangeHandler());
+    private Scene createEmptyScene( IShader shader ) {
+        Scene scene = new Scene(shader, new NewGameSceneChangeHandler());
 
         return scene;
     }

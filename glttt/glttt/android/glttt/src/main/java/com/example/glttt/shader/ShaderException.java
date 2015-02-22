@@ -1,4 +1,6 @@
-package com.example.glttt;
+package com.example.glttt.shader;
+
+import com.example.glttt.GLTTTException;
 
 public class ShaderException extends GLTTTException
 {

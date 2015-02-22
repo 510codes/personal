@@ -29,7 +29,8 @@ public class Triangle
 	{
 		return vertexData[(vertexNum*7) + 2];
 	}
-	
+
+    @Override
 	public String toString()
 	{
 		return id;

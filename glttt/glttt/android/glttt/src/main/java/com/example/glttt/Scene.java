@@ -5,15 +5,13 @@ import java.util.ArrayList;
 import android.opengl.Matrix;
 
 import com.example.glttt.pulser.IPulseReceiver;
+import com.example.glttt.shader.IShader;
 
 public class Scene
 {
 	private ArrayList<ModelObject> mModelObjects;
 
-	private int mPositionHandle;
-	private int mColourHandle;
-	private int mMvpMatrixHandle;
-
+    private IShader mShader;
 	private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
     private float[] mEyePos;
@@ -24,15 +22,13 @@ public class Scene
 
     private ISceneChangeHandler mSceneChangeHandler;
 
-    public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler) {
-        this( positionHandle, colourHandle, mvpMatrixHandle, viewportChangeHandler, null);
+    public Scene(IShader shader, ISceneChangeHandler viewportChangeHandler) {
+        this( shader, viewportChangeHandler, null);
     }
 
-    public Scene(int positionHandle, int colourHandle, int mvpMatrixHandle, ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
+    public Scene(IShader shader, ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
 	{
-		mPositionHandle = positionHandle;
-		mColourHandle = colourHandle;
-		mMvpMatrixHandle = mvpMatrixHandle;
+        mShader = shader;
         mModelObjects = new ArrayList<ModelObject>();
 
         mViewMatrix = new float[16];
@@ -134,17 +130,15 @@ public class Scene
 
     private void drawModelObject( ModelObject modelObject )
     {
-    	float[] mvpMatrix = new float[16];
-    		    
 	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
 	    // (which currently contains model * view).
-        mvpMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
+        float[] mvpMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
 
 	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
 	    // (which now contains model * view * projection).
 	    Matrix.multiplyMM(mvpMatrix, 0, mProjectionMatrix, 0, mvpMatrix, 0);
 	    
-	    modelObject.draw( mvpMatrix, mMvpMatrixHandle, mPositionHandle, mColourHandle);
+	    modelObject.draw( mvpMatrix, mShader);
     }
 
     public void onViewportChanged( int[] currentViewPort ) {

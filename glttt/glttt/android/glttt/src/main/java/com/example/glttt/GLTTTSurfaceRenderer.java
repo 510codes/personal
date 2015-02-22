@@ -8,17 +8,17 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ShaderFactory;
+
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public static final int FLOAT_BYTE_LENGTH = 4;
 
-    private int mPositionHandle;
-    private int mMVPMatrixHandle;
-    private int mColourHandle;
-
     private Resources mResources;
 
     private SceneFactory mSceneFactory;
+    private IShader mShader;
     private SceneFactory.TYPE mCurrentSceneType;
     private Scene mCurrentScene;
 
@@ -30,39 +30,14 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	mCurrentScene = null;
         mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
         mSceneFactory = sceneFactory;
-        mColourHandle = -1;
-        mPositionHandle = -1;
-        mMVPMatrixHandle = -1;
     }
     
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
-        Shader shader = Shader.create(
-                mResources.getString(R.string.vertex_shader),
-                mResources.getString(R.string.fragment_shader)
-        );
+        mShader = ShaderFactory.createSimpleShader(mResources);
 
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_MVPMatrix");
-        mColourHandle = GLES20.glGetUniformLocation(shader.getProgram(), "a_color");
-
-        mPositionHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_position");
-        if (mPositionHandle == -1) {
-            throw new ShaderException("could not get position handle");
-        }
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(shader.getProgram(), "u_VPMatrix");
-        if (mMVPMatrixHandle == -1) {
-            throw new ShaderException("could not get MVP matrix handle");
-        }
-        mColourHandle = GLES20.glGetAttribLocation(shader.getProgram(), "a_color");
-        if (mColourHandle == -1) {
-            throw new ShaderException("could not get color handle");
-        }
-
-        checkGlError("glGetUniformLocation");
-
-        GLES20.glUseProgram(shader.getProgram());
+        GLES20.glUseProgram(mShader.getProgram());
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
@@ -100,17 +75,9 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     	return mCurrentScene.getClickedModelObject(screenX, screenY);
     }
 
-    private void checkGlError(String op) {
-        int error;
-        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e("opengl", op + ": glError " + error);
-            throw new RuntimeException(op + ": glError " + error);
-        }
-    }
-
     public void setCurrentScene( SceneFactory.TYPE type ) {
         mCurrentSceneType = type;
-        mCurrentScene = mSceneFactory.create(mCurrentSceneType, mPositionHandle, mColourHandle, mMVPMatrixHandle);
+        mCurrentScene = mSceneFactory.create(mCurrentSceneType, mShader);
     }
 
     public void setScaleFactor( float scaleFactor ) {
