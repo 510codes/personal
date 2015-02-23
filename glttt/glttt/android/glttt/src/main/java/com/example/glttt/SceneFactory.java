@@ -222,8 +222,6 @@ public class SceneFactory {
     }
 
     private Scene createEmptyScene( IShader shader ) {
-        Scene scene = new Scene(shader, new NewGameSceneChangeHandler());
-
-        return scene;
+        return new Scene(shader, new NewGameSceneChangeHandler());
     }
 }

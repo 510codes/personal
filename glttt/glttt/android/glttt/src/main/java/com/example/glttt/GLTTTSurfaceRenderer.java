@@ -3,30 +3,25 @@ package com.example.glttt;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.res.Resources;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.example.glttt.shader.IShader;
-import com.example.glttt.shader.ShaderFactory;
 
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public static final int FLOAT_BYTE_LENGTH = 4;
-
-    private Resources mResources;
 
     private SceneFactory mSceneFactory;
     private IShader mShader;
     private SceneFactory.TYPE mCurrentSceneType;
     private Scene mCurrentScene;
 
-    public GLTTTSurfaceRenderer( Resources resources, SceneFactory sceneFactory, IShader shader )
+    public GLTTTSurfaceRenderer( SceneFactory sceneFactory, IShader shader )
     {
     	super();
     	
-    	mResources = resources;
     	mCurrentScene = null;
         mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
         mSceneFactory = sceneFactory;
@@ -70,11 +65,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         mCurrentScene.draw();
     }
     
-    public ModelObject getClickedModelObject( int screenX, int screenY )
-    {
-    	return mCurrentScene.getClickedModelObject(screenX, screenY);
-    }
-
     public void setCurrentScene( SceneFactory.TYPE type ) {
         mCurrentSceneType = type;
         mCurrentScene = mSceneFactory.create(mCurrentSceneType, mShader);

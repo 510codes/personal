@@ -77,7 +77,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
             mScene.setYRotation(mPosInDegrees);
 
-            Log.d("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
+            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
         }
     }
 
@@ -111,7 +111,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             mScene.setEyePos(mEyePos);
             mScene.setEyeLookAt(mEyeLookAt);
 
-            Log.d("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
+            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
         }
     }
 
@@ -120,14 +120,10 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         if (dTimeInS > 0.0f) {
             float dvBoard = (float)dx;       // dx should be a CHANGE in velocity here, so not sure about this
             float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
-
-            Log.d("GameBoardInputReceiver", "new board force: " + forceBoard);
             addBoardSpinForce(dTimeInS, forceBoard);
 
             float dvEye = (float)dy;        // dy should be a CHANGE in velocity here, so not sure about this
             float forceEye = (dvEye / dTimeInS) * SWIPE_MASS;
-
-            Log.d("GameBoardInputReceiver", "new eye force: " + forceEye);
             addEyeMoveForce(dTimeInS, forceEye);
         }
     }
@@ -157,7 +153,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         // Don't let the object get too small or too large.
         mScaleFactor = Math.max(SCALE_FACTOR_MIN, Math.min(mScaleFactor, SCALE_FACTOR_MAX));
 
-        Log.d("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
+        Log.v("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
         mScene.setZoomFactor(mScaleFactor);
     }
 

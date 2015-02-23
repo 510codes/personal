@@ -31,6 +31,11 @@ public class PerFragmentShader implements IShader {
     }
 
     @Override
+    public int getStride() {
+        return PER_FRAG_TRIANGLE_STRIDE;
+    }
+
+    @Override
     public void initialize() {
         mProgram.initialize();
 
@@ -85,10 +90,5 @@ public class PerFragmentShader implements IShader {
 
         //Draw the triangles
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3 * numTris);
-    }
-
-    @Override
-    public int getStride() {
-        return PER_FRAG_TRIANGLE_STRIDE;
     }
 }

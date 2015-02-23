@@ -3,7 +3,6 @@ package com.example.glttt;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.example.glttt.pulser.PulseManager;
@@ -32,7 +31,7 @@ public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
         ShaderFactory shaderFactory = new ShaderFactory(getResources());
         IShader shader = shaderFactory.createPerFragShader();
         SceneFactory sceneFactory = new SceneFactory(new PulseManager(PHYSICS_FPS), mGestureManager, shader.requiresNormalData());
-        mSurfaceRenderer = new GLTTTSurfaceRenderer(getResources(), sceneFactory, shader);
+        mSurfaceRenderer = new GLTTTSurfaceRenderer(sceneFactory, shader);
         setRenderer(mSurfaceRenderer);
 
         mPresenter = new GamePresenter(this);

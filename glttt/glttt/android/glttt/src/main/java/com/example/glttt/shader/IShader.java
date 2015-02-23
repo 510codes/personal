@@ -1,9 +1,6 @@
 package com.example.glttt.shader;
 
-import com.example.glttt.shapes.Triangle;
-
 import java.nio.FloatBuffer;
-import java.util.List;
 
 public interface IShader {
     public int getProgramHandle();

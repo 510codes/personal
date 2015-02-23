@@ -28,6 +28,11 @@ public class SimpleShader implements IShader {
     }
 
     @Override
+    public int getStride() {
+        return SIMPLE_TRIANGLE_STRIDE;
+    }
+
+    @Override
     public void initialize() {
         mProgram.initialize();
 
@@ -62,10 +67,5 @@ public class SimpleShader implements IShader {
 
         //Draw the triangles
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3 * numTris);
-    }
-
-    @Override
-    public int getStride() {
-        return SIMPLE_TRIANGLE_STRIDE;
     }
 }
