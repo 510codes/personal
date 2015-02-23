@@ -16,6 +16,10 @@ public class Triangle
 	{
 		return vertexData;
 	}
+
+    public int getStride() {
+        return mStride;
+    }
 	
 	public float getX( int vertexNum )
 	{

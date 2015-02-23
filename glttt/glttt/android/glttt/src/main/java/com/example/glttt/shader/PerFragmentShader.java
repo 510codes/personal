@@ -2,13 +2,12 @@ package com.example.glttt.shader;
 
 import android.opengl.GLES20;
 
-import com.example.glttt.shapes.Triangle;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class PerFragmentShader implements IShader {
+
+    private static final int PER_FRAG_TRIANGLE_STRIDE = 10;
+
     private final ShaderProgram mProgram;
     private int mMVPMatrixHandle;
     private int mMVMatrixHandle;
@@ -65,39 +64,31 @@ public class PerFragmentShader implements IShader {
     }
 
     @Override
-    public void draw( float[] mvMatrix, float[] mvpMatrix, Iterable<Triangle> tris ) {
+    public void draw( float[] mvMatrix, float[] mvpMatrix, FloatBuffer vertexFB, int numTris ) {
         GLES20.glUniform3f(mLightPos, 0.0f, 5.0f, 5.0f);
 
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mvMatrix, 0);
 
-        for (Triangle t : tris)
-        {
-            drawTriangle(t);
-        }
-    }
-
-    private void drawTriangle(Triangle tri) {
-        float[] vertexData = tri.getVertexData();
-        ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
-        vertexBB.order(ByteOrder.nativeOrder());
-        FloatBuffer vertexFB = vertexBB.asFloatBuffer();
-        vertexFB.put(vertexData);
-
         vertexFB.position(0);
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 40, vertexFB);
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, PER_FRAG_TRIANGLE_STRIDE * 4, vertexFB);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         vertexFB.position(3);
-        GLES20.glVertexAttribPointer(mColourHandle, 4, GLES20.GL_FLOAT, false, 40, vertexFB);
+        GLES20.glVertexAttribPointer(mColourHandle, 4, GLES20.GL_FLOAT, false, PER_FRAG_TRIANGLE_STRIDE * 4, vertexFB);
         GLES20.glEnableVertexAttribArray(mColourHandle);
 
         vertexFB.position(7);
-        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, 40, vertexFB);
+        GLES20.glVertexAttribPointer(mNormalHandle, 3, GLES20.GL_FLOAT, false, PER_FRAG_TRIANGLE_STRIDE * 4, vertexFB);
         GLES20.glEnableVertexAttribArray(mNormalHandle);
 
-        //Draw the shape
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        //Draw the triangles
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3 * numTris);
+    }
+
+    @Override
+    public int getStride() {
+        return PER_FRAG_TRIANGLE_STRIDE;
     }
 }

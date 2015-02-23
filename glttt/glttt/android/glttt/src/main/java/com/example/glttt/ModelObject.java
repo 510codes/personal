@@ -1,10 +1,14 @@
 package com.example.glttt;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.opengl.GLU;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.Triangle;
@@ -17,6 +21,9 @@ public class ModelObject
     private float mScaleFactor;
     private float mYRotation;
     private float[] mTranslation;
+
+    private FloatBuffer mVertexBuffer;
+    private boolean mVertexBufferDirty;
 
 	public ModelObject( String id )
 	{
@@ -31,14 +38,17 @@ public class ModelObject
         mTranslation[0] = 0.0f;
         mTranslation[0] = 0.0f;
         mTranslation[0] = 0.0f;
+        mVertexBufferDirty = true;
 	}
 
     public void add( Triangle t ) {
         mTriangles.add(t);
+        mVertexBufferDirty = true;
     }
 
     public void add( Triangle[] tri ) {
         mTriangles.addAll(Arrays.asList(tri));
+        mVertexBufferDirty = true;
     }
 
     public float[] multiplyByModelMatrix( float[] matrix, int index ) {
@@ -89,9 +99,27 @@ public class ModelObject
         }
     }
 
-	public void draw( float[] mvMatrix, float[] mvpMatrix, IShader shader )
+    private FloatBuffer getVertexBuffer(int stride) {
+        if (mVertexBufferDirty) {
+            ByteBuffer vertexBB = ByteBuffer.allocateDirect(stride * 3 * 4 * mTriangles.size());
+            vertexBB.order(ByteOrder.nativeOrder());
+            mVertexBuffer = vertexBB.asFloatBuffer();
+            for (Triangle t : mTriangles)
+            {
+                mVertexBuffer.put(t.getVertexData());
+            }
+            mVertexBufferDirty = false;
+        }
+
+        return mVertexBuffer;
+    }
+
+    public void draw( float[] mvMatrix, float[] mvpMatrix, IShader shader )
 	{
-        shader.draw( mvMatrix, mvpMatrix, mTriangles );
+        long startTimeNanos = System.nanoTime();
+        shader.draw( mvMatrix, mvpMatrix, getVertexBuffer(shader.getStride()), mTriangles.size() );
+        long elapsedTimeNanos = System.nanoTime() - startTimeNanos;
+        Log.v("chris", "ModelObject.draw(" + mId + "): elapsed time: " + (elapsedTimeNanos / 1000000) + " ms");
 	}
 
 	private static float sign( float p1x, float p1y, float p2x, float p2y, float p3x, float p3y )

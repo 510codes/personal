@@ -2,13 +2,12 @@ package com.example.glttt.shader;
 
 import android.opengl.GLES20;
 
-import com.example.glttt.shapes.Triangle;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class SimpleShader implements IShader {
+
+    private static final int SIMPLE_TRIANGLE_STRIDE = 7;
+
     private ShaderProgram mProgram;
     private int mPositionHandle;
     private int mMVPMatrixHandle;
@@ -49,32 +48,24 @@ public class SimpleShader implements IShader {
     }
 
     @Override
-    public void draw( float[] mvMatrix, float[] mvpMatrix, Iterable<Triangle> tris ) {
+    public void draw( float[] mvMatrix, float[] mvpMatrix, FloatBuffer vertexFB, int numTris ) {
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
 
-        for (Triangle t : tris)
-        {
-            drawTriangle(t);
-        }
-    }
-
-    private void drawTriangle(Triangle tri) {
-        float[] vertexData = tri.getVertexData();
-        ByteBuffer vertexBB = ByteBuffer.allocateDirect(vertexData.length * 4);
-        vertexBB.order(ByteOrder.nativeOrder());
-        FloatBuffer vertexFB = vertexBB.asFloatBuffer();
-        vertexFB.put(vertexData);
-
         vertexFB.position(0);
-        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 28, vertexFB);
+        GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, SIMPLE_TRIANGLE_STRIDE * 4, vertexFB);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         vertexFB.position(3);
-        GLES20.glVertexAttribPointer(mColourHandle, 4, GLES20.GL_FLOAT, false, 28, vertexFB);
+        GLES20.glVertexAttribPointer(mColourHandle, 4, GLES20.GL_FLOAT, false, SIMPLE_TRIANGLE_STRIDE * 4, vertexFB);
         GLES20.glEnableVertexAttribArray(mColourHandle);
 
-        //Draw the shape
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        //Draw the triangles
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3 * numTris);
+    }
+
+    @Override
+    public int getStride() {
+        return SIMPLE_TRIANGLE_STRIDE;
     }
 }
