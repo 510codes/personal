@@ -16,6 +16,7 @@ public class ModelObject
     private String mId;
     private float mScaleFactor;
     private float mYRotation;
+    private float[] mTranslation;
 
 	public ModelObject( String id )
 	{
@@ -25,6 +26,11 @@ public class ModelObject
     	Matrix.setIdentityM(mModelMatrix, 0);
         mScaleFactor = 1.0f;
         mYRotation = 0.0f;
+        mTranslation = new float[4];
+        mTranslation[0] = 0.0f;
+        mTranslation[0] = 0.0f;
+        mTranslation[0] = 0.0f;
+        mTranslation[0] = 0.0f;
 	}
 
     public void add( Triangle t ) {
@@ -54,14 +60,21 @@ public class ModelObject
         recalculateModelMatrix();
     }
 
-	void translate( float x, float y, float z )
+    public void setTranslation( float x, float y, float z ) {
+        mTranslation[0] = x;
+        mTranslation[1] = y;
+        mTranslation[2] = z;
+        recalculateModelMatrix();
+    }
+
+	private void translate( float x, float y, float z )
 	{
         synchronized (mModelMatrix) {
             Matrix.translateM(mModelMatrix, 0, x, y, z);
         }
 	}
 
-    void rotate( float angle, float x, float y, float z ) {
+    private void rotate( float angle, float x, float y, float z ) {
         synchronized(mModelMatrix) {
             Matrix.rotateM(mModelMatrix, 0, angle, x, y, z);
         }
@@ -72,6 +85,7 @@ public class ModelObject
             Matrix.setIdentityM(mModelMatrix, 0);
             rotate(mYRotation, 0.0f, 1.0f, 0.0f);
             Matrix.scaleM(mModelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
+            translate(mTranslation[0], mTranslation[1], mTranslation[2]);
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.glttt.shapes;
 
+import java.util.ArrayList;
+
 public class ShapeFactory {
 
     private final boolean mIncludeNormalData;
@@ -20,7 +22,7 @@ public class ShapeFactory {
         int stride = (mIncludeNormalData ? 10 : 7);
         float[] vertexData = new float[stride * 3];
 
-        float nvx = 0f, nvy = 0f, nvz = 0f;
+        float nvx, nvy, nvz;
 
         for (int i=0; i<3; ++i)
         {
@@ -142,7 +144,21 @@ public class ShapeFactory {
             i++;
         }
 
-        return null;
+        Triangle[] tri = new Triangle[rings*sectors*2];
+        for (i=0; i<rings*sectors; ++i) {
+            float[] quadVertices = new float[4*3];
+
+            for (int j=0; j<4; ++j) {
+                int index = indices[(i*4) + j];
+                System.arraycopy(vertices, index*3, quadVertices, j*3, 3);
+            }
+
+            Triangle[] quadTris = createRectangle(quadVertices, colour, vertexDivideFactor, id+"_"+i);
+            tri[(i*2)] = quadTris[0];
+            tri[(i*2)+1] = quadTris[1];
+        }
+
+        return tri;
     }
 
     /*void draw(GLfloat x, GLfloat y, GLfloat z)

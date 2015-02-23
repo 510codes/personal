@@ -140,7 +140,12 @@ public class SceneFactory {
         Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
         ModelObject obj = new ModelObject("board");
         obj.add(boardTris);
+        scene.add(obj);
 
+        Triangle[] sphereTris = mShapeFactory.createSphere("sphere", 10.0f, 10, 10, new float[]{0.4f, 0.0f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        obj = new ModelObject("sphere");
+        obj.setTranslation(0.0f, 1.0f, 0.0f);
+        obj.add(sphereTris);
         scene.add(obj);
 
         // Position the eye behind the origin.
