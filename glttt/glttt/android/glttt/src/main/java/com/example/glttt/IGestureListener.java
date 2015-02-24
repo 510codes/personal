@@ -1,8 +1,9 @@
 package com.example.glttt;
 
 public interface IGestureListener {
-    public void newSwipeGesture( float dTimeInS, long dx, long dy );
-    public void tapDown( int x, int y );
-    public void tapUp( int x, int y );
-    public void newScaleGesture( float factor );
+    public void onSwipeGesture( float dTimeInS, long dx, long dy );
+    public void onTapDown( int x, int y );
+    public void onTapUp( int x, int y );
+    public void onPointerMove( int x, int y );
+    public void onScaleGesture( float factor );
 }

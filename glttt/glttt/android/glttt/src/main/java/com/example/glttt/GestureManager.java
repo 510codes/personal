@@ -42,7 +42,7 @@ public class GestureManager {
                     mLastTouchY = y;
                     mActivePointerId = e.getPointerId(0);
                     Log.v("PointerTracker", "ACTION_DOWN: mActivePointerReview: " + mActivePointerId);
-                    mGestureListener.tapDown((int) x, (int) y);
+                    mGestureListener.onTapDown((int) x, (int) y);
                     break;
                 }
 
@@ -57,7 +57,8 @@ public class GestureManager {
                         final long dy = (long) y - (long) mLastTouchY;
 
                         Log.v("PointerTracker", "ACTION_MOVE: dx: " + dx + ", dy: " + dy);
-                        mGestureListener.newSwipeGesture(dTimeInS, dx, dy);
+                        mGestureListener.onSwipeGesture(dTimeInS, dx, dy);
+                        mGestureListener.onPointerMove( (int)x, (int)y );
                     }
 
                     mLastTouchX = x;
@@ -67,7 +68,7 @@ public class GestureManager {
                 }
 
                 case MotionEvent.ACTION_UP: {
-                    mGestureListener.tapUp((int) e.getX(), (int) e.getY());
+                    mGestureListener.onTapUp((int) e.getX(), (int) e.getY());
                     Log.v("PointerTracker", "ACTION_UP");
                     mActivePointerId = INVALID_POINTER_ID;
                     break;
@@ -112,7 +113,7 @@ public class GestureManager {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            mGestureListener.newScaleGesture(detector.getScaleFactor());
+            mGestureListener.onScaleGesture(detector.getScaleFactor());
             return true;
         }
     }

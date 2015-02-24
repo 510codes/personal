@@ -116,7 +116,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     @Override
-    public synchronized void newSwipeGesture( float dTimeInS, long dx, long dy ) {
+    public synchronized void onSwipeGesture( float dTimeInS, long dx, long dy ) {
         if (dTimeInS > 0.0f) {
             float dvBoard = (float)dx;       // dx should be a CHANGE in velocity here, so not sure about this
             float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
@@ -129,12 +129,12 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     @Override
-    public void tapDown( int x, int y ) {
+    public void onTapDown( int x, int y ) {
         mTapDownObject = mScene.getClickedModelObject(x, y);
     }
 
     @Override
-    public void tapUp( int x, int y ) {
+    public void onTapUp( int x, int y ) {
         ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
@@ -147,7 +147,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     @Override
-    public synchronized void newScaleGesture( float factor ) {
+    public synchronized void onScaleGesture( float factor ) {
         mScaleFactor *= Math.pow(factor, SCALE_EXPONENT);
 
         // Don't let the object get too small or too large.
@@ -156,6 +156,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         Log.v("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
         mScene.setZoomFactor(mScaleFactor);
     }
+
+    @Override
+    public void onPointerMove( int x, int y ) {}
 
     private synchronized void addBoardSpinForce( float dTimeInS, float force ) {
         float acc = force / BOARD_MASS;

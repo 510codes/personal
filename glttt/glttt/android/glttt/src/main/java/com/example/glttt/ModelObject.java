@@ -179,4 +179,6 @@ public class ModelObject
     public String toString() {
         return mId;
     }
+
+    public String getId() { return mId; }
 }
