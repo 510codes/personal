@@ -1,5 +1,9 @@
 package com.example.glttt.shapes;
 
+import android.util.Log;
+
+import java.util.ArrayList;
+
 public class ShapeFactory {
 
     private final boolean mIncludeNormalData;
@@ -108,6 +112,10 @@ public class ShapeFactory {
         return t;
     }
 
+    private boolean compareVertices( float[] buf, int off1, int off2 ) {
+        return buf[off1] == buf[off2] && buf[off1+1] == buf[off2+1] && buf[off1+2] == buf[off2+2];
+    }
+
     public Triangle[] createSphere( String id, float radius, int rings, int sectors, float[] colour, float vertexDivideFactor ) {
         float[] vertices;
         float[] normals;
@@ -171,7 +179,8 @@ public class ShapeFactory {
             i++;
         }
 
-        Triangle[] tri = new Triangle[rings*sectors*2];
+        ArrayList<Triangle> tri = new ArrayList<Triangle>();
+        int droppedQuadCount = 0;
         for (i=0; i<rings*sectors; ++i) {
             float[] quadVertices = new float[4*3];
             float[] quadVertexNormals = new float[4*3];
@@ -182,11 +191,26 @@ public class ShapeFactory {
                 System.arraycopy(normals, index*3, quadVertexNormals, j*3, 3);
             }
 
-            Triangle[] quadTris = createRectangle(quadVertices, quadVertexNormals, colour, vertexDivideFactor, id+"_"+i);
-            tri[(i*2)] = quadTris[0];
-            tri[(i*2)+1] = quadTris[1];
+            String quadId = id + "_" + i;
+            boolean dropQuad = false;
+            for (int j=0; j<3 && !dropQuad; ++j) {
+                for (int k=j+1; k<4 && !dropQuad; ++k) {
+                    if (compareVertices(quadVertices, j*3, k*3)) {
+                        dropQuad = true;
+                        droppedQuadCount++;
+                    }
+                }
+            }
+
+            if (!dropQuad) {
+                Triangle[] quadTris = createRectangle(quadVertices, quadVertexNormals, colour, vertexDivideFactor, quadId);
+                tri.add(quadTris[0]);
+                tri.add(quadTris[1]);
+            }
         }
 
-        return tri;
+        Log.d("ShapeFactory", "createSphere(): dropped " + droppedQuadCount + " quads (" + droppedQuadCount * 2 + " triangles) from the sphere");
+
+        return tri.toArray(new Triangle[0]);
     }
 }
