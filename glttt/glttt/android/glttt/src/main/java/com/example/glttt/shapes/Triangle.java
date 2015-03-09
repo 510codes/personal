@@ -36,6 +36,16 @@ public class Triangle
 		return vertexData[(vertexNum * mStride) + 2];
 	}
 
+    public float[] getVertex( int vertexNum ) {
+        float[] v = new float[4];
+        v[0] = vertexData[(vertexNum * mStride)];
+        v[1] = vertexData[(vertexNum * mStride) + 1];
+        v[2] = vertexData[(vertexNum * mStride) + 2];
+        v[3] = 1.0f;
+
+        return v;
+    }
+
     @Override
 	public String toString()
 	{

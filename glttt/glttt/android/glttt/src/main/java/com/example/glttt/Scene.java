@@ -71,7 +71,7 @@ public class Scene
         }
 	}
 	
-	public ModelObject getClickedModelObject( int screenX, int screenY, float z )
+	public ModelObject getClickedModelObject( int screenX, int screenY )
 	{
     	float xpos = screenX;
     	float ypos = mCurrentViewPort[3];
@@ -79,7 +79,7 @@ public class Scene
 
         for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
             ModelObject modelObject = entry.getValue();
-			if (modelObject.clickedOn((int)xpos, (int)ypos, z, mViewMatrix, mProjectionMatrix, mCurrentViewPort) != null)
+			if (modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort) != null)
 			{
 				return modelObject;
 			}
@@ -88,20 +88,23 @@ public class Scene
 		return null;
 	}
 
-    // You would project a coordinate C onto the screen using the formula:
+    public float[] getClickPosition( String modelObject, int screenX, int screenY ) {
+        ModelObject obj = mModelObjects.get(modelObject);
+        if (obj != null) {
+            return getClickPosition(obj, screenX, screenY);
+        }
+
+        return null;
+    }
+
+        // You would project a coordinate C onto the screen using the formula:
     // C' = P * V * M * C
-    public float[] getClickPosition( String modelObject, int screenX, int screenY, float z ) {
+    public float[] getClickPosition( ModelObject obj, int screenX, int screenY ) {
         float xpos = screenX;
         float ypos = mCurrentViewPort[3];
         ypos -= screenY;
 
-        float[] pos = null;
-        ModelObject obj = mModelObjects.get(modelObject);
-        if (obj != null) {
-            pos = obj.clickedOn((int)xpos, (int)ypos, z, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
-        }
-
-        return pos;
+        return obj.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
     }
 
 	public void setLookAt( float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ )

@@ -130,33 +130,24 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public void onTapDown( int x, int y ) {
-        mTapDownObject = mScene.getClickedModelObject(x, y, 0.0f);
-        float[] pos1 = mScene.getClickPosition("board", x, y, 0.0f);
-        if (pos1 != null) {
-            //mScene.getObjectByName("touchsphere1").setTranslation(pos1[0], pos1[1], pos1[2]);
-        }
-
-        float[] pos2 = mScene.getClickPosition("board", x, y, 1.0f);
-        if (pos2 != null) {
-            //mScene.getObjectByName("touchsphere2").setTranslation(pos2[0], pos2[1], pos2[2]);
-        }
-
-        if (pos1 != null && pos2 != null) {
-            float xdif = pos2[0] - pos1[0];
-            float ydif = pos2[1] - pos1[1];
-            float zdif = pos2[2] - pos1[2];
-            float y0pos = pos1[1] / ydif;
-
-            float newx = pos1[0] - (xdif * y0pos);
-            float newy = pos1[1] - (ydif * y0pos);
-            float newz = pos1[2] - (zdif * y0pos);
-            mScene.getObjectByName("touchsphere3").setTranslation(newx, newy, newz);
+        mTapDownObject = mScene.getClickedModelObject(x, y);
+        if (mTapDownObject != null) {
+            float[] pos = mScene.getClickPosition(mTapDownObject, x, y);
+            if (pos != null) {
+                ModelObject touchsphere3 = mScene.getObjectByName("touchsphere3");
+                Transformation transformation = mTapDownObject.getTransformation();
+                // TODO: not entirely sure about the use of translation here
+                // is it correct to simply translate the object using the point
+                // returned from getClickPosition()?
+                transformation.translate(pos[0], pos[1], pos[2]);
+                touchsphere3.setTransformation(transformation);
+            }
         }
     }
 
     @Override
     public void onTapUp( int x, int y ) {
-        ModelObject tapUpObject = mScene.getClickedModelObject(x, y, 0.0f);
+        ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
         }

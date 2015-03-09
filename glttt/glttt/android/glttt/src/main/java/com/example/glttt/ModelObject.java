@@ -17,9 +17,7 @@ public class ModelObject
     private final float[] mModelMatrix;
     private ArrayList<Triangle> mTriangles;
     private String mId;
-    private float mScaleFactor;
-    private float mYRotation;
-    private float[] mTranslation;
+    private Transformation mTransformation;
 
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
@@ -28,15 +26,9 @@ public class ModelObject
 	{
         this.mId = id;
         this.mModelMatrix = new float[16];
+        mTransformation = new Transformation();
 		this.mTriangles = new ArrayList<Triangle>();
     	Matrix.setIdentityM(mModelMatrix, 0);
-        mScaleFactor = 1.0f;
-        mYRotation = 0.0f;
-        mTranslation = new float[4];
-        mTranslation[0] = 0.0f;
-        mTranslation[0] = 0.0f;
-        mTranslation[0] = 0.0f;
-        mTranslation[0] = 0.0f;
         mVertexBufferDirty = true;
 	}
 
@@ -58,43 +50,34 @@ public class ModelObject
         return newMatrix;
     }
 
+    public Transformation getTransformation() {
+        return new Transformation(mTransformation);
+    }
+
+    public void setTransformation( Transformation t ) {
+        this.mTransformation = t;
+        recalculateModelMatrix();
+    }
+
     public void setScaleFactor( float factor )
 	{
-        mScaleFactor = factor;
+        mTransformation.setScaleFactor(factor);
         recalculateModelMatrix();
 	}
 
     public void setYRotation( float degrees ) {
-        mYRotation = degrees;
+        mTransformation.setYRotation(degrees);
         recalculateModelMatrix();
     }
 
     public void setTranslation( float x, float y, float z ) {
-        mTranslation[0] = x;
-        mTranslation[1] = y;
-        mTranslation[2] = z;
+        mTransformation.setTranslation(x, y, z);
         recalculateModelMatrix();
-    }
-
-	private void translate( float x, float y, float z )
-	{
-        synchronized (mModelMatrix) {
-            Matrix.translateM(mModelMatrix, 0, x, y, z);
-        }
-	}
-
-    private void rotate( float angle, float x, float y, float z ) {
-        synchronized(mModelMatrix) {
-            Matrix.rotateM(mModelMatrix, 0, angle, x, y, z);
-        }
     }
 
     private void recalculateModelMatrix() {
         synchronized(mModelMatrix) {
-            Matrix.setIdentityM(mModelMatrix, 0);
-            rotate(mYRotation, 0.0f, 1.0f, 0.0f);
-            Matrix.scaleM(mModelMatrix, 0, mScaleFactor, mScaleFactor, mScaleFactor);
-            translate(mTranslation[0], mTranslation[1], mTranslation[2]);
+            mTransformation.calculateTransformationMatrix(mModelMatrix);
         }
     }
 
@@ -186,7 +169,7 @@ public class ModelObject
     }
 
     // returns the position, in modelspace, of the click
-    public float[] clickedOn( int screenX, int screenY, float z, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
+    public float[] clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
 	{
         float[] pos = null;
         float[] mvMatrix = new float[16];
@@ -196,7 +179,7 @@ public class ModelObject
 
 		for (Triangle t : mTriangles)
 		{
-            float[] screen0 = getTransformedPoint( t.getX(0), t.getY(0), t.getZ(0), mvMatrix, projectionMatrix, viewport );
+            float[] screen0 = getTransformedPoint(t.getX(0), t.getY(0), t.getZ(0), mvMatrix, projectionMatrix, viewport);
             float[] screen1 = getTransformedPoint( t.getX(1), t.getY(1), t.getZ(1), mvMatrix, projectionMatrix, viewport );
             float[] screen2 = getTransformedPoint( t.getX(2), t.getY(2), t.getZ(2), mvMatrix, projectionMatrix, viewport );
 
@@ -213,13 +196,92 @@ public class ModelObject
 			
 			if (inside)
 			{
-                pos = getUnTransformedPoint(screenX, screenY, z, mvMatrix, projectionMatrix, viewport);
+                float[] pos1 = getUnTransformedPoint(screenX, screenY, 0.0f, mvMatrix, projectionMatrix, viewport);
+                float[] pos2 = getUnTransformedPoint(screenX, screenY, 1.0f, mvMatrix, projectionMatrix, viewport);
+                float[] d = new float[4];
+                vector(d, pos2, pos1);
+                normalize(d);
+                float dist = getIntersection(t, pos1, d);
+
+                pos = new float[4];
+                pos[0] = pos1[0] + (d[0] * dist);
+                pos[1] = pos1[1] + (d[1] * dist);
+                pos[2] = pos1[2] + (d[2] * dist);
+                pos[3] = 1.0f;
+
                 break;
 			}			
 		}
 
 		return pos;
 	}
+
+    private void vector( float[] a, float[] b, float[] c) {
+        a[0] = b[0] - c[0];
+        a[1] = b[1] - c[1];
+        a[2] = b[2] - c[2];
+    }
+
+    private void crossProduct( float[] out, float[] v1, float[] v2 ) {
+        out[0] = v1[1] * v2[2] - v1[2] * v2[1];
+        out[1] = v1[2] * v2[0] - v1[0] * v2[2];
+        out[2] = v1[0] * v2[1] - v1[1] * v2[0];
+    }
+
+    private float innerProduct( float[] v, float[] q ) {
+        return ((v)[0] * (q)[0] + (v)[1] * (q)[1] + (v)[2] * (q)[2]);
+    }
+
+    private void normalize( float[] v ) {
+        float l = (float)Math.sqrt( (v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+        v[0] /= l;
+        v[1] /= l;
+        v[2] /= l;
+    }
+
+    private float getIntersection( Triangle tri, float[] p, float[] d ) {
+        float e1[] = new float[3];
+        float e2[] = new float[3];
+        float h[] = new float[3];
+        float s[] = new float[3];
+        float q[] = new float[3];
+        float a,f,u,v;
+        float[] v0 = tri.getVertex(0);
+        float[] v1 = tri.getVertex(1);
+        float[] v2 = tri.getVertex(2);
+        vector(e1,v1,v0);
+        vector(e2, v2, v0);
+
+        crossProduct(h,d,e2);
+        a = innerProduct(e1,h);
+
+        if (a > -0.00001 && a < 0.00001)
+            throw new RuntimeException("ray does not intersect with triangle (1)");
+
+        f = 1/a;
+        vector(s,p,v0);
+        u = f * (innerProduct(s,h));
+
+        if (u < 0.0 || u > 1.0)
+            throw new RuntimeException("ray does not intersect with triangle (2)");
+
+        crossProduct(q,s,e1);
+        v = f * innerProduct(d,q);
+
+        if (v < 0.0 || u + v > 1.0)
+            throw new RuntimeException("ray does not intersect with triangle (3)");
+
+        // at this stage we can compute t to find out where
+        // the intersection point is on the line
+        float t = f * innerProduct(e2,q);
+
+        if (t > 0.00001) // ray intersection
+            return t;
+
+        else // this means that there is a line intersection
+            // but not a ray intersection
+            throw new RuntimeException("ray does not intersect with triangle (but line does) (4)");
+    }
 
     public String toString() {
         return mId;
