@@ -148,6 +148,24 @@ public class SceneFactory {
         obj.add(sphereTris);
         scene.add(obj);
 
+        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 5, 5, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        obj = new ModelObject("touchsphere1");
+        obj.setTranslation(-2.0f, 0.0f, -2.0f);
+        obj.add(touchSphereTris);
+        scene.add(obj);
+
+        touchSphereTris = mShapeFactory.createSphere("touchsphere2", 4.0f, 5, 5, new float[]{0.0f, 0.6f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        obj = new ModelObject("touchsphere2");
+        obj.setTranslation(2.0f, 0.0f, 2.0f);
+        obj.add(touchSphereTris);
+        scene.add(obj);
+
+        touchSphereTris = mShapeFactory.createSphere("touchsphere3", 4.0f, 5, 5, new float[]{0.6f, 0.0f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        obj = new ModelObject("touchsphere3");
+        obj.setTranslation(-2.0f, 0.0f, 2.0f);
+        obj.add(touchSphereTris);
+        scene.add(obj);
+
         // Position the eye behind the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;

@@ -1,6 +1,6 @@
 package com.example.glttt;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import android.opengl.Matrix;
 
@@ -9,10 +9,10 @@ import com.example.glttt.shader.IShader;
 
 public class Scene
 {
-	private ArrayList<ModelObject> mModelObjects;
+	private LinkedHashMap<String, ModelObject> mModelObjects;
 
     private IShader mShader;
-	private float[] mViewMatrix;
+    private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
     private float[] mEyePos;
     private float[] mEyeLookAt;
@@ -29,7 +29,7 @@ public class Scene
     public Scene(IShader shader, ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
 	{
         mShader = shader;
-        mModelObjects = new ArrayList<ModelObject>();
+        mModelObjects = new LinkedHashMap<String, ModelObject>();
 
         mViewMatrix = new float[16];
         mProjectionMatrix = new float[16];
@@ -61,26 +61,25 @@ public class Scene
 	
 	public void add( ModelObject m )
 	{
-		mModelObjects.add(m);
+		mModelObjects.put(m.getId(), m);
 	}
 	
 	public void draw()
 	{
-		for (ModelObject modelObject : mModelObjects)
-		{
-			drawModelObject(modelObject);
-		}
+        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+            entry.getValue().draw(mViewMatrix, mProjectionMatrix, mShader);
+        }
 	}
 	
-	public ModelObject getClickedModelObject( int screenX, int screenY )
+	public ModelObject getClickedModelObject( int screenX, int screenY, float z )
 	{
     	float xpos = screenX;
     	float ypos = mCurrentViewPort[3];
     	ypos -= screenY;
-    	
-		for (ModelObject modelObject : mModelObjects)
-		{
-			if (modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort))
+
+        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+            ModelObject modelObject = entry.getValue();
+			if (modelObject.clickedOn((int)xpos, (int)ypos, z, mViewMatrix, mProjectionMatrix, mCurrentViewPort) != null)
 			{
 				return modelObject;
 			}
@@ -88,7 +87,23 @@ public class Scene
 
 		return null;
 	}
-	
+
+    // You would project a coordinate C onto the screen using the formula:
+    // C' = P * V * M * C
+    public float[] getClickPosition( String modelObject, int screenX, int screenY, float z ) {
+        float xpos = screenX;
+        float ypos = mCurrentViewPort[3];
+        ypos -= screenY;
+
+        float[] pos = null;
+        ModelObject obj = mModelObjects.get(modelObject);
+        if (obj != null) {
+            pos = obj.clickedOn((int)xpos, (int)ypos, z, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
+        }
+
+        return pos;
+    }
+
 	public void setLookAt( float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ )
 	{
         mEyePos[0] = eyeX;
@@ -128,20 +143,6 @@ public class Scene
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 	}
 
-    private void drawModelObject( ModelObject modelObject )
-    {
-	    // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-	    // (which currently contains model * view).
-        float[] mvMatrix = modelObject.multiplyByModelMatrix(mViewMatrix, 0);
-
-        float[] mvpMatrix = new float[16];
-	    // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
-	    // (which now contains model * view * projection).
-	    Matrix.multiplyMM(mvpMatrix, 0, mProjectionMatrix, 0, mvMatrix, 0);
-	    
-	    modelObject.draw( mvMatrix, mvpMatrix, mShader);
-    }
-
     public void onViewportChanged( int[] currentViewPort ) {
         mCurrentViewPort = currentViewPort;
         int width = currentViewPort[2];
@@ -151,17 +152,19 @@ public class Scene
     }
 
     public void setZoomFactor( float zoomFactor ) {
-        for (ModelObject modelObject : mModelObjects)
-        {
-            modelObject.setScaleFactor(zoomFactor);
+        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+            entry.getValue().setScaleFactor(zoomFactor);
         }
     }
 
     public void setYRotation( float degrees ) {
-        for (ModelObject modelObject : mModelObjects)
-        {
-            modelObject.setYRotation(degrees);
+        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+            entry.getValue().setYRotation(degrees);
         }
+    }
+
+    public ModelObject getObjectByName( String name ) {
+        return mModelObjects.get(name);
     }
 
     public float[] getEyePos() {
