@@ -172,30 +172,25 @@ public class ModelObject
     public float[] clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
 	{
         float[] pos = null;
-        float[] mvMatrix = new float[16];
-        synchronized (mModelMatrix) {
-            Matrix.multiplyMM(mvMatrix, 0, viewMatrix, 0, mModelMatrix, 0);
-        }
+        float[] mvMatrix = multiplyByModelMatrix(viewMatrix, 0);
 
-		for (Triangle t : mTriangles)
-		{
+		for (Triangle t : mTriangles) {
             float[] screen0 = getTransformedPoint(t.getX(0), t.getY(0), t.getZ(0), mvMatrix, projectionMatrix, viewport);
-            float[] screen1 = getTransformedPoint( t.getX(1), t.getY(1), t.getZ(1), mvMatrix, projectionMatrix, viewport );
-            float[] screen2 = getTransformedPoint( t.getX(2), t.getY(2), t.getZ(2), mvMatrix, projectionMatrix, viewport );
+            float[] screen1 = getTransformedPoint(t.getX(1), t.getY(1), t.getZ(1), mvMatrix, projectionMatrix, viewport);
+            float[] screen2 = getTransformedPoint(t.getX(2), t.getY(2), t.getZ(2), mvMatrix, projectionMatrix, viewport);
 
-			boolean b1, b2, b3;
+            boolean b1, b2, b3;
 
             float sign1 = sign(screenX, screenY, screen0[0], screen0[1], screen1[0], screen1[1]);
-			b1 = sign1 < 0.0f;
+            b1 = sign1 < 0.0f;
             float sign2 = sign(screenX, screenY, screen1[0], screen1[1], screen2[0], screen2[1]);
-			b2 = sign2 < 0.0f;
+            b2 = sign2 < 0.0f;
             float sign3 = sign(screenX, screenY, screen2[0], screen2[1], screen0[0], screen0[1]);
-			b3 = sign3 < 0.0f;
-	
-			boolean inside = ((b1 == b2) && (b2 == b3));
-			
-			if (inside)
-			{
+            b3 = sign3 < 0.0f;
+
+            boolean inside = ((b1 == b2) && (b2 == b3));
+
+            if (inside) {
                 float[] pos1 = getUnTransformedPoint(screenX, screenY, 0.0f, mvMatrix, projectionMatrix, viewport);
                 float[] pos2 = getUnTransformedPoint(screenX, screenY, 1.0f, mvMatrix, projectionMatrix, viewport);
                 float[] d = new float[4];
@@ -210,8 +205,8 @@ public class ModelObject
                 pos[3] = 1.0f;
 
                 break;
-			}			
-		}
+            }
+        }
 
 		return pos;
 	}
