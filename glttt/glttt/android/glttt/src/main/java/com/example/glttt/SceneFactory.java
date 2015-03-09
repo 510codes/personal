@@ -113,6 +113,13 @@ public class SceneFactory {
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
             };
 
+            float[] pegVerticesTop = {
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK
+            };
+
             Triangle[] pegTris;
             ModelObject peg;
 
@@ -133,6 +140,11 @@ public class SceneFactory {
 
             pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_right");
             peg = new ModelObject("peg"+x+"_right_4");
+            peg.add(pegTris);
+            scene.add(peg);
+
+            pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_top");
+            peg = new ModelObject("peg"+x+"_top_4");
             peg.add(pegTris);
             scene.add(peg);
         }
