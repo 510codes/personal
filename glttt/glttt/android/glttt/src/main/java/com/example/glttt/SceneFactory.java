@@ -79,24 +79,24 @@ public class SceneFactory {
 
         float boardVertices[] = {
                 -100.0f, 0.0f, -100.0f,
-                100.0f, 0.0f, -100.0f,
+                -100.0f, 0.0f, 100.0f,
                 100.0f, 0.0f, 100.0f,
-                -100.0f, 0.0f, 100.0f
+                100.0f, 0.0f, -100.0f
         };
 
         for (int x=0; x<8; ++x) {
             float[] pegVerticesFront = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
             };
 
             float[] pegVerticesBack = {
                     PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
+                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
                     PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK
+                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
             };
 
             float[] pegVerticesLeft = {

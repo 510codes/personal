@@ -197,14 +197,15 @@ public class ModelObject
                 vector(d, pos2, pos1);
                 normalize(d);
                 float dist = getIntersection(t, pos1, d);
+                if (!Float.isNaN(dist)) {
+                    pos = new float[4];
+                    pos[0] = pos1[0] + (d[0] * dist);
+                    pos[1] = pos1[1] + (d[1] * dist);
+                    pos[2] = pos1[2] + (d[2] * dist);
+                    pos[3] = 1.0f;
 
-                pos = new float[4];
-                pos[0] = pos1[0] + (d[0] * dist);
-                pos[1] = pos1[1] + (d[1] * dist);
-                pos[2] = pos1[2] + (d[2] * dist);
-                pos[3] = 1.0f;
-
-                break;
+                    break;
+                }
             }
         }
 
@@ -251,20 +252,20 @@ public class ModelObject
         a = innerProduct(e1,h);
 
         if (a > -0.00001 && a < 0.00001)
-            throw new RuntimeException("ray does not intersect with triangle (1)");
+            return Float.NaN;
 
         f = 1/a;
         vector(s,p,v0);
         u = f * (innerProduct(s,h));
 
         if (u < 0.0 || u > 1.0)
-            throw new RuntimeException("ray does not intersect with triangle (2)");
+            return Float.NaN;
 
         crossProduct(q,s,e1);
         v = f * innerProduct(d,q);
 
         if (v < 0.0 || u + v > 1.0)
-            throw new RuntimeException("ray does not intersect with triangle (3)");
+            return Float.NaN;
 
         // at this stage we can compute t to find out where
         // the intersection point is on the line
@@ -275,7 +276,7 @@ public class ModelObject
 
         else // this means that there is a line intersection
             // but not a ray intersection
-            throw new RuntimeException("ray does not intersect with triangle (but line does) (4)");
+            return Float.NaN;
     }
 
     public String toString() {
