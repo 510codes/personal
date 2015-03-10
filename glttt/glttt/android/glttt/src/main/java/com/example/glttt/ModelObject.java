@@ -196,21 +196,39 @@ public class ModelObject
                 float[] d = new float[4];
                 vector(d, pos2, pos1);
                 normalize(d);
-                float dist = getIntersection(t, pos1, d);
-                if (!Float.isNaN(dist)) {
-                    pos = new float[4];
-                    pos[0] = pos1[0] + (d[0] * dist);
-                    pos[1] = pos1[1] + (d[1] * dist);
-                    pos[2] = pos1[2] + (d[2] * dist);
-                    pos[3] = 1.0f;
+                float[] vec0 = new float[4];
+                float[] vec1 = new float[4];
+                float[] surfaceNormal = new float[4];
+                vector(vec0, t.getVertex(1), t.getVertex(0));
+                vector(vec1, t.getVertex(2), t.getVertex(0));
+                crossProduct(surfaceNormal, vec0, vec1);
+                normalize(surfaceNormal);
 
-                    break;
+                if (dotProduct(surfaceNormal, d) < 0.0f) {
+                    float dist = getIntersection(t, pos1, d);
+                    if (!Float.isNaN(dist)) {
+                        pos = new float[4];
+                        pos[0] = pos1[0] + (d[0] * dist);
+                        pos[1] = pos1[1] + (d[1] * dist);
+                        pos[2] = pos1[2] + (d[2] * dist);
+                        pos[3] = 1.0f;
+
+                        break;
+                    }
                 }
             }
         }
 
 		return pos;
 	}
+
+    private float dotProduct( float[] vec0, float[] vec1 ) {
+        float sum = 0;
+        for(int i = 0; i < 3; i++){
+            sum += vec0[i] * vec1[i];
+        }
+        return sum;
+    }
 
     private void vector( float[] a, float[] b, float[] c) {
         a[0] = b[0] - c[0];

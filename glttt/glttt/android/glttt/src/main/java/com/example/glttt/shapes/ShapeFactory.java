@@ -128,8 +128,8 @@ public class ShapeFactory {
         int v = 0;
         int n = 0;
         for(r = 0; r < rings; r++) for(s = 0; s < sectors; s++) {
-            final float y = (float)Math.sin( -(Math.PI / 2.0f) + Math.PI * r * R );
-            final float x = (float)Math.cos(2*Math.PI * s * S) * (float)Math.sin( Math.PI * r * R );
+            final float x = (float)Math.sin( -(Math.PI / 2.0f) + Math.PI * r * R );
+            final float y = (float)Math.cos(2*Math.PI * s * S) * (float)Math.sin( Math.PI * r * R );
             final float z = (float)Math.sin(2*Math.PI * s * S) * (float)Math.sin( Math.PI * r * R );
 
             texcoords[t] = s*S;
@@ -147,15 +147,13 @@ public class ShapeFactory {
             vertices[v] = z * radius;
             v++;
 
-            // TODO: i had to make the normals negative in order to get the sphere
-            // to shade properly.  i don't know why, need to figure it out
-            normals[n] = -x;
+            normals[n] = x;
             n++;
 
-            normals[n] = -y;
+            normals[n] = y;
             n++;
 
-            normals[n] = -z;
+            normals[n] = z;
             n++;
         }
 
