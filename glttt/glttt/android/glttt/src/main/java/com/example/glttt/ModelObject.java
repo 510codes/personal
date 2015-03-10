@@ -194,17 +194,17 @@ public class ModelObject
                 float[] pos1 = getUnTransformedPoint(screenX, screenY, 0.0f, mvMatrix, projectionMatrix, viewport);
                 float[] pos2 = getUnTransformedPoint(screenX, screenY, 1.0f, mvMatrix, projectionMatrix, viewport);
                 float[] d = new float[4];
-                vector(d, pos2, pos1);
-                normalize(d);
+                Math3d.vector(d, pos2, pos1);
+                Math3d.normalize(d);
                 float[] vec0 = new float[4];
                 float[] vec1 = new float[4];
                 float[] surfaceNormal = new float[4];
-                vector(vec0, t.getVertex(1), t.getVertex(0));
-                vector(vec1, t.getVertex(2), t.getVertex(0));
-                crossProduct(surfaceNormal, vec0, vec1);
-                normalize(surfaceNormal);
+                Math3d.vector(vec0, t.getVertex(1), t.getVertex(0));
+                Math3d.vector(vec1, t.getVertex(2), t.getVertex(0));
+                Math3d.crossProduct(surfaceNormal, vec0, vec1);
+                Math3d.normalize(surfaceNormal);
 
-                if (dotProduct(surfaceNormal, d) < 0.0f) {
+                if (Math3d.dotProduct(surfaceNormal, d) < 0.0f) {
                     float dist = getIntersection(t, pos1, d);
                     if (!Float.isNaN(dist)) {
                         pos = new float[4];
@@ -222,37 +222,6 @@ public class ModelObject
 		return pos;
 	}
 
-    private float dotProduct( float[] vec0, float[] vec1 ) {
-        float sum = 0;
-        for(int i = 0; i < 3; i++){
-            sum += vec0[i] * vec1[i];
-        }
-        return sum;
-    }
-
-    private void vector( float[] a, float[] b, float[] c) {
-        a[0] = b[0] - c[0];
-        a[1] = b[1] - c[1];
-        a[2] = b[2] - c[2];
-    }
-
-    private void crossProduct( float[] out, float[] v1, float[] v2 ) {
-        out[0] = v1[1] * v2[2] - v1[2] * v2[1];
-        out[1] = v1[2] * v2[0] - v1[0] * v2[2];
-        out[2] = v1[0] * v2[1] - v1[1] * v2[0];
-    }
-
-    private float innerProduct( float[] v, float[] q ) {
-        return ((v)[0] * (q)[0] + (v)[1] * (q)[1] + (v)[2] * (q)[2]);
-    }
-
-    private void normalize( float[] v ) {
-        float l = (float)Math.sqrt( (v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-        v[0] /= l;
-        v[1] /= l;
-        v[2] /= l;
-    }
-
     private float getIntersection( Triangle tri, float[] p, float[] d ) {
         float e1[] = new float[3];
         float e2[] = new float[3];
@@ -263,31 +232,31 @@ public class ModelObject
         float[] v0 = tri.getVertex(0);
         float[] v1 = tri.getVertex(1);
         float[] v2 = tri.getVertex(2);
-        vector(e1,v1,v0);
-        vector(e2, v2, v0);
+        Math3d.vector(e1,v1,v0);
+        Math3d.vector(e2, v2, v0);
 
-        crossProduct(h,d,e2);
-        a = innerProduct(e1,h);
+        Math3d.crossProduct(h,d,e2);
+        a = Math3d.innerProduct(e1,h);
 
         if (a > -0.00001 && a < 0.00001)
             return Float.NaN;
 
         f = 1/a;
-        vector(s,p,v0);
-        u = f * (innerProduct(s,h));
+        Math3d.vector(s,p,v0);
+        u = f * (Math3d.innerProduct(s,h));
 
         if (u < 0.0 || u > 1.0)
             return Float.NaN;
 
-        crossProduct(q,s,e1);
-        v = f * innerProduct(d,q);
+        Math3d.crossProduct(q,s,e1);
+        v = f * Math3d.innerProduct(d,q);
 
         if (v < 0.0 || u + v > 1.0)
             return Float.NaN;
 
         // at this stage we can compute t to find out where
         // the intersection point is on the line
-        float t = f * innerProduct(e2,q);
+        float t = f * Math3d.innerProduct(e2,q);
 
         if (t > 0.00001) // ray intersection
             return t;
