@@ -27,8 +27,12 @@ public class Math3d {
         return ((v)[0] * (q)[0] + (v)[1] * (q)[1] + (v)[2] * (q)[2]);
     }
 
+    public static float vectorlength( float[] v ) {
+        return (float)Math.sqrt( (v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+    }
+
     public static void normalize( float[] v ) {
-        float l = (float)Math.sqrt( (v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+        float l = vectorlength(v);
         v[0] /= l;
         v[1] /= l;
         v[2] /= l;

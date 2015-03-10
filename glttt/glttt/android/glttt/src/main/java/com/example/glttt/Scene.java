@@ -76,16 +76,33 @@ public class Scene
     	float xpos = screenX;
     	float ypos = mCurrentViewPort[3];
     	ypos -= screenY;
+        ModelObject closestObject = null;
+        float closestDist = Float.NaN;
 
         for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
             ModelObject modelObject = entry.getValue();
-			if (modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort) != null)
-			{
-				return modelObject;
+			float[] pos = modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
+            if (pos != null) {
+                float[] transformedPos;
+                transformedPos = modelObject.multiplyVectorByModelMatrix(pos, 0);
+                float[] vec = new float[4];
+                Math3d.vector(vec, transformedPos, mEyePos);
+                float dist = Math3d.vectorlength(vec);
+
+                if (closestObject != null) {
+                    if (Float.isNaN(closestDist) || dist < closestDist) {
+                        closestDist = dist;
+                        closestObject = modelObject;
+                    }
+                }
+                else {
+                    closestObject = modelObject;
+                    closestDist = dist;
+                }
 			}
 		}
 
-		return null;
+		return closestObject;
 	}
 
     public float[] getClickPosition( String modelObject, int screenX, int screenY ) {

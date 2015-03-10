@@ -42,12 +42,20 @@ public class ModelObject
         mVertexBufferDirty = true;
     }
 
-    private float[] multiplyByModelMatrix( float[] matrix, int index ) {
+    public float[] multiplyMatrixByModelMatrix( float[] matrix, int index ) {
         float[] newMatrix = new float[16];
         synchronized (mModelMatrix) {
             Matrix.multiplyMM(newMatrix, 0, matrix, index, mModelMatrix, 0);
         }
         return newMatrix;
+    }
+
+    public float[] multiplyVectorByModelMatrix( float[] vector, int index ) {
+        float[] newVector = new float[4];
+        synchronized (mModelMatrix) {
+            Matrix.multiplyMV(newVector, 0, mModelMatrix, index, vector, 0);
+        }
+        return newVector;
     }
 
     public Transformation getTransformation() {
@@ -100,7 +108,7 @@ public class ModelObject
 	{
         long startTimeNanos = System.nanoTime();
 
-        float[] mvMatrix = multiplyByModelMatrix(viewMatrix, 0);
+        float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
 
         float[] mvpMatrix = new float[16];
         // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
@@ -172,7 +180,7 @@ public class ModelObject
     public float[] clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
 	{
         float[] pos = null;
-        float[] mvMatrix = multiplyByModelMatrix(viewMatrix, 0);
+        float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
 
 		for (Triangle t : mTriangles) {
             float[] screen0 = getTransformedPoint(t.getX(0), t.getY(0), t.getZ(0), mvMatrix, projectionMatrix, viewport);
