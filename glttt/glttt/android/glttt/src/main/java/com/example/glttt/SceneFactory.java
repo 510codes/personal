@@ -121,31 +121,23 @@ public class SceneFactory {
             };
 
             Triangle[] pegTris;
-            ModelObject peg;
+            ModelObject peg = new ModelObject("peg"+x);
 
             pegTris = mShapeFactory.createRectangle(pegVerticesFront, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_front");
-            peg = new ModelObject("peg"+x+"_front_1");
             peg.add(pegTris);
-            scene.add(peg);
 
             pegTris = mShapeFactory.createRectangle(pegVerticesBack, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_back");
-            peg = new ModelObject("peg"+x+"_back_2");
             peg.add(pegTris);
-            scene.add(peg);
 
             pegTris = mShapeFactory.createRectangle(pegVerticesLeft, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_left");
-            peg = new ModelObject("peg"+x+"_left_3");
             peg.add(pegTris);
-            scene.add(peg);
 
             pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_right");
-            peg = new ModelObject("peg"+x+"_right_4");
             peg.add(pegTris);
-            scene.add(peg);
 
             pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_top");
-            peg = new ModelObject("peg"+x+"_top_4");
             peg.add(pegTris);
+
             scene.add(peg);
         }
 
@@ -160,19 +152,19 @@ public class SceneFactory {
         obj.add(sphereTris);
         scene.add(obj);
 
-        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 5, 5, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 10, 10, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
         obj = new ModelObject("touchsphere1");
         obj.setTranslation(-2.0f, 0.0f, -2.0f);
         obj.add(touchSphereTris);
         scene.add(obj);
 
-        touchSphereTris = mShapeFactory.createSphere("touchsphere2", 4.0f, 5, 5, new float[]{0.0f, 0.6f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        touchSphereTris = mShapeFactory.createSphere("touchsphere2", 4.0f, 10, 10, new float[]{0.0f, 0.6f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
         obj = new ModelObject("touchsphere2");
         obj.setTranslation(2.0f, 0.0f, 2.0f);
         obj.add(touchSphereTris);
         scene.add(obj);
 
-        touchSphereTris = mShapeFactory.createSphere("touchsphere3", 4.0f, 5, 5, new float[]{0.6f, 0.0f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        touchSphereTris = mShapeFactory.createSphere("touchsphere3", 4.0f, 10, 10, new float[]{0.6f, 0.0f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
         obj = new ModelObject("touchsphere3");
         obj.setTranslation(-2.0f, 0.0f, 2.0f);
         obj.add(touchSphereTris);
