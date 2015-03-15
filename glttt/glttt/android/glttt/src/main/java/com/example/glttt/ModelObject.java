@@ -22,8 +22,6 @@ public class ModelObject
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
 
-    private static final float SMALL_NUM = 0.0000001f;
-
 	public ModelObject( String id )
 	{
         this.mId = id;
@@ -199,7 +197,7 @@ public class ModelObject
                     float[] rayOrigin = new float[4];
                     float[] rayDirection = new float[4];
                     getScreenTouchRay(screenX, screenY, mvMatrix, projectionMatrix, viewport, rayOrigin, rayDirection);
-                    if (getPlaneIntersectionInternal(t.getVertex(0), surfaceNormal, rayOrigin, rayDirection, outPos, outDir)) {
+                    if (Math3d.getPlaneIntersection(t.getVertex(0), surfaceNormal, rayOrigin, rayDirection, outPos, outDir)) {
                         found = true;
                         break;
                     }
@@ -230,42 +228,7 @@ public class ModelObject
         float[] rayDirection = new float[4];
         getScreenTouchRay(screenX, screenY, mvMatrix, projectionMatrix, viewport, rayOrigin, rayDirection);
 
-        return getPlaneIntersectionInternal(p, n, rayOrigin, rayDirection, outPos, outDir);
-    }
-
-    private static boolean getPlaneIntersectionInternal( float[] planePos, float[] planeNormal, float[] rayOrigin, float[] rayDir, float[] outPos, float[] outDir ) {
-        boolean found = false;
-
-        float dp = Math3d.dotProduct(planeNormal, rayDir);
-        if (Math.abs(dp) < SMALL_NUM) {
-            return false;
-        }
-
-        if (dp <= 0.0f) {
-            float t = 0.0f;
-            for (int i=0; i<3; ++i) {
-                t += (planeNormal[i] * rayOrigin[i]);
-                t += (planeNormal[i] * -planePos[i]);
-            }
-
-            t /= -dp;
-
-            if (t >= 0.0f) {
-                outPos[0] = rayOrigin[0] + (rayDir[0] * t);
-                outPos[1] = rayOrigin[1] + (rayDir[1] * t);
-                outPos[2] = rayOrigin[2] + (rayDir[2] * t);
-                outPos[3] = 1.0f;
-
-                outDir[0] = -rayDir[0];
-                outDir[1] = -rayDir[1];
-                outDir[2] = -rayDir[2];
-                outDir[3] = 0.0f;
-
-                found = true;
-            }
-        }
-
-        return found;
+        return Math3d.getPlaneIntersection(p, n, rayOrigin, rayDirection, outPos, outDir);
     }
 
     private static float getIntersection( Triangle tri, float[] p, float[] d ) {

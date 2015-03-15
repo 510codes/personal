@@ -1,6 +1,8 @@
 package com.example.glttt;
 
 public class Math3d {
+    private static final float SMALL_NUM = 0.0000001f;
+
     private Math3d() {}
 
     public static float dotProduct( float[] vec0, float[] vec1 ) {
@@ -51,5 +53,40 @@ public class Math3d {
         }
 
         return true;
+    }
+
+    public static boolean getPlaneIntersection( float[] planePos, float[] planeNormal, float[] rayOrigin, float[] rayDir, float[] outPos, float[] outDir ) {
+        boolean found = false;
+
+        float dp = Math3d.dotProduct(planeNormal, rayDir);
+        if (Math.abs(dp) < SMALL_NUM) {
+            return false;
+        }
+
+        if (dp <= 0.0f) {
+            float t = 0.0f;
+            for (int i=0; i<3; ++i) {
+                t += (planeNormal[i] * rayOrigin[i]);
+                t += (planeNormal[i] * -planePos[i]);
+            }
+
+            t /= -dp;
+
+            if (t >= 0.0f) {
+                outPos[0] = rayOrigin[0] + (rayDir[0] * t);
+                outPos[1] = rayOrigin[1] + (rayDir[1] * t);
+                outPos[2] = rayOrigin[2] + (rayDir[2] * t);
+                outPos[3] = 1.0f;
+
+                outDir[0] = -rayDir[0];
+                outDir[1] = -rayDir[1];
+                outDir[2] = -rayDir[2];
+                outDir[3] = 0.0f;
+
+                found = true;
+            }
+        }
+
+        return found;
     }
 }
