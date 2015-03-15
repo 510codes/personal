@@ -37,4 +37,19 @@ public class Math3d {
         v[1] /= l;
         v[2] /= l;
     }
+
+    public static boolean getSurfaceNormal( float[] out, float[] v0, float[] v1, float[] v2 ) {
+        float[] vec0 = new float[4];
+        float[] vec1 = new float[4];
+
+        Math3d.vector(vec0, v1, v0);
+        Math3d.vector(vec1, v2, v0);
+        Math3d.crossProduct(out, vec0, vec1);
+        Math3d.normalize(out);
+        if (Float.isNaN(out[0]) || Float.isNaN(out[1]) || Float.isNaN(out[2])) {
+            return false;
+        }
+
+        return true;
+    }
 }

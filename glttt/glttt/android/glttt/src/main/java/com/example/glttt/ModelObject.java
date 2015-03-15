@@ -22,6 +22,8 @@ public class ModelObject
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
 
+    private static final float SMALL_NUM = 0.0000001f;
+
 	public ModelObject( String id )
 	{
         this.mId = id;
@@ -134,9 +136,8 @@ public class ModelObject
         return resultVec;
     }
 
-    float[] glhUnProjectf(float winx, float winy, float winz, float[] modelview, float[] projection, int[] viewport)
+    static boolean glhUnProjectf(float winx, float winy, float winz, float[] modelview, float[] projection, int[] viewport, float[] outPos)
     {
-        float[] objectCoordinate = new float[4];
         float[] m = new float[16], A = new float[16];
         float[] in = new float[4], out = new float[4];
 
@@ -152,34 +153,28 @@ public class ModelObject
         Matrix.multiplyMV(out, 0, m, 0, in, 0);
 
         if(out[3]==0.0)
-            return null;
+            return false;
 
         out[3]=1.0f/out[3];
-        objectCoordinate[0]=out[0]*out[3];
-        objectCoordinate[1]=out[1]*out[3];
-        objectCoordinate[2]=out[2]*out[3];
+        outPos[0]=out[0]*out[3];
+        outPos[1]=out[1]*out[3];
+        outPos[2]=out[2]*out[3];
+        outPos[3] = 1.0f;
 
-        return objectCoordinate;
+        return true;
     }
 
-    private float[] getUnTransformedPoint( float x, float y, float z, float[] modelViewMatrix, float[] projectionMatrix, int[] viewport ) {
-        float[] resultVec;
-
-        //GLU.gluUnProject(x, y, z, modelViewMatrix, 0, projectionMatrix, 0, viewport, 0, resultVec, 0);
-        //GLU.gluUnProject(x, y, 1.0f, modelViewMatrix, 0, projectionMatrix, 0, viewport, 0, resultVec, 0);
-
-        //resultVec = glhUnProjectf(x, y, 0.0f, modelViewMatrix, projectionMatrix, viewport);
-        //resultVec = glhUnProjectf(x, y, 1.0f, modelViewMatrix, projectionMatrix, viewport);
-
-        resultVec = glhUnProjectf(x, y, z, modelViewMatrix, projectionMatrix, viewport);
-
-        return resultVec;
+    private static boolean getUnTransformedPoint( float x, float y, float z, float[] modelViewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos ) {
+        return glhUnProjectf(x, y, z, modelViewMatrix, projectionMatrix, viewport, outPos);
     }
 
+    private static String vectorToString( float[] v ) {
+        return "[" + v[0] + ", " + v[1] + ", " + v[2] + ", " + v[3] + "]";
+    }
     // returns the position, in modelspace, of the click
-    public float[] clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport )
+    public boolean clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir )
 	{
-        float[] pos = null;
+        boolean found = false;
         float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
 
 		for (Triangle t : mTriangles) {
@@ -199,38 +194,81 @@ public class ModelObject
             boolean inside = ((b1 == b2) && (b2 == b3));
 
             if (inside) {
-                float[] pos1 = getUnTransformedPoint(screenX, screenY, 0.0f, mvMatrix, projectionMatrix, viewport);
-                float[] pos2 = getUnTransformedPoint(screenX, screenY, 1.0f, mvMatrix, projectionMatrix, viewport);
-                float[] d = new float[4];
-                Math3d.vector(d, pos2, pos1);
-                Math3d.normalize(d);
-                float[] vec0 = new float[4];
-                float[] vec1 = new float[4];
                 float[] surfaceNormal = new float[4];
-                Math3d.vector(vec0, t.getVertex(1), t.getVertex(0));
-                Math3d.vector(vec1, t.getVertex(2), t.getVertex(0));
-                Math3d.crossProduct(surfaceNormal, vec0, vec1);
-                Math3d.normalize(surfaceNormal);
-
-                if (Math3d.dotProduct(surfaceNormal, d) < 0.0f) {
-                    float dist = getIntersection(t, pos1, d);
-                    if (!Float.isNaN(dist)) {
-                        pos = new float[4];
-                        pos[0] = pos1[0] + (d[0] * dist);
-                        pos[1] = pos1[1] + (d[1] * dist);
-                        pos[2] = pos1[2] + (d[2] * dist);
-                        pos[3] = 1.0f;
-
+                if (Math3d.getSurfaceNormal(surfaceNormal, t.getVertex(0), t.getVertex(1), t.getVertex(2))) {
+                    float[] rayOrigin = new float[4];
+                    float[] rayDirection = new float[4];
+                    getScreenTouchRay(screenX, screenY, mvMatrix, projectionMatrix, viewport, rayOrigin, rayDirection);
+                    if (getPlaneIntersectionInternal(t.getVertex(0), surfaceNormal, rayOrigin, rayDirection, outPos, outDir)) {
+                        found = true;
                         break;
                     }
                 }
             }
         }
 
-		return pos;
+		return found;
 	}
 
-    private float getIntersection( Triangle tri, float[] p, float[] d ) {
+    private static void getScreenTouchRay( int screenX, int screenY, float[] mvMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir ) {
+        float[] pos1 = new float[4];
+        getUnTransformedPoint(screenX, screenY, 0.0f, mvMatrix, projectionMatrix, viewport, outPos);
+        getUnTransformedPoint(screenX, screenY, 1.0f, mvMatrix, projectionMatrix, viewport, pos1);
+        Math3d.vector(outDir, pos1, outPos);
+        Math3d.normalize(outDir);
+    }
+
+    public boolean getPlaneIntersection( int screenX, int screenY, float[] surfacePoint, float[] surfaceNormal, float[] viewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir ) {
+        float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
+
+        float[] p;
+        float[] n;
+        p = multiplyVectorByModelMatrix(surfacePoint, 0);
+        n = multiplyVectorByModelMatrix(surfaceNormal, 0);
+
+        float[] rayOrigin = new float[4];
+        float[] rayDirection = new float[4];
+        getScreenTouchRay(screenX, screenY, mvMatrix, projectionMatrix, viewport, rayOrigin, rayDirection);
+
+        return getPlaneIntersectionInternal(p, n, rayOrigin, rayDirection, outPos, outDir);
+    }
+
+    private static boolean getPlaneIntersectionInternal( float[] planePos, float[] planeNormal, float[] rayOrigin, float[] rayDir, float[] outPos, float[] outDir ) {
+        boolean found = false;
+
+        float dp = Math3d.dotProduct(planeNormal, rayDir);
+        if (Math.abs(dp) < SMALL_NUM) {
+            return false;
+        }
+
+        if (dp <= 0.0f) {
+            float t = 0.0f;
+            for (int i=0; i<3; ++i) {
+                t += (planeNormal[i] * rayOrigin[i]);
+                t += (planeNormal[i] * -planePos[i]);
+            }
+
+            t /= -dp;
+
+            if (t >= 0.0f) {
+                outPos[0] = rayOrigin[0] + (rayDir[0] * t);
+                outPos[1] = rayOrigin[1] + (rayDir[1] * t);
+                outPos[2] = rayOrigin[2] + (rayDir[2] * t);
+                outPos[3] = 1.0f;
+
+                outDir[0] = -rayDir[0];
+                outDir[1] = -rayDir[1];
+                outDir[2] = -rayDir[2];
+                outDir[3] = 0.0f;
+
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    private static float getIntersection( Triangle tri, float[] p, float[] d ) {
         float e1[] = new float[3];
         float e2[] = new float[3];
         float h[] = new float[3];
@@ -241,7 +279,7 @@ public class ModelObject
         float[] v1 = tri.getVertex(1);
         float[] v2 = tri.getVertex(2);
         Math3d.vector(e1,v1,v0);
-        Math3d.vector(e2, v2, v0);
+        Math3d.vector(e2,v2,v0);
 
         Math3d.crossProduct(h,d,e2);
         a = Math3d.innerProduct(e1,h);

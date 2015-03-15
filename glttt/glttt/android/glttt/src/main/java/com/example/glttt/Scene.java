@@ -81,8 +81,10 @@ public class Scene
 
         for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
             ModelObject modelObject = entry.getValue();
-			float[] pos = modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
-            if (pos != null) {
+            float[] pos = new float[4];
+            float[] dir = new float[4];
+			boolean found = modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, pos, dir);
+            if (found) {
                 float[] transformedPos;
                 transformedPos = modelObject.multiplyVectorByModelMatrix(pos, 0);
                 float[] vec = new float[4];
@@ -105,23 +107,29 @@ public class Scene
 		return closestObject;
 	}
 
-    public float[] getClickPosition( String modelObject, int screenX, int screenY ) {
+    public boolean getClickPosition( String modelObject, int screenX, int screenY, float[] outPos, float[] outDir ) {
         ModelObject obj = mModelObjects.get(modelObject);
         if (obj != null) {
-            return getClickPosition(obj, screenX, screenY);
+            return getClickPosition(obj, screenX, screenY, outPos, outDir);
         }
 
-        return null;
+        return false;
     }
 
-        // You would project a coordinate C onto the screen using the formula:
-    // C' = P * V * M * C
-    public float[] getClickPosition( ModelObject obj, int screenX, int screenY ) {
+    public boolean getClickPosition( ModelObject obj, int screenX, int screenY, float[] outPos, float[] outDir ) {
         float xpos = screenX;
         float ypos = mCurrentViewPort[3];
         ypos -= screenY;
 
-        return obj.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort);
+        return obj.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, outPos, outDir);
+    }
+
+    public boolean getPlaneIntersection( ModelObject obj, int screenX, int screenY, float[] planePoint, float[] planeNormal, float[] outPos, float[] outDir ) {
+        float xpos = screenX;
+        float ypos = mCurrentViewPort[3];
+        ypos -= screenY;
+
+        return obj.getPlaneIntersection((int)xpos, (int)ypos, planePoint, planeNormal, mViewMatrix, mProjectionMatrix, mCurrentViewPort, outPos, outDir);
     }
 
 	public void setLookAt( float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ )

@@ -27,6 +27,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     private static final float SCALE_FACTOR_MIN = 1.0f;
     private static final float SCALE_EXPONENT = 1.5f;
 
+    private static final float[] BOARD_NORMAL = {0.0f, 1.0f, 0.0f, 0.0f};
+    private static final float[] BOARD_P0 = {0.0f, 0.0f, 0.0f, 0.0f};
+
     private float mPosInDegrees;
     private float mBoardVelocity;
     private float mEyeVelocity;
@@ -117,14 +120,16 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public synchronized void onSwipeGesture( float dTimeInS, long dx, long dy ) {
-        if (dTimeInS > 0.0f) {
-            float dvBoard = (float)dx;       // dx should be a CHANGE in velocity here, so not sure about this
-            float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
-            addBoardSpinForce(dTimeInS, forceBoard);
+        if (mTapDownObject == null || !mTapDownObject.getId().equals("sphere")) {
+            if (dTimeInS > 0.0f) {
+                float dvBoard = (float) dx;       // dx should be a CHANGE in velocity here, so not sure about this
+                float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
+                addBoardSpinForce(dTimeInS, forceBoard);
 
-            float dvEye = (float)dy;        // dy should be a CHANGE in velocity here, so not sure about this
-            float forceEye = (dvEye / dTimeInS) * SWIPE_MASS;
-            addEyeMoveForce(dTimeInS, forceEye);
+                float dvEye = (float) dy;        // dy should be a CHANGE in velocity here, so not sure about this
+                float forceEye = (dvEye / dTimeInS) * SWIPE_MASS;
+                addEyeMoveForce(dTimeInS, forceEye);
+            }
         }
     }
 
@@ -132,8 +137,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     public void onTapDown( int x, int y ) {
         mTapDownObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject != null) {
-            float[] pos = mScene.getClickPosition(mTapDownObject, x, y);
-            if (pos != null) {
+            float[] pos = new float[4];
+            float[] dir = new float[4];
+            if (mScene.getClickPosition(mTapDownObject, x, y, pos, dir)) {
                 ModelObject touchsphere3 = mScene.getObjectByName("touchsphere3");
                 Transformation transformation = mTapDownObject.getTransformation();
                 // TODO: not entirely sure about the use of translation here
@@ -141,12 +147,39 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
                 // returned from getClickPosition()?
                 transformation.translate(pos[0], pos[1], pos[2]);
                 touchsphere3.setTransformation(transformation);
+
+                if (mTapDownObject.getId().equals("sphere")) {
+                    updateSpherePos(x, y);
+                }
             }
         }
     }
 
+    private void updateSpherePos(int xpos, int ypos) {
+        float[] pos = new float[4];
+        float[] dir = new float[4];
+        ModelObject board = mScene.getObjectByName("board");
+        if (mScene.getPlaneIntersection(board, xpos, ypos, BOARD_P0, BOARD_NORMAL, pos, dir)) {
+            float[] vecSurface = new float[4];
+            vecSurface[0] = dir[0];
+            vecSurface[1] = 0.0f;
+            vecSurface[2] = dir[2];
+            vecSurface[3] = 0.0f;
+            Math3d.normalize(vecSurface);
+
+            float dotprod = Math3d.dotProduct(dir, vecSurface);
+            float theta = (float) Math.acos(dotprod);
+            float h = 1.25f / (float) Math.sin(theta);
+
+            float x = pos[0] + (dir[0] * h);
+            float y = pos[1] + (dir[1] * h);
+            float z = pos[2] + (dir[2] * h);
+            mTapDownObject.setTranslation(x, y, z);
+        }
+    }
+
     @Override
-    public void onTapUp( int x, int y ) {
+    public synchronized void onTapUp( int x, int y ) {
         ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
@@ -170,7 +203,11 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     @Override
-    public void onPointerMove( int x, int y ) {}
+    public synchronized void onPointerMove( int x, int y ) {
+        if (mTapDownObject != null && mTapDownObject.getId().equals("sphere")) {
+            updateSpherePos(x, y);
+        }
+    }
 
     private synchronized void addBoardSpinForce( float dTimeInS, float force ) {
         float acc = force / BOARD_MASS;
