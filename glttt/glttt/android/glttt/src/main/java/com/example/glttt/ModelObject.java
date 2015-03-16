@@ -18,6 +18,7 @@ public class ModelObject
     private ArrayList<Triangle> mTriangles;
     private String mId;
     private Transformation mTransformation;
+    private float mExtent;
 
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
@@ -30,16 +31,30 @@ public class ModelObject
 		this.mTriangles = new ArrayList<Triangle>();
     	Matrix.setIdentityM(mModelMatrix, 0);
         mVertexBufferDirty = true;
+        mExtent = 0.0f;
 	}
 
     public void add( Triangle t ) {
         mTriangles.add(t);
         mVertexBufferDirty = true;
+        recalculateExtent();
     }
 
-    public void add( Triangle[] tri ) {
-        mTriangles.addAll(Arrays.asList(tri));
+    public void add( Triangle[] t ) {
+        mTriangles.addAll(Arrays.asList(t));
         mVertexBufferDirty = true;
+        recalculateExtent();
+    }
+
+    private void recalculateExtent() {
+        for (Triangle t : mTriangles) {
+            for (int i = 0; i < 3; ++i) {
+                float len = Math3d.vectorlength(t.getVertex(i));
+                if (len > mExtent) {
+                    mExtent = len;
+                }
+            }
+        }
     }
 
     public float[] multiplyMatrixByModelMatrix( float[] matrix, int index ) {
@@ -48,6 +63,16 @@ public class ModelObject
             Matrix.multiplyMM(newMatrix, 0, matrix, index, mModelMatrix, 0);
         }
         return newMatrix;
+    }
+
+    public float[] getOriginInModelspace() {
+        float[] origin = new float[4];
+        origin[0] = 0.0f;
+        origin[1] = 0.0f;
+        origin[2] = 0.0f;
+        origin[3] = 1.0f;
+
+        return multiplyVectorByModelMatrix(origin, 0);
     }
 
     public float[] multiplyVectorByModelMatrix( float[] vector, int index ) {
@@ -280,4 +305,8 @@ public class ModelObject
     }
 
     public String getId() { return mId; }
+
+    public float getExtent() {
+        return mExtent;
+    }
 }
