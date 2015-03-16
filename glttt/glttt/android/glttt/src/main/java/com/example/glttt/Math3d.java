@@ -89,4 +89,37 @@ public class Math3d {
 
         return found;
     }
+
+    public static boolean getSphereIntersection( float[] sphereOrigin, float radius, float[] rayOrigin, float[] rayDir ) {
+        boolean inside = false;
+
+        float sr_sq = radius * radius;
+        float[] oc = new float[4];
+        Math3d.vector(oc, sphereOrigin, rayOrigin);
+        float loc_sq = Math3d.dotProduct(oc, oc);
+        float e = radius * 0.0000001f;
+        if (loc_sq < sr_sq) {
+            inside = true;
+        }
+
+        float tca = Math3d.dotProduct(oc, rayDir);
+        if (!inside && tca < e) {
+            return false;
+        }
+
+        float thc_sq = sr_sq - loc_sq + (tca*tca);
+        if (thc_sq < e) {
+            return false;
+        }
+
+        /*float t;
+        if (inside)
+            t = tca + (float)Math.sqrt(thc_sq);
+        else
+            t = tca - (float)Math.sqrt(thc_sq);
+
+        pointIntersect = this->ro + (this->rd * t);*/
+
+        return true;
+    }
 }
