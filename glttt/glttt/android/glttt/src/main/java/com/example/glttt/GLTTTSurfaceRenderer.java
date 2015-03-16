@@ -66,7 +66,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
-        mCurrentScene.draw();
+        mCurrentScene.draw(mShader);
 
         mFrameCount++;
         long currentTime = System.nanoTime();
@@ -81,7 +81,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     
     public void setCurrentScene( SceneFactory.TYPE type ) {
         mCurrentSceneType = type;
-        mCurrentScene = mSceneFactory.create(mCurrentSceneType, mShader);
+        mCurrentScene = mSceneFactory.create(mCurrentSceneType);
     }
 
     public void setScaleFactor( float scaleFactor ) {

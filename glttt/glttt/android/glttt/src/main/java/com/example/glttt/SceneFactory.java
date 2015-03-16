@@ -48,20 +48,20 @@ public class SceneFactory {
         GAME_BOARD_SCENE
     }
 
-    public Scene create( TYPE type, IShader shader ) {
+    public Scene create( TYPE type ) {
         Scene scene;
 
         switch (type) {
             case NEW_GAME_SCENE:
-                scene = createNewGameScene(shader);
+                scene = createNewGameScene();
                 break;
 
             case GAME_BOARD_SCENE:
-                scene = createGameBoardScene(shader);
+                scene = createGameBoardScene();
                 break;
 
             case NO_SCENE:
-                scene = createEmptyScene(shader);
+                scene = createEmptyScene();
                 break;
 
             default:
@@ -71,9 +71,9 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createGameBoardScene( IShader shader ) {
+    private Scene createGameBoardScene() {
         GameBoardInputReceiver inputReceiver = new GameBoardInputReceiver();
-        Scene scene = new Scene(shader, new GameBoardSceneChangeHandler(), inputReceiver);
+        Scene scene = new Scene(new GameBoardSceneChangeHandler(), inputReceiver);
         mPulseManager.setPulseReceiver(inputReceiver);
         mGestureManager.setGestureListener(inputReceiver);
 
@@ -191,9 +191,9 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createNewGameScene( IShader shader )
+    private Scene createNewGameScene()
     {
-        Scene scene = new Scene(shader, new NewGameSceneChangeHandler());
+        Scene scene = new Scene(new NewGameSceneChangeHandler());
 
         float whiteVertices[] = {
                 250f, 300f, 0f,
@@ -244,7 +244,7 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createEmptyScene( IShader shader ) {
-        return new Scene(shader, new NewGameSceneChangeHandler());
+    private Scene createEmptyScene() {
+        return new Scene(new NewGameSceneChangeHandler());
     }
 }

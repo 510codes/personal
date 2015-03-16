@@ -11,7 +11,6 @@ public class Scene
 {
 	private LinkedHashMap<String, ModelObject> mModelObjects;
 
-    private IShader mShader;
     private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
     private float[] mEyePos;
@@ -22,13 +21,12 @@ public class Scene
 
     private ISceneChangeHandler mSceneChangeHandler;
 
-    public Scene(IShader shader, ISceneChangeHandler viewportChangeHandler) {
-        this( shader, viewportChangeHandler, null);
+    public Scene(ISceneChangeHandler viewportChangeHandler) {
+        this( viewportChangeHandler, null);
     }
 
-    public Scene(IShader shader, ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
+    public Scene(ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
 	{
-        mShader = shader;
         mModelObjects = new LinkedHashMap<String, ModelObject>();
 
         mViewMatrix = new float[16];
@@ -64,10 +62,10 @@ public class Scene
 		mModelObjects.put(m.getId(), m);
 	}
 	
-	public void draw()
+	public void draw(IShader shader)
 	{
         for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
-            entry.getValue().draw(mViewMatrix, mProjectionMatrix, mShader);
+            entry.getValue().draw(mViewMatrix, mProjectionMatrix, shader);
         }
 	}
 	
@@ -149,14 +147,18 @@ public class Scene
         updateLookAt();
     }
 
-    public void setEyePos( float[] pos ) {
-        mEyePos = pos;
+    public void setEyePos( float x, float y, float z ) {
+        mEyePos[0] = x;
+        mEyePos[1] = y;
+        mEyePos[2] = z;
 
         updateLookAt();
     }
 
-    public void setEyeLookAt( float[] pos ) {
-        mEyeLookAt = pos;
+    public void setEyeLookAt( float x, float y, float z ) {
+        mEyeLookAt[0] = x;
+        mEyeLookAt[1] = y;
+        mEyeLookAt[2] = z;
 
         updateLookAt();
     }

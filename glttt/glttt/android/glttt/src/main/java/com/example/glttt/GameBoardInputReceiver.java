@@ -35,26 +35,22 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     private float mEyeVelocity;
     private float mScaleFactor;
     private Scene mScene;
-    private float[] mEyePos;
-    private float[] mEyeLookAt;
     private ModelObject mTapDownObject;
+    private float mEyePosY;
 
     public GameBoardInputReceiver() {
         mPosInDegrees = 0.0f;
         mBoardVelocity = 0.0f;
         mEyeVelocity = 0.0f;
         mScene = null;
-        mEyePos = null;
-        mEyeLookAt = null;
         mTapDownObject = null;
         mScaleFactor = 1.0f;
+        mEyePosY = 0.0f;
     }
 
     @Override
     public void setScene( Scene scene ) {
         mScene = scene;
-        mEyePos = scene.getEyePos();
-        mEyeLookAt = scene.getEyeLookAt();
     }
 
     @Override
@@ -96,25 +92,24 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             }
             addEyeMoveForce(dTimeInS, dampingForce);
 
-            float deltaPos = mEyeVelocity * dTimeInS;
-            mEyePos[1] += deltaPos;
-            if (mEyePos[1] > EYE_POS_Y_MAX) {
-                mEyePos[1] = EYE_POS_Y_MAX;
+            mEyePosY += mEyeVelocity * dTimeInS;
+            if (mEyePosY > EYE_POS_Y_MAX) {
+                mEyePosY = EYE_POS_Y_MAX;
                 mEyeVelocity = 0.0f;
             }
-            if (mEyePos[1] < EYE_POS_Y_MIN) {
-                mEyePos[1] = EYE_POS_Y_MIN;
+            if (mEyePosY < EYE_POS_Y_MIN) {
+                mEyePosY = EYE_POS_Y_MIN;
                 mEyeVelocity = 0.0f;
             }
 
-            float fact = (mEyePos[1] - EYE_POS_Y_MIN) / (EYE_POS_Y_MAX - EYE_POS_Y_MIN);
-            mEyePos[2] = EYE_POS_Z_MAX - ((EYE_POS_Z_MAX - EYE_POS_Z_MIN) * fact);
-            mEyeLookAt[2] = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
+            float fact = (mEyePosY - EYE_POS_Y_MIN) / (EYE_POS_Y_MAX - EYE_POS_Y_MIN);
+            float eyePosZ = EYE_POS_Z_MAX - ((EYE_POS_Z_MAX - EYE_POS_Z_MIN) * fact);
+            float eyeLookAtZ = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
 
-            mScene.setEyePos(mEyePos);
-            mScene.setEyeLookAt(mEyeLookAt);
+            mScene.setEyePos(0.0f, mEyePosY, eyePosZ);
+            mScene.setEyeLookAt(0.0f, 0.0f, eyeLookAtZ);
 
-            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", mEyePos[1]: " + mEyePos[1]);
+            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + (mEyeVelocity * dTimeInS) + ", mEyePosY: " + mEyePosY);
         }
     }
 
