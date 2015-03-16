@@ -196,12 +196,4 @@ public class Scene
     public ModelObject getObjectByName( String name ) {
         return mModelObjects.get(name);
     }
-
-    public float[] getEyePos() {
-        return mEyePos;
-    }
-
-    public float[] getEyeLookAt() {
-        return mEyeLookAt;
-    }
 }
