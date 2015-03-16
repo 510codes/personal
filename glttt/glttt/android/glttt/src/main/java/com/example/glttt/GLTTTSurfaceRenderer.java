@@ -11,12 +11,12 @@ import com.example.glttt.shader.IShader;
 
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
-    public static final int FLOAT_BYTE_LENGTH = 4;
-
     private SceneFactory mSceneFactory;
     private IShader mShader;
     private SceneFactory.TYPE mCurrentSceneType;
     private Scene mCurrentScene;
+    private int mFrameCount;
+    private long mIntervalStartTime;
 
     public GLTTTSurfaceRenderer( SceneFactory sceneFactory, IShader shader )
     {
@@ -26,6 +26,8 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
         mSceneFactory = sceneFactory;
         mShader = shader;
+        mFrameCount = 0;
+        mIntervalStartTime = 0;
     }
     
     @Override
@@ -56,6 +58,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         currentViewPort[3] = height;
 
         mCurrentScene.onViewportChanged(currentViewPort);
+        mIntervalStartTime = System.nanoTime();
     }
 
     @Override
@@ -64,6 +67,16 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
         mCurrentScene.draw();
+
+        mFrameCount++;
+        long currentTime = System.nanoTime();
+        long elapsedTime = currentTime - mIntervalStartTime;
+        if (elapsedTime > 1000000000) {
+            float fps = mFrameCount / ((float)elapsedTime / 1000000000.0f);
+            //Log.d("GLTTTSurfaceRenderer", "onDrawFrame(): frames: " + mFrameCount + ", fps: " + fps);
+            mFrameCount = 0;
+            mIntervalStartTime = currentTime;
+        }
     }
     
     public void setCurrentScene( SceneFactory.TYPE type ) {
