@@ -86,38 +86,38 @@ public class SceneFactory {
 
         for (int x=0; x<8; ++x) {
             float[] pegVerticesFront = {
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+                    -PEG_THICK, 0.0f, -PEG_THICK,
+                    -PEG_THICK, 75.0f, -PEG_THICK,
+                    +PEG_THICK, 75.0f, -PEG_THICK,
+                    +PEG_THICK, 0.0f, -PEG_THICK
             };
 
             float[] pegVerticesBack = {
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
+                    -PEG_THICK, 0.0f, +PEG_THICK,
+                    +PEG_THICK, 0.0f, +PEG_THICK,
+                    +PEG_THICK, 75.0f, +PEG_THICK,
+                    -PEG_THICK, 75.0f, +PEG_THICK
             };
 
             float[] pegVerticesLeft = {
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK
+                    -PEG_THICK, 0.0f, +PEG_THICK,
+                    -PEG_THICK, 75.0f, +PEG_THICK,
+                    -PEG_THICK, 75.0f, -PEG_THICK,
+                    -PEG_THICK, 0.0f, -PEG_THICK
             };
 
             float[] pegVerticesRight = {
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 0.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK
+                    +PEG_THICK, 0.0f, +PEG_THICK,
+                    +PEG_THICK, 0.0f, -PEG_THICK,
+                    +PEG_THICK, 75.0f, -PEG_THICK,
+                    +PEG_THICK, 75.0f, +PEG_THICK
             };
 
             float[] pegVerticesTop = {
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK,
-                    PEG_POS[x][0] - PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] + PEG_THICK,
-                    PEG_POS[x][0] + PEG_THICK, 75.0f, PEG_POS[x][1] - PEG_THICK
+                    -PEG_THICK, 75.0f, -PEG_THICK,
+                    -PEG_THICK, 75.0f, +PEG_THICK,
+                    +PEG_THICK, 75.0f, +PEG_THICK,
+                    +PEG_THICK, 75.0f, -PEG_THICK
             };
 
             Triangle[] pegTris;
@@ -138,6 +138,7 @@ public class SceneFactory {
             pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_top");
             peg.add(pegTris);
 
+            peg.setTranslation(PEG_POS[x][0] / BOARD_VERTEX_DIVISOR, 0, PEG_POS[x][1] / BOARD_VERTEX_DIVISOR);
             scene.add(peg);
         }
 
