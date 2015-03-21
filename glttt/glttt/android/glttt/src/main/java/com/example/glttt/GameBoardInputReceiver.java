@@ -102,15 +102,24 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
                 mEyeVelocity = 0.0f;
             }
 
-            float fact = (mEyePosY - EYE_POS_Y_MIN) / (EYE_POS_Y_MAX - EYE_POS_Y_MIN);
-            float eyePosZ = EYE_POS_Z_MAX - ((EYE_POS_Z_MAX - EYE_POS_Z_MIN) * fact);
-            float eyeLookAtZ = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
-
-            mScene.setEyePos(0.0f, mEyePosY, eyePosZ);
-            mScene.setEyeLookAt(0.0f, 0.0f, eyeLookAtZ);
+            updateEye();
 
             Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + (mEyeVelocity * dTimeInS) + ", mEyePosY: " + mEyePosY);
         }
+    }
+
+    private void updateEye() {
+        float fact = (mEyePosY - EYE_POS_Y_MIN) / (EYE_POS_Y_MAX - EYE_POS_Y_MIN);
+
+        float eyePosZ = EYE_POS_Z_MAX - ((EYE_POS_Z_MAX - EYE_POS_Z_MIN) * fact);
+        //eyePosZ -= (mScaleFactor * 2.0f);
+
+        float eyeLookAtZ = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
+        //eyeLookAtZ -= (mScaleFactor * 2.0f);
+
+        Log.d("GameBoardInputReceiver", "updateEye(): mEyePosY: " + mEyePosY + ", eyePosZ: " + eyePosZ + ", eyeLookAtZ: " + eyeLookAtZ + ", mScaleFactor: " + mScaleFactor);
+        mScene.setEyePos(0.0f, mEyePosY, eyePosZ);
+        mScene.setEyeLookAt(0.0f, 0.0f, eyeLookAtZ);
     }
 
     @Override
@@ -195,6 +204,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
         Log.v("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
         mScene.setZoomFactor(mScaleFactor);
+        //updateEye();
     }
 
     @Override
