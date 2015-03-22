@@ -190,6 +190,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             if (mTapDownObject.getId().equals("sphere")) {
                 int peg = getPegIntersection(mTapDownObject);
                 Log.d("GameBoardInputReceiver", "onTapUp: tapped on peg: " + peg);
+                if (peg != -1) {
+                    addSphereToPeg(mTapDownObject, peg);
+                }
             }
         }
         else {
@@ -197,6 +200,12 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         }
 
         mTapDownObject = null;
+    }
+
+    private void addSphereToPeg( ModelObject sphere, int peg ) {
+        ModelObject pegObj = mScene.getObjectByName("peg" + peg);
+        Transformation pegTransformation = pegObj.getTransformation();
+        sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
     }
 
     public int getPegIntersection( ModelObject sphere ) {

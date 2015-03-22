@@ -60,4 +60,16 @@ public class Transformation {
     private static void rotate( float[] m, float angle, float x, float y, float z ) {
         Matrix.rotateM(m, 0, angle, x, y, z);
     }
+
+    public float getTranslationX() {
+        return mTranslationX;
+    }
+
+    public float getTranslationY() {
+        return mTranslationY;
+    }
+
+    public float getTranslationZ() {
+        return mTranslationZ;
+    }
 }
