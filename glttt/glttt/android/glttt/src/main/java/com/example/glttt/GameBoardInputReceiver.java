@@ -117,7 +117,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         float eyeLookAtZ = EYE_LOOKAT_Z_MAX - ((EYE_LOOKAT_Z_MAX - EYE_LOOKAT_Z_MIN) * fact);
         //eyeLookAtZ -= (mScaleFactor * 2.0f);
 
-        Log.d("GameBoardInputReceiver", "updateEye(): mEyePosY: " + mEyePosY + ", eyePosZ: " + eyePosZ + ", eyeLookAtZ: " + eyeLookAtZ + ", mScaleFactor: " + mScaleFactor);
+        //Log.d("GameBoardInputReceiver", "updateEye(): mEyePosY: " + mEyePosY + ", eyePosZ: " + eyePosZ + ", eyeLookAtZ: " + eyeLookAtZ + ", mScaleFactor: " + mScaleFactor);
         mScene.setEyePos(0.0f, mEyePosY, eyePosZ);
         mScene.setEyeLookAt(0.0f, 0.0f, eyeLookAtZ);
     }
@@ -187,12 +187,36 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
+            if (mTapDownObject.getId().equals("sphere")) {
+                int peg = getPegIntersection(mTapDownObject);
+                Log.d("GameBoardInputReceiver", "onTapUp: tapped on peg: " + peg);
+            }
         }
         else {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on nothing");
         }
 
         mTapDownObject = null;
+    }
+
+    public int getPegIntersection( ModelObject sphere ) {
+        float[] sphereOrigin = sphere.getOriginInModelspace();
+        int peg = -1;
+        float[] vec = new float[4];
+        Math3d.vector(vec, sphere.getExtentVertexInModelspace(), sphere.getOriginInModelspace());
+        float r = Math3d.vectorlength(vec);
+
+        for (int i=0; i<8; ++i) {
+            ModelObject pegObj = mScene.getObjectByName("peg" + i);
+            float[] pegOrigin = pegObj.getOriginInModelspace();
+            float[] pegUp = pegObj.getUpVectorInModelspace();
+            if (Math3d.getSphereIntersection(sphereOrigin, r, pegOrigin, pegUp)) {
+                peg = i;
+                break;
+            }
+        }
+
+        return peg;
     }
 
     @Override

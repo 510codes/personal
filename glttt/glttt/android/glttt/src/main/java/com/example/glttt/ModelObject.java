@@ -18,7 +18,7 @@ public class ModelObject
     private ArrayList<Triangle> mTriangles;
     private String mId;
     private Transformation mTransformation;
-    private float mExtent;
+    private float[] mExtentVertex;
 
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
@@ -31,7 +31,7 @@ public class ModelObject
 		this.mTriangles = new ArrayList<Triangle>();
     	Matrix.setIdentityM(mModelMatrix, 0);
         mVertexBufferDirty = true;
-        mExtent = 0.0f;
+        mExtentVertex = null;
 	}
 
     public void add( Triangle t ) {
@@ -47,11 +47,13 @@ public class ModelObject
     }
 
     private void recalculateExtent() {
+        float extent = -1.0f;
         for (Triangle t : mTriangles) {
             for (int i = 0; i < 3; ++i) {
                 float len = Math3d.vectorlength(t.getVertex(i));
-                if (len > mExtent) {
-                    mExtent = len;
+                if (len > extent) {
+                    mExtentVertex = t.getVertex(i);
+                    extent = len;
                 }
             }
         }
@@ -73,6 +75,29 @@ public class ModelObject
         origin[3] = 1.0f;
 
         return multiplyVectorByModelMatrix(origin, 0);
+    }
+
+    public float[] getExtentVertexInModelspace() {
+        float[] extentVertex = new float[4];
+        extentVertex[0] = mExtentVertex[0];
+        extentVertex[1] = mExtentVertex[1];
+        extentVertex[2] = mExtentVertex[2];
+        extentVertex[3] = 1.0f;
+
+        return multiplyVectorByModelMatrix(extentVertex, 0);
+    }
+
+    public float[] getUpVectorInModelspace() {
+        float[] upVector = new float[4];
+        upVector[0] = 0.0f;
+        upVector[1] = 1.0f;
+        upVector[2] = 0.0f;
+        upVector[3] = 0.0f;
+
+        float[] upVecInModelSpace = multiplyVectorByModelMatrix(upVector, 0);
+        Math3d.normalize(upVecInModelSpace);
+
+        return upVecInModelSpace;
     }
 
     public float[] multiplyVectorByModelMatrix( float[] vector, int index ) {
@@ -305,8 +330,4 @@ public class ModelObject
     }
 
     public String getId() { return mId; }
-
-    public float getExtent() {
-        return mExtent;
-    }
 }
