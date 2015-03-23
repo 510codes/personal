@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import android.opengl.GLU;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.Triangle;
@@ -19,11 +20,13 @@ public class ModelObject
     private String mId;
     private Transformation mTransformation;
     private float[] mExtentVertex;
+    private float mExtent;
 
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
     private PhysicsAttribs mPhysicsAttribs;
     private IPhysicsAction mPhysicsAction;
+    private boolean mAtRest;
 
     public ModelObject( String id ) {
         this(id, null, null);
@@ -38,8 +41,10 @@ public class ModelObject
     	Matrix.setIdentityM(mModelMatrix, 0);
         mVertexBufferDirty = true;
         mExtentVertex = null;
+        mExtent = -0.0f;
         mPhysicsAttribs = attribs;
         mPhysicsAction = action;
+        mAtRest = true;
 	}
 
     public void add( Triangle t ) {
@@ -55,13 +60,13 @@ public class ModelObject
     }
 
     private void recalculateExtent() {
-        float extent = -1.0f;
+        mExtent = -0.0f;
         for (Triangle t : mTriangles) {
             for (int i = 0; i < 3; ++i) {
                 float len = Math3d.vectorlength(t.getVertex(i));
-                if (len > extent) {
+                if (len > mExtent) {
                     mExtentVertex = t.getVertex(i);
-                    extent = len;
+                    mExtent = len;
                 }
             }
         }
@@ -340,13 +345,36 @@ public class ModelObject
     public String getId() { return mId; }
 
     public void updatePhysics( float deltaTimeInS ) {
-        float vel = mPhysicsAttribs.onDeltaTime(deltaTimeInS);
-        if (vel != 0.0f) {
-            mPhysicsAction.onVelocityChange(deltaTimeInS, vel);
+        if (!mAtRest) {
+            if (mPhysicsAttribs != null) {
+                float vel = mPhysicsAttribs.onDeltaTime(deltaTimeInS);
+                if (vel != 0.0f) {
+                    Log.d("ModelObject", mId + ": updatePhysics(): deltaTimeInS: " + deltaTimeInS + ", vel: " + vel);
+                    if (!mPhysicsAction.onVelocityChange(deltaTimeInS, vel)) {
+                        mAtRest = true;
+                    }
+                }
+                else {
+                    mAtRest = true;
+                }
+            }
         }
     }
 
     public PhysicsAttribs getPhysicsAttribs() {
-        return mPhysicsAttribs;
+        return new PhysicsAttribs(mPhysicsAttribs);
+    }
+
+    public void setPhysicsAttribs( PhysicsAttribs attribs ) {
+        mPhysicsAttribs = new PhysicsAttribs(attribs);
+        mAtRest = false;
+    }
+
+    public void setPhysicsAction( IPhysicsAction action ) {
+        mPhysicsAction = action;
+    }
+
+    public float getExtent() {
+        return mExtent;
     }
 }

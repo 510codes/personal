@@ -147,7 +147,7 @@ public class SceneFactory {
         }
 
         Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
-        PhysicsAttribs physicsAttribs = new PhysicsAttribs(BOARD_MASS, BOARD_VELOCITY_MIN, BOARD_DAMPING_ACCELERATION);
+        PhysicsAttribs physicsAttribs = new PhysicsAttribs(BOARD_MASS, BOARD_VELOCITY_MIN, 0.0f, BOARD_DAMPING_ACCELERATION);
         ModelObject obj = new ModelObject("board", physicsAttribs, new BoardPhysicsAction(scene));
         obj.add(boardTris);
         scene.add(obj);

@@ -12,12 +12,14 @@ public class BoardPhysicsAction implements IPhysicsAction {
     }
 
     @Override
-    public synchronized void onVelocityChange( float dTimeInS, float vel ) {
+    public synchronized boolean onVelocityChange( float dTimeInS, float vel ) {
         float deltaDegrees = vel * dTimeInS;
         mPosInDegrees += deltaDegrees;
 
         mScene.setYRotation(mPosInDegrees);
 
         Log.v("BoardPhysicsAction", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
+
+        return true;
     }
 }

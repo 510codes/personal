@@ -1,5 +1,6 @@
 package com.example.glttt;
 
 public interface IPhysicsAction {
-    public void onVelocityChange( float dTimeInS, float vel );
+    // return 'false' if the object has come to rest
+    public boolean onVelocityChange( float dTimeInS, float vel );
 }

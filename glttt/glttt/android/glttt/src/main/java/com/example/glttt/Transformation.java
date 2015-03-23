@@ -72,4 +72,16 @@ public class Transformation {
     public float getTranslationZ() {
         return mTranslationZ;
     }
+
+    public void setTranslationX(float x) {
+        mTranslationX = x;
+    }
+
+    public void setTranslationY(float y) {
+        mTranslationY = y;
+    }
+
+    public void setTranslationZ(float z) {
+        mTranslationZ = z;
+    }
 }

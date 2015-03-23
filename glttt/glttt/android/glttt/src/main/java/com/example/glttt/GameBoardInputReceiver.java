@@ -37,7 +37,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         mTapDownObject = null;
         mScaleFactor = 1.0f;
         mEyePosY = 0.0f;
-        mEyePhysicsAttribs = new PhysicsAttribs(EYE_MASS, EYE_VELOCITY_MIN, EYE_DAMPING_ACCELERATION);
+        mEyePhysicsAttribs = new PhysicsAttribs(EYE_MASS, EYE_VELOCITY_MIN, 0.0f, EYE_DAMPING_ACCELERATION);
     }
 
     @Override
@@ -47,13 +47,17 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public synchronized void onPulse( long dtInNanos ) {
-        processBoardPulse(dtInNanos);
         processEyePulse(dtInNanos);
-    }
-
-    private void processBoardPulse( long dtInNanos ) {
         float dTimeInS = (float)dtInNanos / (float)NANOS_PER_SECOND;
-        mScene.getObjectByName("board").updatePhysics(dTimeInS);
+        ModelObject obj = mScene.getObjectByName("board");
+        if (obj != null) {
+            obj.updatePhysics(dTimeInS);
+        }
+
+        obj = mScene.getObjectByName("sphere");
+        if (obj != null) {
+            obj.updatePhysics(dTimeInS);
+        }
     }
 
     private void processEyePulse( long dtInNanos ) {
@@ -96,7 +100,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         if (mTapDownObject == null || !mTapDownObject.getId().equals("sphere")) {
             if (dTimeInS > 0.0f) {
                 // dx should be a CHANGE in velocity here, so not sure about this
-                mScene.getObjectByName("board").getPhysicsAttribs().addForce(dTimeInS, (float) dx, SWIPE_MASS);
+                PhysicsAttribs boardPhysicsAttribs = mScene.getObjectByName("board").getPhysicsAttribs();
+                boardPhysicsAttribs.addForce(dTimeInS, (float) dx, SWIPE_MASS);
+                mScene.getObjectByName("board").setPhysicsAttribs(boardPhysicsAttribs);
 
                 // dy should be a CHANGE in velocity here, so not sure about this
                 mEyePhysicsAttribs.addForce(dTimeInS, (float)dy, SWIPE_MASS);
@@ -173,6 +179,9 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         ModelObject pegObj = mScene.getObjectByName("peg" + peg);
         Transformation pegTransformation = pegObj.getTransformation();
         sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
+        PhysicsAttribs spherePhysicsAttribs = new PhysicsAttribs(2.0f, 0.0f, 2.0f, 0.0f);
+        sphere.setPhysicsAttribs(spherePhysicsAttribs);
+        sphere.setPhysicsAction(new SphereDropPhysicsAction(sphere));
     }
 
     private int getPegIntersection( ModelObject sphere ) {
