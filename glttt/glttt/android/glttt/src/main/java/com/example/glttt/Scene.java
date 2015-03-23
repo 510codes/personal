@@ -1,6 +1,7 @@
 package com.example.glttt;
 
 import java.util.LinkedHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import android.opengl.Matrix;
 
@@ -10,6 +11,7 @@ import com.example.glttt.shader.IShader;
 public class Scene
 {
 	private LinkedHashMap<String, ModelObject> mModelObjects;
+    private final ReentrantReadWriteLock mModelObjectsLock;
 
     private float[] mViewMatrix;
 	private float[] mProjectionMatrix;
@@ -28,6 +30,7 @@ public class Scene
     public Scene(ISceneChangeHandler viewportChangeHandler, IPulseReceiver pulseReceiver)
 	{
         mModelObjects = new LinkedHashMap<String, ModelObject>();
+        mModelObjectsLock = new ReentrantReadWriteLock();
 
         mViewMatrix = new float[16];
         mProjectionMatrix = new float[16];
@@ -59,13 +62,25 @@ public class Scene
 	
 	public void add( ModelObject m )
 	{
-		mModelObjects.put(m.getId(), m);
+		mModelObjectsLock.writeLock().lock();
+        try {
+            mModelObjects.put(m.getId(), m);
+        }
+        finally {
+            mModelObjectsLock.writeLock().unlock();
+        }
 	}
 	
 	public void draw(IShader shader)
 	{
-        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
-            entry.getValue().draw(mViewMatrix, mProjectionMatrix, shader);
+        mModelObjectsLock.readLock().lock();
+        try {
+            for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+                entry.getValue().draw(mViewMatrix, mProjectionMatrix, shader);
+            }
+        }
+        finally {
+            mModelObjectsLock.readLock().unlock();
         }
 	}
 	
@@ -77,38 +92,49 @@ public class Scene
         ModelObject closestObject = null;
         float closestDist = Float.NaN;
 
-        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
-            ModelObject modelObject = entry.getValue();
-            float[] pos = new float[4];
-            float[] dir = new float[4];
-			boolean found = modelObject.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, pos, dir);
-            if (found) {
-                float[] transformedPos;
-                transformedPos = modelObject.multiplyVectorByModelMatrix(pos, 0);
-                float[] vec = new float[4];
-                Math3d.vector(vec, transformedPos, mEyePos);
-                float dist = Math3d.vectorlength(vec);
+        mModelObjectsLock.readLock().lock();
+        try {
+            for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+                ModelObject modelObject = entry.getValue();
+                float[] pos = new float[4];
+                float[] dir = new float[4];
+                boolean found = modelObject.clickedOn((int) xpos, (int) ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, pos, dir);
+                if (found) {
+                    float[] transformedPos;
+                    transformedPos = modelObject.multiplyVectorByModelMatrix(pos, 0);
+                    float[] vec = new float[4];
+                    Math3d.vector(vec, transformedPos, mEyePos);
+                    float dist = Math3d.vectorlength(vec);
 
-                if (closestObject != null) {
-                    if (Float.isNaN(closestDist) || dist < closestDist) {
-                        closestDist = dist;
+                    if (closestObject != null) {
+                        if (Float.isNaN(closestDist) || dist < closestDist) {
+                            closestDist = dist;
+                            closestObject = modelObject;
+                        }
+                    } else {
                         closestObject = modelObject;
+                        closestDist = dist;
                     }
                 }
-                else {
-                    closestObject = modelObject;
-                    closestDist = dist;
-                }
-			}
-		}
+            }
+        }
+        finally {
+            mModelObjectsLock.readLock().unlock();
+        }
 
 		return closestObject;
 	}
 
     public boolean getClickPosition( String modelObject, int screenX, int screenY, float[] outPos, float[] outDir ) {
-        ModelObject obj = mModelObjects.get(modelObject);
-        if (obj != null) {
-            return getClickPosition(obj, screenX, screenY, outPos, outDir);
+        mModelObjectsLock.readLock().lock();
+        try {
+            ModelObject obj = mModelObjects.get(modelObject);
+            if (obj != null) {
+                return getClickPosition(obj, screenX, screenY, outPos, outDir);
+            }
+        }
+        finally {
+            mModelObjectsLock.readLock().unlock();
         }
 
         return false;
@@ -182,18 +208,37 @@ public class Scene
     }
 
     public void setZoomFactor( float zoomFactor ) {
-        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
-            entry.getValue().setScaleFactor(zoomFactor);
+        mModelObjectsLock.readLock().lock();
+        try {
+            for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+                entry.getValue().setScaleFactor(zoomFactor);
+            }
         }
+        finally {
+            mModelObjectsLock.readLock().unlock();
+        }
+
     }
 
     public void setYRotation( float degrees ) {
-        for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
-            entry.getValue().setYRotation(degrees);
+        mModelObjectsLock.readLock().lock();
+        try {
+            for (LinkedHashMap.Entry<String, ModelObject> entry : mModelObjects.entrySet()) {
+                entry.getValue().setYRotation(degrees);
+            }
+        }
+        finally {
+            mModelObjectsLock.readLock().unlock();
         }
     }
 
     public ModelObject getObjectByName( String name ) {
-        return mModelObjects.get(name);
+        mModelObjectsLock.readLock().lock();
+        try {
+            return mModelObjects.get(name);
+        }
+        finally {
+            mModelObjectsLock.readLock().unlock();
+        }
     }
 }
