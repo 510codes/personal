@@ -179,7 +179,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         ModelObject pegObj = mScene.getObjectByName("peg" + peg);
         Transformation pegTransformation = pegObj.getTransformation();
         sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
-        PhysicsAttribs spherePhysicsAttribs = new PhysicsAttribs(2.0f, 0.0f, 2.0f, 0.0f);
+        PhysicsAttribs spherePhysicsAttribs = new PhysicsAttribs(2.0f, 0.0f, 9.8f, 0.0f);
         sphere.setPhysicsAttribs(spherePhysicsAttribs);
         sphere.setPhysicsAction(new SphereDropPhysicsAction(sphere));
     }
@@ -213,7 +213,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
         Log.v("GameBoardInputReceiver", "setting zoom factor: " + mScaleFactor);
         mScene.setZoomFactor(mScaleFactor);
-        //updateEye();
+        updateEye();
     }
 
     @Override
