@@ -9,10 +9,6 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     private static final float SWIPE_MASS = 1.0f;
 
-    private static final float BOARD_MASS = 2.0f;
-    private static final float BOARD_DAMPING_ACCELERATION = 400.0f;
-    private static final float BOARD_VELOCITY_MIN = 10.0f;
-
     private static final float EYE_MASS = 20.0f;
     private static final float EYE_DAMPING_ACCELERATION = 30.0f;
     private static final float EYE_POS_Y_MAX = 15.0f;
@@ -30,22 +26,18 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     private static final float[] BOARD_NORMAL = {0.0f, 1.0f, 0.0f, 0.0f};
     private static final float[] BOARD_P0 = {0.0f, 0.0f, 0.0f, 0.0f};
 
-    private float mPosInDegrees;
-    private float mBoardVelocity;
-    private float mEyeVelocity;
     private float mScaleFactor;
     private Scene mScene;
     private ModelObject mTapDownObject;
     private float mEyePosY;
+    private PhysicsAttribs mEyePhysicsAttribs;
 
     public GameBoardInputReceiver() {
-        mPosInDegrees = 0.0f;
-        mBoardVelocity = 0.0f;
-        mEyeVelocity = 0.0f;
         mScene = null;
         mTapDownObject = null;
         mScaleFactor = 1.0f;
         mEyePosY = 0.0f;
+        mEyePhysicsAttribs = new PhysicsAttribs(EYE_MASS, EYE_VELOCITY_MIN, EYE_DAMPING_ACCELERATION);
     }
 
     @Override
@@ -60,51 +52,28 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     }
 
     private void processBoardPulse( long dtInNanos ) {
-        if (Math.abs(mBoardVelocity) < BOARD_VELOCITY_MIN) {
-            mBoardVelocity = 0.0f;
-        }
-        else {
-            float dampingForce = BOARD_MASS * BOARD_DAMPING_ACCELERATION;
-            float dTimeInS = (float)dtInNanos / (float)NANOS_PER_SECOND;
-            if (mBoardVelocity > 0.0f) {
-                dampingForce *= -1.0f;
-            }
-            addBoardSpinForce(dTimeInS, dampingForce);
-
-            float deltaDegrees = mBoardVelocity * dTimeInS;
-            mPosInDegrees += deltaDegrees;
-
-            mScene.setYRotation(mPosInDegrees);
-
-            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaDegrees: " + deltaDegrees + ", mPosInDegrees: " + mPosInDegrees);
-        }
+        float dTimeInS = (float)dtInNanos / (float)NANOS_PER_SECOND;
+        mScene.getObjectByName("board").updatePhysics(dTimeInS);
     }
 
     private void processEyePulse( long dtInNanos ) {
-        if (Math.abs(mEyeVelocity) < EYE_VELOCITY_MIN) {
-            mEyeVelocity = 0.0f;
-        }
-        else {
-            float dampingForce = EYE_MASS * EYE_DAMPING_ACCELERATION;
-            float dTimeInS = (float)dtInNanos / (float)NANOS_PER_SECOND;
-            if (mEyeVelocity > 0.0f) {
-                dampingForce *= -1.0f;
-            }
-            addEyeMoveForce(dTimeInS, dampingForce);
+        float dTimeInS = (float)dtInNanos / (float)NANOS_PER_SECOND;
+        float vel = mEyePhysicsAttribs.onDeltaTime(dTimeInS);
 
-            mEyePosY += mEyeVelocity * dTimeInS;
+        if (vel != 0.0f) {
+            mEyePosY += vel * dTimeInS;
             if (mEyePosY > EYE_POS_Y_MAX) {
                 mEyePosY = EYE_POS_Y_MAX;
-                mEyeVelocity = 0.0f;
+                mEyePhysicsAttribs.setVelocity(0.0f);
             }
             if (mEyePosY < EYE_POS_Y_MIN) {
                 mEyePosY = EYE_POS_Y_MIN;
-                mEyeVelocity = 0.0f;
+                mEyePhysicsAttribs.setVelocity(0.0f);
             }
 
             updateEye();
 
-            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + (mEyeVelocity * dTimeInS) + ", mEyePosY: " + mEyePosY);
+            Log.v("GameBoardInputReceiver", "dTimeInS: " + dTimeInS + ", deltaPos: " + (vel * dTimeInS) + ", mEyePosY: " + mEyePosY);
         }
     }
 
@@ -126,13 +95,11 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     public synchronized void onSwipeGesture( float dTimeInS, long dx, long dy ) {
         if (mTapDownObject == null || !mTapDownObject.getId().equals("sphere")) {
             if (dTimeInS > 0.0f) {
-                float dvBoard = (float) dx;       // dx should be a CHANGE in velocity here, so not sure about this
-                float forceBoard = (dvBoard / dTimeInS) * SWIPE_MASS;
-                addBoardSpinForce(dTimeInS, forceBoard);
+                // dx should be a CHANGE in velocity here, so not sure about this
+                mScene.getObjectByName("board").getPhysicsAttribs().addForce(dTimeInS, (float) dx, SWIPE_MASS);
 
-                float dvEye = (float) dy;        // dy should be a CHANGE in velocity here, so not sure about this
-                float forceEye = (dvEye / dTimeInS) * SWIPE_MASS;
-                addEyeMoveForce(dTimeInS, forceEye);
+                // dy should be a CHANGE in velocity here, so not sure about this
+                mEyePhysicsAttribs.addForce(dTimeInS, (float)dy, SWIPE_MASS);
             }
         }
     }
@@ -208,7 +175,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
     }
 
-    public int getPegIntersection( ModelObject sphere ) {
+    private int getPegIntersection( ModelObject sphere ) {
         float[] sphereOrigin = sphere.getOriginInModelspace();
         int peg = -1;
         float[] vec = new float[4];
@@ -245,19 +212,5 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         if (mTapDownObject != null && mTapDownObject.getId().equals("sphere")) {
             updateSpherePos(x, y);
         }
-    }
-
-    private synchronized void addBoardSpinForce( float dTimeInS, float force ) {
-        float acc = force / BOARD_MASS;
-        float dv = acc * dTimeInS;
-        mBoardVelocity += dv;
-        Log.v("GameBoardInputReceiver", "new board force: dTimeInS: " + dTimeInS + ", force: " + force + ", mBoardVelocity is now: " + mBoardVelocity);
-    }
-
-    private synchronized void addEyeMoveForce( float dTimeInS, float force ) {
-        float acc = force / EYE_MASS;
-        float dv = acc * dTimeInS;
-        mEyeVelocity += dv;
-        Log.v("GameBoardInputReceiver", "new eye force: dTimeInS: " + dTimeInS + ", force: " + force + ", mEyeVelocity is now: " + mEyeVelocity);
     }
 }

@@ -22,8 +22,14 @@ public class ModelObject
 
     private FloatBuffer mVertexBuffer;
     private boolean mVertexBufferDirty;
+    private PhysicsAttribs mPhysicsAttribs;
+    private IPhysicsAction mPhysicsAction;
 
-	public ModelObject( String id )
+    public ModelObject( String id ) {
+        this(id, null, null);
+    }
+
+	public ModelObject( String id, PhysicsAttribs attribs, IPhysicsAction action )
 	{
         this.mId = id;
         this.mModelMatrix = new float[16];
@@ -32,6 +38,8 @@ public class ModelObject
     	Matrix.setIdentityM(mModelMatrix, 0);
         mVertexBufferDirty = true;
         mExtentVertex = null;
+        mPhysicsAttribs = attribs;
+        mPhysicsAction = action;
 	}
 
     public void add( Triangle t ) {
@@ -330,4 +338,15 @@ public class ModelObject
     }
 
     public String getId() { return mId; }
+
+    public void updatePhysics( float deltaTimeInS ) {
+        float vel = mPhysicsAttribs.onDeltaTime(deltaTimeInS);
+        if (vel != 0.0f) {
+            mPhysicsAction.onVelocityChange(deltaTimeInS, vel);
+        }
+    }
+
+    public PhysicsAttribs getPhysicsAttribs() {
+        return mPhysicsAttribs;
+    }
 }

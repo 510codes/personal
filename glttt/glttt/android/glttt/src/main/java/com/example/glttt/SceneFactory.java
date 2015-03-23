@@ -12,6 +12,10 @@ public class SceneFactory {
 
     private static final float[] PEG_COLOUR_NORMAL = {0.55f, 0.55f, 0.48f, 0.3f};
 
+    private static final float BOARD_MASS = 2.0f;
+    private static final float BOARD_DAMPING_ACCELERATION = 400.0f;
+    private static final float BOARD_VELOCITY_MIN = 10.0f;
+
     private enum PegLabel {
         PEG_A,
         PEG_B,
@@ -143,7 +147,8 @@ public class SceneFactory {
         }
 
         Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
-        ModelObject obj = new ModelObject("board");
+        PhysicsAttribs physicsAttribs = new PhysicsAttribs(BOARD_MASS, BOARD_VELOCITY_MIN, BOARD_DAMPING_ACCELERATION);
+        ModelObject obj = new ModelObject("board", physicsAttribs, new BoardPhysicsAction(scene));
         obj.add(boardTris);
         scene.add(obj);
 
