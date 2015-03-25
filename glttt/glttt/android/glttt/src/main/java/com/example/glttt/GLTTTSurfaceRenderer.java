@@ -11,23 +11,19 @@ import com.example.glttt.shader.IShader;
 
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
-    private SceneFactory mSceneFactory;
     private IShader mShader;
-    private SceneFactory.TYPE mCurrentSceneType;
-    private Scene mCurrentScene;
     private int mFrameCount;
     private long mIntervalStartTime;
+    private final IPresenter mPresenter;
 
-    public GLTTTSurfaceRenderer( SceneFactory sceneFactory, IShader shader )
+    public GLTTTSurfaceRenderer( IPresenter presenter, IShader shader )
     {
     	super();
     	
-    	mCurrentScene = null;
-        mCurrentSceneType = SceneFactory.TYPE.NO_SCENE;
-        mSceneFactory = sceneFactory;
         mShader = shader;
         mFrameCount = 0;
         mIntervalStartTime = 0;
+        mPresenter = presenter;
     }
     
     @Override
@@ -40,8 +36,6 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
-
-        setCurrentScene(mCurrentSceneType);
     }
 
     @Override
@@ -57,7 +51,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
         currentViewPort[2] = width;
         currentViewPort[3] = height;
 
-        mCurrentScene.onViewportChanged(currentViewPort);
+        mPresenter.onViewportChanged(currentViewPort);
         mIntervalStartTime = System.nanoTime();
     }
 
@@ -66,29 +60,16 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
-        mCurrentScene.draw(mShader);
+        mPresenter.drawScene(mShader);
 
         mFrameCount++;
         long currentTime = System.nanoTime();
         long elapsedTime = currentTime - mIntervalStartTime;
         if (elapsedTime > 1000000000) {
-            float fps = mFrameCount / ((float)elapsedTime / 1000000000.0f);
+            float fps = mFrameCount / ((float) elapsedTime / 1000000000.0f);
             //Log.d("GLTTTSurfaceRenderer", "onDrawFrame(): frames: " + mFrameCount + ", fps: " + fps);
             mFrameCount = 0;
             mIntervalStartTime = currentTime;
         }
-    }
-    
-    public void setCurrentScene( SceneFactory.TYPE type ) {
-        mCurrentSceneType = type;
-        mCurrentScene = mSceneFactory.create(mCurrentSceneType);
-    }
-
-    public void setScaleFactor( float scaleFactor ) {
-        mCurrentScene.setZoomFactor(scaleFactor);
-    }
-
-    public void setRotation( float degrees ) {
-        mCurrentScene.setYRotation(degrees);
     }
 }

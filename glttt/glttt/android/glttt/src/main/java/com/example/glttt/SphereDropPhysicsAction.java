@@ -8,10 +8,10 @@ public class SphereDropPhysicsAction implements IPhysicsAction {
     private boolean mStopped;
     private float mMinY;
 
-    public SphereDropPhysicsAction( ModelObject sphere ) {
+    public SphereDropPhysicsAction( ModelObject sphere, int posOnPeg ) {
         mSphere = sphere;
         mStopped = false;
-        mMinY = sphere.getExtent();
+        mMinY = sphere.getExtent() * 2 * (posOnPeg + 1) - sphere.getExtent();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class SphereDropPhysicsAction implements IPhysicsAction {
             }
             transformation.setTranslationY(yPos);
             mSphere.setTransformation(transformation);
-            Log.d("SphereDropPhysicsAction", "onVelocityChange(): dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", ypos: " + yPos);
+            //Log.d("SphereDropPhysicsAction", "onVelocityChange(): dTimeInS: " + dTimeInS + ", deltaPos: " + deltaPos + ", ypos: " + yPos);
         }
 
         return !mStopped;

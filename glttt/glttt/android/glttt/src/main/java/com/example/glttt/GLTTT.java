@@ -67,7 +67,7 @@ public class GLTTT extends Activity {
         super.onCreate(savedInstanceState);
 
         View contentView = getWindow().findViewById(Window.ID_ANDROID_CONTENT);
-        mSurfaceView = new GLTTTSurfaceView(this, contentView);
+        mSurfaceView = new GLTTTSurfaceView(this);
         Log.e("opengl", Boolean.toString(detectOpenGLES20()));
         
         setContentView(R.layout.activity_glttt);

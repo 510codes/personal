@@ -1,14 +1,10 @@
 package com.example.glttt;
 
 import com.example.glttt.pulser.PulseManager;
-import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.shapes.Triangle;
 
 public class SceneFactory {
-
-    private static final float ORIGINAL_TRI_VERTEX_DIVISOR = 500.0f;
-    private static final float BOARD_VERTEX_DIVISOR = 50.0f;
 
     private static final float[] PEG_COLOUR_NORMAL = {0.55f, 0.55f, 0.48f, 0.3f};
 
@@ -40,8 +36,8 @@ public class SceneFactory {
     private PulseManager mPulseManager;
     private GestureManager mGestureManager;
 
-    public SceneFactory( PulseManager pulseManager, GestureManager gestureManager, boolean includeNormalData ) {
-        mShapeFactory = new ShapeFactory(includeNormalData);
+    public SceneFactory( ShapeFactory shapeFactory, PulseManager pulseManager, GestureManager gestureManager ) {
+        mShapeFactory = shapeFactory;
         mPulseManager = pulseManager;
         mGestureManager = gestureManager;
     }
@@ -52,16 +48,16 @@ public class SceneFactory {
         GAME_BOARD_SCENE
     }
 
-    public Scene create( TYPE type ) {
+    public Scene create( TYPE type, IPresenter presenter, float vertexDivisor ) {
         Scene scene;
 
         switch (type) {
             case NEW_GAME_SCENE:
-                scene = createNewGameScene();
+                scene = createNewGameScene(vertexDivisor);
                 break;
 
             case GAME_BOARD_SCENE:
-                scene = createGameBoardScene();
+                scene = createGameBoardScene(presenter, vertexDivisor);
                 break;
 
             case NO_SCENE:
@@ -75,8 +71,9 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createGameBoardScene() {
-        GameBoardInputReceiver inputReceiver = new GameBoardInputReceiver();
+    private Scene createGameBoardScene(IPresenter presenter, float vertexDivisor) {
+        GameBoardInputReceiver inputReceiver = new GameBoardInputReceiver(presenter);
+        presenter.setGameStateListener(inputReceiver);
         Scene scene = new Scene(new GameBoardSceneChangeHandler(), inputReceiver);
         mPulseManager.setPulseReceiver(inputReceiver);
         mGestureManager.setGestureListener(inputReceiver);
@@ -127,50 +124,44 @@ public class SceneFactory {
             Triangle[] pegTris;
             ModelObject peg = new ModelObject("peg"+x);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesFront, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_front");
+            pegTris = mShapeFactory.createRectangle(pegVerticesFront, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_front");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesBack, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_back");
+            pegTris = mShapeFactory.createRectangle(pegVerticesBack, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_back");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesLeft, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_left");
+            pegTris = mShapeFactory.createRectangle(pegVerticesLeft, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_left");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_right");
+            pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_right");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, BOARD_VERTEX_DIVISOR, "peg"+x+"_top");
+            pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_top");
             peg.add(pegTris);
 
-            peg.setTranslation(PEG_POS[x][0] / BOARD_VERTEX_DIVISOR, 0, PEG_POS[x][1] / BOARD_VERTEX_DIVISOR);
+            peg.setTranslation(PEG_POS[x][0] / vertexDivisor, 0, PEG_POS[x][1] / vertexDivisor);
             scene.add(peg);
         }
 
-        Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, BOARD_VERTEX_DIVISOR, "board");
+        Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, vertexDivisor, "board");
         PhysicsAttribs physicsAttribs = new PhysicsAttribs(BOARD_MASS, BOARD_VELOCITY_MIN, 0.0f, BOARD_DAMPING_ACCELERATION);
-        ModelObject obj = new ModelObject("board", physicsAttribs, new BoardPhysicsAction(scene));
+        ModelObject obj = new ModelObject("board", physicsAttribs, new BoardPhysicsAction(scene), false);
         obj.add(boardTris);
         scene.add(obj);
 
-        Triangle[] sphereTris = mShapeFactory.createSphere("sphere", 10.0f, 10, 10, new float[]{0.4f, 0.0f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
-        obj = new ModelObject("sphere");
-        obj.setTranslation(0.0f, 1.0f, 0.0f);
-        obj.add(sphereTris);
-        scene.add(obj);
-
-        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 10, 10, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 10, 10, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, vertexDivisor);
         obj = new ModelObject("touchsphere1");
         obj.setTranslation(-2.0f, 0.0f, -2.0f);
         obj.add(touchSphereTris);
         scene.add(obj);
 
-        touchSphereTris = mShapeFactory.createSphere("touchsphere2", 4.0f, 10, 10, new float[]{0.0f, 0.6f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        touchSphereTris = mShapeFactory.createSphere("touchsphere2", 4.0f, 10, 10, new float[]{0.0f, 0.6f, 0.6f, 1.0f}, vertexDivisor);
         obj = new ModelObject("touchsphere2");
         obj.setTranslation(2.0f, 0.0f, 2.0f);
         obj.add(touchSphereTris);
         scene.add(obj);
 
-        touchSphereTris = mShapeFactory.createSphere("touchsphere3", 4.0f, 10, 10, new float[]{0.6f, 0.0f, 0.6f, 1.0f}, BOARD_VERTEX_DIVISOR);
+        touchSphereTris = mShapeFactory.createSphere("touchsphere3", 4.0f, 10, 10, new float[]{0.6f, 0.0f, 0.6f, 1.0f}, vertexDivisor);
         obj = new ModelObject("touchsphere3");
         obj.setTranslation(-2.0f, 0.0f, 2.0f);
         obj.add(touchSphereTris);
@@ -196,7 +187,7 @@ public class SceneFactory {
         return scene;
     }
 
-    private Scene createNewGameScene()
+    private Scene createNewGameScene( float vertexDivisor )
     {
         Scene scene = new Scene(new NewGameSceneChangeHandler());
 
@@ -217,8 +208,8 @@ public class SceneFactory {
         //gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
         //draw_message( 0.5, 200, 200, "Select your colour:" );
 
-        Triangle[] whiteSquareTris = mShapeFactory.createRectangle(whiteVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "white");
-        Triangle[] redSquareTris = mShapeFactory.createRectangle(redVertices, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, ORIGINAL_TRI_VERTEX_DIVISOR, "red");
+        Triangle[] whiteSquareTris = mShapeFactory.createRectangle(whiteVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, vertexDivisor, "white");
+        Triangle[] redSquareTris = mShapeFactory.createRectangle(redVertices, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, vertexDivisor, "red");
 
         ModelObject redSquare = new ModelObject("redSquare");
         redSquare.add( redSquareTris );

@@ -3,63 +3,30 @@ package com.example.glttt;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
-import android.view.View;
 
-import com.example.glttt.pulser.PulseManager;
 import com.example.glttt.shader.IShader;
 import com.example.glttt.shader.ShaderFactory;
 
-public class GLTTTSurfaceView extends GLSurfaceView implements IGameView
+public class GLTTTSurfaceView extends GLSurfaceView
 {
-    private static final int PHYSICS_FPS = 60;
-	private final GLTTTSurfaceRenderer mSurfaceRenderer;
-	private View mContentView;
-    private GestureManager mGestureManager;
+    private final GestureManager mGestureManager;
     private GamePresenter mPresenter;
 
-    public GLTTTSurfaceView(Context context, View contentView)
+    public GLTTTSurfaceView(Context context)
     {
         super(context);
-        
-        mContentView = contentView;
+
+        ShaderFactory shaderFactory = new ShaderFactory(getResources());
+        IShader shader = shaderFactory.createPerFragShader();
+
+        mGestureManager = new GestureManager(context);
+        mPresenter = new GamePresenter(mGestureManager, shader);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
-        mGestureManager = new GestureManager(context);
-        ShaderFactory shaderFactory = new ShaderFactory(getResources());
-        IShader shader = shaderFactory.createPerFragShader();
-        SceneFactory sceneFactory = new SceneFactory(new PulseManager(PHYSICS_FPS), mGestureManager, shader.requiresNormalData());
-        mSurfaceRenderer = new GLTTTSurfaceRenderer(sceneFactory, shader);
-        setRenderer(mSurfaceRenderer);
-
-        mPresenter = new GamePresenter(this);
-        mSurfaceRenderer.setCurrentScene(mPresenter.getCurrentSceneType());
-    }
-
-    @Override
-    public float getContentViewLeft() {
-        return mContentView.getLeft();
-    }
-
-    @Override
-    public float getContentViewTop() {
-        return mContentView.getTop();
-    }
-
-    @Override
-    public void setCurrentScene(SceneFactory.TYPE type) {
-        mSurfaceRenderer.setCurrentScene(type);
-    }
-
-    public void setScaleFactor( float scaleFactor ) {
-        mSurfaceRenderer.setScaleFactor(scaleFactor);
-    }
-
-    @Override
-    public void setRotation( float degrees ) {
-        mSurfaceRenderer.setRotation(degrees);
+        setRenderer(new GLTTTSurfaceRenderer(mPresenter, shader));
     }
 
     @Override

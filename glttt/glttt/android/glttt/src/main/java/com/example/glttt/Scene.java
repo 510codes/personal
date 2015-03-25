@@ -18,6 +18,7 @@ public class Scene
     private float[] mEyePos;
     private float[] mEyeLookAt;
     private float[] mEyeUpVec;
+    private Transformation mTransformation;
 
     private int[] mCurrentViewPort;
 
@@ -31,6 +32,7 @@ public class Scene
 	{
         mModelObjects = new LinkedHashMap<String, ModelObject>();
         mModelObjectsLock = new ReentrantReadWriteLock();
+        mTransformation = new Transformation();
 
         mViewMatrix = new float[16];
         mProjectionMatrix = new float[16];
@@ -83,7 +85,7 @@ public class Scene
             mModelObjectsLock.readLock().unlock();
         }
 	}
-	
+
 	public ModelObject getClickedModelObject( int screenX, int screenY )
 	{
     	float xpos = screenX;
@@ -218,6 +220,7 @@ public class Scene
             mModelObjectsLock.readLock().unlock();
         }
 
+        mTransformation.setScaleFactor(zoomFactor);
     }
 
     public void setYRotation( float degrees ) {
@@ -230,6 +233,8 @@ public class Scene
         finally {
             mModelObjectsLock.readLock().unlock();
         }
+
+        mTransformation.setYRotation(degrees);
     }
 
     public ModelObject getObjectByName( String name ) {
@@ -240,5 +245,9 @@ public class Scene
         finally {
             mModelObjectsLock.readLock().unlock();
         }
+    }
+
+    public Transformation getTransformation() {
+        return new Transformation(mTransformation);
     }
 }

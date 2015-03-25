@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.glttt.pulser.IPulseReceiver;
 
-public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener {
+public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener, IGameStateListener {
     private static final long NANOS_PER_SECOND = 1000000000;
 
     private static final float SWIPE_MASS = 1.0f;
@@ -26,18 +26,24 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
     private static final float[] BOARD_NORMAL = {0.0f, 1.0f, 0.0f, 0.0f};
     private static final float[] BOARD_P0 = {0.0f, 0.0f, 0.0f, 0.0f};
 
+    private final IPresenter mPresenter;
     private float mScaleFactor;
     private Scene mScene;
     private ModelObject mTapDownObject;
     private float mEyePosY;
     private PhysicsAttribs mEyePhysicsAttribs;
+    private String mMoveSphereName;
+    private String mDropSphereName;
 
-    public GameBoardInputReceiver() {
+    public GameBoardInputReceiver( IPresenter presenter ) {
+        mPresenter = presenter;
         mScene = null;
         mTapDownObject = null;
         mScaleFactor = 1.0f;
         mEyePosY = 0.0f;
         mEyePhysicsAttribs = new PhysicsAttribs(EYE_MASS, EYE_VELOCITY_MIN, 0.0f, EYE_DAMPING_ACCELERATION);
+        mMoveSphereName = null;
+        mDropSphereName = null;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             obj.updatePhysics(dTimeInS);
         }
 
-        obj = mScene.getObjectByName("sphere");
+        obj = mScene.getObjectByName(mDropSphereName);
         if (obj != null) {
             obj.updatePhysics(dTimeInS);
         }
@@ -97,7 +103,7 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public synchronized void onSwipeGesture( float dTimeInS, long dx, long dy ) {
-        if (mTapDownObject == null || !mTapDownObject.getId().equals("sphere")) {
+        if (mTapDownObject == null || !mTapDownObject.getId().equals(mMoveSphereName)) {
             if (dTimeInS > 0.0f) {
                 // dx should be a CHANGE in velocity here, so not sure about this
                 PhysicsAttribs boardPhysicsAttribs = mScene.getObjectByName("board").getPhysicsAttribs();
@@ -117,15 +123,15 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
             float[] pos = new float[4];
             float[] dir = new float[4];
             if (mScene.getClickPosition(mTapDownObject, x, y, pos, dir)) {
-                ModelObject touchsphere3 = mScene.getObjectByName("touchsphere3");
+                /*ModelObject touchsphere3 = mScene.getObjectByName("touchsphere3");
                 Transformation transformation = mTapDownObject.getTransformation();
                 // TODO: not entirely sure about the use of translation here
                 // is it correct to simply translate the object using the point
                 // returned from getClickPosition()?
                 transformation.translate(pos[0], pos[1], pos[2]);
-                touchsphere3.setTransformation(transformation);
+                touchsphere3.setTransformation(transformation);*/
 
-                if (mTapDownObject.getId().equals("sphere")) {
+                if (mTapDownObject.getId().equals(mMoveSphereName)) {
                     updateSpherePos(x, y);
                 }
             }
@@ -160,11 +166,14 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         ModelObject tapUpObject = mScene.getClickedModelObject(x, y);
         if (mTapDownObject == tapUpObject && mTapDownObject != null) {
             Log.d("GameBoardInputReceiver", "x: " + x + ", y: " + y + ", tapped on: " + mTapDownObject);
-            if (mTapDownObject.getId().equals("sphere")) {
+            if (mTapDownObject.getId().equals(mMoveSphereName)) {
                 int peg = getPegIntersection(mTapDownObject);
-                Log.d("GameBoardInputReceiver", "onTapUp: tapped on peg: " + peg);
                 if (peg != -1) {
-                    addSphereToPeg(mTapDownObject, peg);
+                    Log.d("GameBoardInputReceiver", "onTapUp: tapped on peg: " + peg);
+                    int posOnPeg = mPresenter.pegSelected(peg);
+                    if (posOnPeg != -1) {
+                        addSphereToPeg(mTapDownObject, peg, posOnPeg);
+                    }
                 }
             }
         }
@@ -175,13 +184,13 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
         mTapDownObject = null;
     }
 
-    private void addSphereToPeg( ModelObject sphere, int peg ) {
+    private void addSphereToPeg( ModelObject sphere, int peg, int posOnPeg ) {
         ModelObject pegObj = mScene.getObjectByName("peg" + peg);
         Transformation pegTransformation = pegObj.getTransformation();
         sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
         PhysicsAttribs spherePhysicsAttribs = new PhysicsAttribs(2.0f, 0.0f, 9.8f, 0.0f);
         sphere.setPhysicsAttribs(spherePhysicsAttribs);
-        sphere.setPhysicsAction(new SphereDropPhysicsAction(sphere));
+        sphere.setPhysicsAction(new SphereDropPhysicsAction(sphere, posOnPeg));
     }
 
     private int getPegIntersection( ModelObject sphere ) {
@@ -218,8 +227,18 @@ public class GameBoardInputReceiver implements IPulseReceiver, IGestureListener 
 
     @Override
     public synchronized void onPointerMove( int x, int y ) {
-        if (mTapDownObject != null && mTapDownObject.getId().equals("sphere")) {
+        if (mTapDownObject != null && mTapDownObject.getId().equals(mMoveSphereName)) {
             updateSpherePos(x, y);
         }
+    }
+
+    @Override
+    public void setMoveSphereName(String name) {
+        mMoveSphereName = name;
+    }
+
+    @Override
+    public void setDropSphereName(String name) {
+        mDropSphereName = name;
     }
 }

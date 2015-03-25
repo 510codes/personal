@@ -27,12 +27,17 @@ public class ModelObject
     private PhysicsAttribs mPhysicsAttribs;
     private IPhysicsAction mPhysicsAction;
     private boolean mAtRest;
+    private final boolean mUseExtentSphere;
 
     public ModelObject( String id ) {
-        this(id, null, null);
+        this(id, null, null, false);
     }
 
-	public ModelObject( String id, PhysicsAttribs attribs, IPhysicsAction action )
+    public ModelObject( String id, boolean useExtentSphere ) {
+        this(id, null, null, useExtentSphere);
+    }
+
+    public ModelObject( String id, PhysicsAttribs attribs, IPhysicsAction action, boolean useExtentSphere )
 	{
         this.mId = id;
         this.mModelMatrix = new float[16];
@@ -45,6 +50,7 @@ public class ModelObject
         mPhysicsAttribs = attribs;
         mPhysicsAction = action;
         mAtRest = true;
+        mUseExtentSphere = useExtentSphere;
 	}
 
     public void add( Triangle t ) {
@@ -126,7 +132,7 @@ public class ModelObject
     }
 
     public void setTransformation( Transformation t ) {
-        this.mTransformation = t;
+        this.mTransformation = new Transformation(t);
         recalculateModelMatrix();
     }
 
@@ -232,11 +238,27 @@ public class ModelObject
     private static String vectorToString( float[] v ) {
         return "[" + v[0] + ", " + v[1] + ", " + v[2] + ", " + v[3] + "]";
     }
+
     // returns the position, in modelspace, of the click
     public boolean clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir )
 	{
-        boolean found = false;
         float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
+        if (mUseExtentSphere) {
+            float[] rayOrigin = new float[4];
+            float[] rayDirection = new float[4];
+            getScreenTouchRay(screenX, screenY, mvMatrix, projectionMatrix, viewport, rayOrigin, rayDirection);
+            float[] origin = new float[4];
+            origin[0] = 0.0f;
+            origin[1] = 0.0f;
+            origin[2] = 0.0f;
+            origin[3] = 1.0f;
+            float r = getExtent();
+            if (!Math3d.getSphereIntersection(origin, r, rayOrigin, rayDirection)) {
+                return false;
+            }
+        }
+
+        boolean found = false;
 
 		for (Triangle t : mTriangles) {
             float[] screen0 = getTransformedPoint(t.getX(0), t.getY(0), t.getZ(0), mvMatrix, projectionMatrix, viewport);
@@ -344,12 +366,16 @@ public class ModelObject
 
     public String getId() { return mId; }
 
+    public void setId( String id ) {
+        mId = id;
+    }
+
     public void updatePhysics( float deltaTimeInS ) {
         if (!mAtRest) {
             if (mPhysicsAttribs != null) {
                 float vel = mPhysicsAttribs.onDeltaTime(deltaTimeInS);
                 if (vel != 0.0f) {
-                    Log.d("ModelObject", mId + ": updatePhysics(): deltaTimeInS: " + deltaTimeInS + ", vel: " + vel);
+                    //Log.d("ModelObject", mId + ": updatePhysics(): deltaTimeInS: " + deltaTimeInS + ", vel: " + vel);
                     if (!mPhysicsAction.onVelocityChange(deltaTimeInS, vel)) {
                         mAtRest = true;
                     }
