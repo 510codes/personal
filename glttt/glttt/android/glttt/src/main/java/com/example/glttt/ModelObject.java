@@ -240,7 +240,7 @@ public class ModelObject
     }
 
     // returns the position, in modelspace, of the click
-    public boolean clickedOn( int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir )
+    public boolean clickedOn( boolean quick, int screenX, int screenY, float[] viewMatrix, float[] projectionMatrix, int[] viewport, float[] outPos, float[] outDir )
 	{
         float[] mvMatrix = multiplyMatrixByModelMatrix(viewMatrix, 0);
         if (mUseExtentSphere) {
@@ -256,6 +256,20 @@ public class ModelObject
             if (!Math3d.getSphereIntersection(origin, r, rayOrigin, rayDirection)) {
                 return false;
             }
+
+            if (quick) {
+                outPos[0] = getExtent();
+                outPos[1] = getExtent();
+                outPos[2] = getExtent();
+                outPos[3] = 1.0f;
+
+                outDir[0] = -rayDirection[0];
+                outDir[1] = -rayDirection[1];
+                outDir[2] = -rayDirection[2];
+                outDir[3] = 0.0f;
+            }
+
+            return true;
         }
 
         boolean found = false;

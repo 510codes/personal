@@ -100,7 +100,7 @@ public class Scene
                 ModelObject modelObject = entry.getValue();
                 float[] pos = new float[4];
                 float[] dir = new float[4];
-                boolean found = modelObject.clickedOn((int) xpos, (int) ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, pos, dir);
+                boolean found = modelObject.clickedOn(true, (int) xpos, (int) ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, pos, dir);
                 if (found) {
                     float[] transformedPos;
                     transformedPos = modelObject.multiplyVectorByModelMatrix(pos, 0);
@@ -147,7 +147,7 @@ public class Scene
         float ypos = mCurrentViewPort[3];
         ypos -= screenY;
 
-        return obj.clickedOn((int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, outPos, outDir);
+        return obj.clickedOn(true, (int)xpos, (int)ypos, mViewMatrix, mProjectionMatrix, mCurrentViewPort, outPos, outDir);
     }
 
     public boolean getPlaneIntersection( ModelObject obj, int screenX, int screenY, float[] planePoint, float[] planeNormal, float[] outPos, float[] outDir ) {
