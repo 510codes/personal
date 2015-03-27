@@ -1,56 +1,72 @@
 package com.example.glttt;
 
+import android.util.Log;
+
 public class TurnManager {
 
     private final Thread mLoopThread;
 
     private static class LoopThread extends Thread {
-        private boolean mDone;
         private final IPlayer mPlayer1;
         private final IPlayer mPlayer2;
-        private final GamePresenter.PEG_SELECT_COLOUR[][] mBoardState;
-        private int mMoveCount;
+        private final GameBoard mGameBoard;
+        private final GamePresenter mPresenter;
         private GamePresenter.PEG_SELECT_COLOUR mCurrentColour;
 
         LoopThread( IPlayer player1, IPlayer player2, GamePresenter.PEG_SELECT_COLOUR startColour,
-                    GamePresenter.PEG_SELECT_COLOUR[][] boardState ) {
-            mDone = false;
+                    GamePresenter presenter, GameBoard gameBoard ) {
             mPlayer1 = player1;
             mPlayer2 = player2;
-            mBoardState = boardState;
-            mMoveCount = 0;
+            mGameBoard = gameBoard;
+            mPresenter = presenter;
             mCurrentColour = startColour;
         }
 
         @Override
         public void run() {
-            while (!mDone) {
-                int peg = mPlayer1.getMove(mCurrentColour);
-                if (!addPeg(peg, mCurrentColour)) {
-                    mDone = true;
+            while (true) {
+                mPresenter.initiateNextMove(mCurrentColour);
+                boolean playerDone = false;
+                while (!playerDone) {
+                    int peg = mPlayer1.getMove();
+                    int height = mGameBoard.moveOnPeg(peg, mCurrentColour);
+                    if (height != -1) {
+                        mPresenter.acceptMove(peg, height);
+                        switchColour();
+                        playerDone = true;
+
+                        try {
+                            Thread.sleep(mPlayer1.getDelayAfterMoveInMillis());
+                        } catch (InterruptedException e) {}
+                    }
                 }
 
-                mMoveCount++;
-                switchColour();
+                logScore();
 
-                try {
-                    Thread.sleep(mPlayer1.getDelayAfterMoveInMillis());
+                mPresenter.initiateNextMove(mCurrentColour);
+                playerDone = false;
+                while (!playerDone) {
+                    int peg = mPlayer2.getMove();
+                    int height = mGameBoard.moveOnPeg(peg, mCurrentColour);
+                    if (height != -1) {
+                        mPresenter.acceptMove(peg, height);
+                        switchColour();
+
+                        playerDone = true;
+                        try {
+                            Thread.sleep(mPlayer2.getDelayAfterMoveInMillis());
+                        } catch (InterruptedException e) {}
+                    }
                 }
-                catch (InterruptedException e) {}
 
-                peg = mPlayer2.getMove(mCurrentColour);
-                if (!addPeg(peg, mCurrentColour)) {
-                    mDone = true;
-                }
-
-                mMoveCount++;
-                switchColour();
-
-                try {
-                    Thread.sleep(mPlayer2.getDelayAfterMoveInMillis());
-                }
-                catch (InterruptedException e) {}
+                logScore();
             }
+        }
+
+        private void logScore() {
+            int redScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.RED);
+            int whiteScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.WHITE);
+            Log.d("LoopThread", "logScore(), red: " + redScore + ", white: " + whiteScore);
         }
 
         private void switchColour() {
@@ -61,21 +77,10 @@ public class TurnManager {
                 mCurrentColour = GamePresenter.PEG_SELECT_COLOUR.RED;
             }
         }
-
-        private boolean addPeg( int peg, GamePresenter.PEG_SELECT_COLOUR colour ) {
-            for (int i=0; i<3; ++i) {
-                if (mBoardState[peg][i] == GamePresenter.PEG_SELECT_COLOUR.NONE) {
-                    mBoardState[peg][i] = colour;
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 
-    public TurnManager( IPlayer player1, IPlayer player2, GamePresenter.PEG_SELECT_COLOUR startColour, GamePresenter.PEG_SELECT_COLOUR[][] boardState ) {
-        mLoopThread = new LoopThread( player1, player2, startColour, boardState );
+    public TurnManager( IPlayer player1, IPlayer player2, GamePresenter.PEG_SELECT_COLOUR startColour, GamePresenter presenter, GameBoard gameBoard ) {
+        mLoopThread = new LoopThread( player1, player2, startColour, presenter, gameBoard );
         mLoopThread.start();
     }
 }

@@ -9,8 +9,8 @@ public class HumanPlayer implements IPlayer {
     }
 
     @Override
-    public int getMove( GamePresenter.PEG_SELECT_COLOUR colour ) {
-        return mPresenter.getNextHumanMove( colour );
+    public int getMove() {
+        return mPresenter.getNextHumanMove();
     }
 
     @Override

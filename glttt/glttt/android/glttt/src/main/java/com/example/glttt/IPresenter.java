@@ -4,9 +4,7 @@ import com.example.glttt.shader.IShader;
 
 public interface IPresenter {
 
-    // returns -1 for invalid selection
-    public int pegSelected( int peg );
-
+    public void pegSelected( int peg );
     public GamePresenter.PEG_SELECT_COLOUR getCurrentTurnColour();
     public Scene getCurrentScene();
     public void setZoomFactor( float zf );
