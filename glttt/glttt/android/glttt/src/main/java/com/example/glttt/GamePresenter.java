@@ -1,5 +1,7 @@
 package com.example.glttt;
 
+import android.util.Log;
+
 import com.example.glttt.pulser.PulseManager;
 import com.example.glttt.shader.IShader;
 import com.example.glttt.shapes.ShapeFactory;
@@ -11,13 +13,18 @@ public class GamePresenter implements IPresenter {
     private static final float ORIGINAL_TRI_VERTEX_DIVISOR = 500.0f;  // this is for the new game scene
     private static final float BOARD_VERTEX_DIVISOR = 50.0f;
 
-    private final PEG_SELECT_COLOUR[][] mPegState;
+    private final PEG_SELECT_COLOUR[][] mBoardState;
     private PEG_SELECT_COLOUR mCurrentTurnColour;
     private Scene mCurrentScene;
     private final ShapeFactory mShapeFactory;
     private int mPegSerialCount;
     private IGameStateListener mGameStateListener;
     private String mMoveSphereName;
+
+    private IPlayer mPlayer1;
+    private IPlayer mPlayer2;
+    private TurnManager mTurnManager;
+    private int mNextHumanMove;
 
     public static enum PEG_SELECT_COLOUR {
         NONE,
@@ -26,10 +33,11 @@ public class GamePresenter implements IPresenter {
     }
 
     public GamePresenter(GestureManager gestureManager, IShader shader) {
-        mPegState = new PEG_SELECT_COLOUR[8][3];
+        mBoardState = new PEG_SELECT_COLOUR[8][3];
         mCurrentTurnColour = PEG_SELECT_COLOUR.RED;
         mPegSerialCount = 0;
         mGameStateListener = null;
+        mNextHumanMove = -1;
         mShapeFactory = new ShapeFactory(shader.requiresNormalData());
         SceneFactory sceneFactory = new SceneFactory(mShapeFactory, new PulseManager(PHYSICS_FPS), gestureManager);
         mCurrentScene = sceneFactory.create(SceneFactory.TYPE.GAME_BOARD_SCENE, this, BOARD_VERTEX_DIVISOR);
@@ -37,23 +45,24 @@ public class GamePresenter implements IPresenter {
 
         for (int i=0; i<8; ++i) {
             for (int j=0; j<3; ++j) {
-                mPegState[i][j] = PEG_SELECT_COLOUR.NONE;
+                mBoardState[i][j] = PEG_SELECT_COLOUR.NONE;
             }
         }
 
-        addNewPegForMove();
+        mPlayer1 = new HumanPlayer(this);
+        mPlayer2 = new ComputerPlayer(this);
+
+        mTurnManager = new TurnManager(mPlayer1, mPlayer2, PEG_SELECT_COLOUR.RED, mBoardState);
     }
 
     @Override
     public int pegSelected(int peg) {
         for (int i=0; i<3; ++i) {
-            if (mPegState[peg][i] == PEG_SELECT_COLOUR.NONE) {
-                mPegState[peg][i] = mCurrentTurnColour;
-                mCurrentTurnColour = (mCurrentTurnColour == PEG_SELECT_COLOUR.RED ?
-                        PEG_SELECT_COLOUR.WHITE : PEG_SELECT_COLOUR.RED);
-
-                mGameStateListener.setDropSphereName(mMoveSphereName);
-                addNewPegForMove();
+            if (mBoardState[peg][i] == PEG_SELECT_COLOUR.NONE) {
+                synchronized (this) {
+                    mNextHumanMove = peg;
+                    notify();
+                }
 
                 return i;
             }
@@ -62,9 +71,9 @@ public class GamePresenter implements IPresenter {
         return -1;
     }
 
-    private void addNewPegForMove() {
+    private void addNewPegForMove(PEG_SELECT_COLOUR colour) {
         mPegSerialCount++;
-        ModelObject sphere = createSphere(mCurrentTurnColour, mPegSerialCount / 2);
+        ModelObject sphere = createSphere(colour, mPegSerialCount / 2);
         mCurrentScene.add(sphere);
     }
 
@@ -96,6 +105,60 @@ public class GamePresenter implements IPresenter {
     @Override
     public void setZoomFactor(float zf) {
         mCurrentScene.setZoomFactor(zf);
+    }
+
+    public int getNextHumanMove(PEG_SELECT_COLOUR colour) {
+        addNewPegForMove(colour);
+        int nextMove = -1;
+
+        try {
+            while (nextMove == -1) {
+                synchronized (this) {
+                    wait();
+                    nextMove = mNextHumanMove;
+                    mNextHumanMove = -1;
+                }
+            }
+        }
+        catch (InterruptedException e) {}
+
+        if (nextMove != -1) {
+            for (int i=0; i<3; ++i) {
+                if (mBoardState[nextMove][i] == PEG_SELECT_COLOUR.NONE) {
+                    addSphereToPeg(nextMove, i);
+                    break;
+                }
+            }
+        }
+
+        return nextMove;
+    }
+
+    public int getNextComputerMove( PEG_SELECT_COLOUR colour ) {
+        for (int i=0; i<8; ++i) {
+            for (int j=0; j<3; ++j) {
+                if (mBoardState[i][j] == GamePresenter.PEG_SELECT_COLOUR.NONE) {
+                    Log.d("ComputerPlayer", "getMove(): chose peg: " + i);
+                    addNewPegForMove(colour);
+                    addSphereToPeg(i, j);
+
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private void addSphereToPeg( int peg, int posOnPeg ) {
+        ModelObject sphere = mCurrentScene.getObjectByName(mMoveSphereName);
+        mGameStateListener.setDropSphereName(mMoveSphereName);
+        ModelObject pegObj = mCurrentScene.getObjectByName("peg" + peg);
+        Transformation pegTransformation = pegObj.getTransformation();
+        sphere.setTranslation(pegTransformation.getTranslationX(), 1.25f, pegTransformation.getTranslationZ());
+        PhysicsAttribs spherePhysicsAttribs = new PhysicsAttribs(2.0f, 0.0f, 9.8f, 0.0f);
+        sphere.setPhysicsAttribs(spherePhysicsAttribs);
+        sphere.setPhysicsAction(new SphereDropPhysicsAction(sphere, posOnPeg));
     }
 
     private ModelObject createSphere( PEG_SELECT_COLOUR colour, int serialNum ) {
