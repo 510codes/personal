@@ -184,7 +184,7 @@ public class ModelObject
         // (which now contains model * view * projection).
         Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, mvMatrix, 0);
 
-        shader.draw( mvMatrix, mvpMatrix, getVertexBuffer(shader.getStride()), mTriangles.size() );
+        shader.drawTriangles( mvMatrix, mvpMatrix, getVertexBuffer(shader.getStride()), mTriangles.size() );
         long elapsedTimeNanos = System.nanoTime() - startTimeNanos;
         //Log.v("chris", "ModelObject.draw(" + mId + "): elapsed time: " + (elapsedTimeNanos / 1000000) + " ms");
 	}

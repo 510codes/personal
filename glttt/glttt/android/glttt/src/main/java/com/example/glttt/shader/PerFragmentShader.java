@@ -69,7 +69,7 @@ public class PerFragmentShader implements IShader {
     }
 
     @Override
-    public void draw( float[] mvMatrix, float[] mvpMatrix, FloatBuffer vertexFB, int numTris ) {
+    public void drawTriangles( float[] mvMatrix, float[] mvpMatrix, FloatBuffer vertexFB, int numTris ) {
         GLES20.glUniform3f(mLightPos, 0.0f, 5.0f, 5.0f);
 
         // Apply the projection and view transformation
