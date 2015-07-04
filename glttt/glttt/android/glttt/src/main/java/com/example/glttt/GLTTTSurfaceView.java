@@ -5,7 +5,9 @@ import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
 import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ISpriteShader;
 import com.example.glttt.shader.ShaderFactory;
+import com.example.glttt.text.GLText;
 
 public class GLTTTSurfaceView extends GLSurfaceView
 {
@@ -18,15 +20,18 @@ public class GLTTTSurfaceView extends GLSurfaceView
 
         ShaderFactory shaderFactory = new ShaderFactory(getResources());
         IShader shader = shaderFactory.createPerFragShader();
+        ISpriteShader spriteShader = shaderFactory.createBatchTextShader();
 
         mGestureManager = new GestureManager(context);
-        mPresenter = new GamePresenter(mGestureManager, shader);
+        GLText glText = new GLText(context.getAssets());
+        Hud hud = new Hud(glText);
+        mPresenter = new GamePresenter(mGestureManager, shader, hud);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
-        setEGLConfigChooser(8 , 8, 8, 8, 16, 0);
+        setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         // Set the Renderer for drawing on the GLSurfaceView
-        setRenderer(new GLTTTSurfaceRenderer(mPresenter, shader));
+        setRenderer(new GLTTTSurfaceRenderer(mPresenter, shader, spriteShader, glText));
     }
 
     @Override

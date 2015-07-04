@@ -21,11 +21,6 @@ public class PerFragmentShader implements IShader {
     }
 
     @Override
-    public int getProgramHandle() {
-        return mProgram.getProgramHandle();
-    }
-
-    @Override
     public boolean requiresNormalData() {
         return true;
     }
@@ -38,6 +33,8 @@ public class PerFragmentShader implements IShader {
     @Override
     public void initialize() {
         mProgram.initialize();
+
+        switchTo();
 
         int program = mProgram.getProgramHandle();
 
@@ -90,5 +87,10 @@ public class PerFragmentShader implements IShader {
 
         //Draw the triangles
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3 * numTris);
+    }
+
+    @Override
+    public void switchTo() {
+        GLES20.glUseProgram(mProgram.getProgramHandle());
     }
 }

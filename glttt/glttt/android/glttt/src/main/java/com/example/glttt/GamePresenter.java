@@ -2,6 +2,7 @@ package com.example.glttt;
 
 import com.example.glttt.pulser.PulseManager;
 import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ISpriteShader;
 import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.shapes.Triangle;
 
@@ -17,6 +18,7 @@ public class GamePresenter implements IPresenter {
     private int mPegSerialCount;
     private IGameStateListener mGameStateListener;
     private String mMoveSphereName;
+    private final Hud mHud;
 
     private IPlayer mPlayer1;
     private IPlayer mPlayer2;
@@ -29,12 +31,13 @@ public class GamePresenter implements IPresenter {
         RED
     }
 
-    public GamePresenter(GestureManager gestureManager, IShader shader) {
+    public GamePresenter(GestureManager gestureManager, IShader shader, Hud hud) {
         mCurrentTurnColour = PEG_SELECT_COLOUR.RED;
         mPegSerialCount = 0;
         mGameStateListener = null;
         mNextHumanMove = -1;
         mShapeFactory = new ShapeFactory(shader.requiresNormalData());
+        mHud = hud;
         SceneFactory sceneFactory = new SceneFactory(mShapeFactory, new PulseManager(PHYSICS_FPS), gestureManager);
         mCurrentScene = sceneFactory.create(SceneFactory.TYPE.GAME_BOARD_SCENE, this, BOARD_VERTEX_DIVISOR);
         mMoveSphereName = null;
@@ -73,6 +76,7 @@ public class GamePresenter implements IPresenter {
     @Override
     public void onViewportChanged(int[] viewport) {
         mCurrentScene.onViewportChanged(viewport);
+        mHud.onViewportChanged(viewport);
     }
 
     @Override
@@ -81,8 +85,12 @@ public class GamePresenter implements IPresenter {
     }
 
     @Override
-    public void drawScene(IShader shader) {
+    public void draw(IShader shader, ISpriteShader spriteShader) {
+        shader.switchTo();
         mCurrentScene.draw(shader);
+
+        spriteShader.switchTo();
+        mHud.draw(spriteShader);
     }
 
     @Override

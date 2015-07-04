@@ -8,19 +8,25 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ISpriteShader;
+import com.example.glttt.text.GLText;
 
 
 public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
-    private IShader mShader;
+    private final IShader mShader;
+    private final ISpriteShader mSpriteShader;
     private int mFrameCount;
     private long mIntervalStartTime;
     private final IPresenter mPresenter;
+    private final GLText mGLText;
 
-    public GLTTTSurfaceRenderer( IPresenter presenter, IShader shader )
+    public GLTTTSurfaceRenderer( IPresenter presenter, IShader shader, ISpriteShader spriteShader, GLText glText )
     {
     	super();
     	
         mShader = shader;
+        mGLText = glText;
+        mSpriteShader = spriteShader;
         mFrameCount = 0;
         mIntervalStartTime = 0;
         mPresenter = presenter;
@@ -30,12 +36,18 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config)
     {
         mShader.initialize();
-        GLES20.glUseProgram(mShader.getProgramHandle());
-
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
+
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        mSpriteShader.initialize();
+        if (!mGLText.load( mSpriteShader, "Roboto-Regular.ttf", 40, 2, 2 )) {
+            throw new RuntimeException("could not load the font");
+        }
     }
 
     @Override
@@ -60,7 +72,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
-        mPresenter.drawScene(mShader);
+        mPresenter.draw(mShader, mSpriteShader);
 
         mFrameCount++;
         long currentTime = System.nanoTime();

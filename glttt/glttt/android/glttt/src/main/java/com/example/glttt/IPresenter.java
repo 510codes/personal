@@ -1,6 +1,7 @@
 package com.example.glttt;
 
 import com.example.glttt.shader.IShader;
+import com.example.glttt.shader.ISpriteShader;
 
 public interface IPresenter {
 
@@ -9,7 +10,7 @@ public interface IPresenter {
     public Scene getCurrentScene();
     public void setZoomFactor( float zf );
     public void setYRotation( float yr );
-    public void drawScene( IShader shader );
+    public void draw( IShader shader, ISpriteShader spriteShader );
     public void onViewportChanged( int[] viewport );
     public void setGameStateListener( IGameStateListener listener );
 }

@@ -27,4 +27,11 @@ public class ShaderFactory
 
         return new PerFragmentShader(new ShaderProgram(vertexShader, fragmentShader));
     }
+
+    public ISpriteShader createBatchTextShader() {
+        String vertexShader = mResources.getString(R.string.batchtext_vertex_shader);
+        String fragmentShader = mResources.getString(R.string.batchtext_fragment_shader);
+
+        return new BatchTextShader(new ShaderProgram(vertexShader, fragmentShader));
+    }
 }
