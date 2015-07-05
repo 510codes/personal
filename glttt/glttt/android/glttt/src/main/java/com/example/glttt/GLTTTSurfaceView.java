@@ -27,7 +27,14 @@ public class GLTTTSurfaceView extends GLSurfaceView
         GLText glText = new GLText(context.getAssets());
         ShapeFactory shapeFactory = new ShapeFactory(shader.requiresNormalData());
         Hud hud = new Hud(shader, glText, shapeFactory);
+
         mPresenter = new GamePresenter(mGestureManager, hud, shapeFactory);
+
+        GameBoard gameBoard = new GameBoard();
+        IPlayer redPlayer = new HumanPlayer(mPresenter);
+        IPlayer whitePlayer = new ComputerPlayer(gameBoard);
+
+        mPresenter.startNewGame(gameBoard, redPlayer, whitePlayer, System.nanoTime());
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);

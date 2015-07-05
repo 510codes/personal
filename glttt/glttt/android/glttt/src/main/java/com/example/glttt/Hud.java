@@ -19,6 +19,10 @@ public class Hud {
     private final float[] mVPMatrix;
     private int mViewportWidth;
     private int mViewportHeight;
+    private HudMessageQueue mMessageQueue;
+
+    private static final long NANOS_PER_MS = 1000000;
+
 
     public Hud( IShader shader, GLText glText, ShapeFactory shapeFactory ) {
         mShader = shader;
@@ -29,6 +33,7 @@ public class Hud {
         mVPMatrix = new float[16];
         mViewportWidth = 0;
         mViewportHeight = 0;
+        mMessageQueue = new HudMessageQueue(8000 * NANOS_PER_MS);
         Matrix.setIdentityM(mProjectionMatrix, 0);
         Matrix.setIdentityM(mViewMatrix, 0);
         Matrix.setIdentityM(mVPMatrix, 0);
@@ -39,7 +44,7 @@ public class Hud {
         mWhiteScore = whiteScore;
     }
 
-    public void draw( ISpriteShader spriteShader ) {
+    public void draw( ISpriteShader spriteShader, long currentTimeInNanos ) {
         float scaleX = mText.getScaleX();
         float scaleY = mText.getScaleY();
         mText.setScale(2.0f);
@@ -56,17 +61,50 @@ public class Hud {
                 leftx, y + height, 0
         };
 
-        Triangle[] tris = mShapeFactory.createRectangle(vertices, Colours.MSG_BOX_COLOUR, 1.0f, "score_msg_box_rect");
+        Triangle[] tris = mShapeFactory.createRectangle(vertices, Colours.SCORE_BOX_COLOUR, 1.0f, "score_msg_box_rect");
         ModelObject scoreMsgBox = new ModelObject("score_msg_box");
         scoreMsgBox.add(tris);
 
         mShader.switchTo();
         scoreMsgBox.draw(mViewMatrix, mProjectionMatrix, mShader);
-        spriteShader.switchTo();
+        drawMessages(spriteShader, currentTimeInNanos);
         mText.draw(spriteShader, "Red: " + mRedScore, leftx, y, mVPMatrix, Colours.SCORE_TEXT_RED);
         mText.drawRJ(spriteShader, "White: " + mWhiteScore, rightx, y, mVPMatrix, Colours.SCORE_TEXT_WHITE);
-        
+
         mText.setScale(scaleX, scaleY);
+    }
+
+    private void drawMessages(ISpriteShader spriteShader, long currentTimeInNanos) {
+        float saveScaleX = mText.getScaleX();
+        float saveScaleY = mText.getScaleY();
+
+        mText.setScale(1.2f);
+
+        String[] msg = mMessageQueue.getMessages(currentTimeInNanos);
+        float y = mViewportHeight / 2.0f;
+        float height = (msg.length * mText.getHeight()) + (mText.getHeight() / 5.0f);
+        float width = mViewportWidth / 1.5f;
+
+        float[] vertices = {
+                -width / 2, y - height, 0,
+                width / 2, y - height, 0,
+                width / 2, y, 0,
+                -width / 2, y, 0
+        };
+
+        Triangle[] tris = mShapeFactory.createRectangle(vertices, Colours.MSG_BOX_COLOUR, 1.0f, "msg_box_rect");
+        ModelObject msgBox = new ModelObject("msg_box");
+        msgBox.add(tris);
+        msgBox.draw(mViewMatrix, mProjectionMatrix, mShader);
+        spriteShader.switchTo();
+
+        float msgY = y;
+        for (int i=0; i<msg.length; ++i) {
+            msgY -= mText.getHeight();
+            mText.draw(spriteShader, msg[i], -width / 2, msgY, mVPMatrix, Colours.SCORE_TEXT_WHITE);
+        }
+
+        mText.setScale(saveScaleX, saveScaleY);
     }
 
     public void onViewportChanged( int[] viewport ) {
@@ -80,18 +118,22 @@ public class Hud {
             Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 1, 10);
         }
         else {
-            Matrix.frustumM(mProjectionMatrix, 0, -1, 1, -1/ratio, 1/ratio, 1, 10);
+            Matrix.frustumM(mProjectionMatrix, 0, -1, 1, -1 / ratio, 1 / ratio, 1, 10);
         }
 
         int useForOrtho = Math.min(mViewportWidth, mViewportHeight);
 
         //TODO: Is this wrong?
         Matrix.orthoM(mViewMatrix, 0,
-                -useForOrtho/2,
+                -useForOrtho / 2,
                 useForOrtho/2,
                 -useForOrtho/2,
                 useForOrtho/2, 0.1f, 100f);
 
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+    }
+
+    public void addMessage(String s, long currentTimeInNanos) {
+        mMessageQueue.add(s, currentTimeInNanos);
     }
 }

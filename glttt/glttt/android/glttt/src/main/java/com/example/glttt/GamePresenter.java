@@ -20,8 +20,6 @@ public class GamePresenter implements IPresenter {
     private String mMoveSphereName;
     private final Hud mHud;
 
-    private IPlayer mPlayer1;
-    private IPlayer mPlayer2;
     private TurnManager mTurnManager;
     private GameBoard mGameBoard;
     private int mNextHumanMove;
@@ -42,12 +40,12 @@ public class GamePresenter implements IPresenter {
         SceneFactory sceneFactory = new SceneFactory(mShapeFactory, new PulseManager(PHYSICS_FPS), gestureManager);
         mCurrentScene = sceneFactory.create(SceneFactory.TYPE.GAME_BOARD_SCENE, this, BOARD_VERTEX_DIVISOR);
         mMoveSphereName = null;
+    }
 
-        mGameBoard = new GameBoard();
-        mPlayer1 = new HumanPlayer(this);
-        mPlayer2 = new ComputerPlayer(mGameBoard);
-
-        mTurnManager = new TurnManager(mPlayer1, mPlayer2, PEG_SELECT_COLOUR.RED, this, mGameBoard);
+    public void startNewGame( GameBoard gameBoard, IPlayer redPlayer, IPlayer whitePlayer, long currentTimeInNanos ) {
+        mGameBoard = gameBoard;
+        mTurnManager = new TurnManager(redPlayer, whitePlayer, PEG_SELECT_COLOUR.RED, this, mGameBoard);
+        mHud.addMessage("The game begins!", currentTimeInNanos);
     }
 
     @Override
@@ -86,12 +84,12 @@ public class GamePresenter implements IPresenter {
     }
 
     @Override
-    public void draw(IShader shader, ISpriteShader spriteShader) {
+    public void draw(IShader shader, ISpriteShader spriteShader, long currentTimeInNanos) {
         shader.switchTo();
         mCurrentScene.draw(shader);
 
         spriteShader.switchTo();
-        mHud.draw(spriteShader);
+        mHud.draw(spriteShader, currentTimeInNanos);
     }
 
     @Override

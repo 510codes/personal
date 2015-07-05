@@ -72,7 +72,7 @@ public class GLTTTSurfaceRenderer implements GLSurfaceView.Renderer {
     {
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
-        mPresenter.draw(mShader, mSpriteShader);
+        mPresenter.draw(mShader, mSpriteShader, System.nanoTime());
 
         mFrameCount++;
         long currentTime = System.nanoTime();

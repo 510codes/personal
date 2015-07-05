@@ -10,7 +10,7 @@ public interface IPresenter {
     public Scene getCurrentScene();
     public void setZoomFactor( float zf );
     public void setYRotation( float yr );
-    public void draw( IShader shader, ISpriteShader spriteShader );
+    public void draw( IShader shader, ISpriteShader spriteShader, long currentTimeInNanos );
     public void onViewportChanged( int[] viewport );
     public void setGameStateListener( IGameStateListener listener );
 }
