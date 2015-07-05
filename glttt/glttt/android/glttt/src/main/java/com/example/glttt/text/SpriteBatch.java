@@ -48,41 +48,43 @@ public class SpriteBatch {
             vertexBuffer[bufferIndex++] = y1;               // Add Y for Vertex 0
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().u1;        // Add U for Vertex 0
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().v2;        // Add V for Vertex 0
-            vertexBuffer[bufferIndex++] = count;
+            vertexBuffer[bufferIndex++] = count % 24;
 
             vertexBuffer[bufferIndex++] = x2;               // Add X for Vertex 1
             vertexBuffer[bufferIndex++] = y1;               // Add Y for Vertex 1
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().u2;        // Add U for Vertex 1
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().v2;        // Add V for Vertex 1
-            vertexBuffer[bufferIndex++] = count;
+            vertexBuffer[bufferIndex++] = count % 24;
 
             vertexBuffer[bufferIndex++] = x2;               // Add X for Vertex 2
             vertexBuffer[bufferIndex++] = y2;               // Add Y for Vertex 2
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().u2;        // Add U for Vertex 2
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().v1;        // Add V for Vertex 2
-            vertexBuffer[bufferIndex++] = count;
+            vertexBuffer[bufferIndex++] = count % 24;
 
             vertexBuffer[bufferIndex++] = x1;               // Add X for Vertex 3
             vertexBuffer[bufferIndex++] = y2;               // Add Y for Vertex 3
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().u1;        // Add U for Vertex 3
             vertexBuffer[bufferIndex++] = sprite.getTextureRegion().v1;        // Add V for Vertex 3
-            vertexBuffer[bufferIndex++] = count;
+            vertexBuffer[bufferIndex++] = count % 24;
 
             // add the sprite mvp matrix to uMVPMatrices array
             Matrix.multiplyMM(mvpMatrix, 0, vpMatrix, 0, sprite.getModelMatrix(), 0);
 
-            //TODO: make sure numSprites < 24
             for (int i = 0; i < 16; ++i) {
-                int index = count * 16 + i;
+                int index = (count % 24) * 16 + i;
                 //Log.d("SpriteBatch", "drawSprites(): uMVPMatrices["+index+"] = mvpMatrix["+i+"];");
                 uMVPMatrices[index] = mvpMatrix[i];
             }
 
             count++;
+
+            if ((count > 0 && count % 24 == 0) || count == sprites.length) {
+                vertices.setVertices(vertexBuffer, 0, bufferIndex);
+                spriteShader.draw(textureId, vertices.vertices, vertices.indices, uMVPMatrices, sprites.length, colour);
+
+                bufferIndex = 0;
+            }
         }
-
-        vertices.setVertices( vertexBuffer, 0, bufferIndex );
-
-        spriteShader.draw(textureId, vertices.vertices, vertices.indices, uMVPMatrices, sprites.length, colour);
     }
 }
