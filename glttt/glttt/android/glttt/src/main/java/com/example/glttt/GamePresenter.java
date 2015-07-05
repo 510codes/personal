@@ -23,6 +23,7 @@ public class GamePresenter implements IPresenter {
     private IPlayer mPlayer1;
     private IPlayer mPlayer2;
     private TurnManager mTurnManager;
+    private GameBoard mGameBoard;
     private int mNextHumanMove;
 
     public static enum PEG_SELECT_COLOUR {
@@ -31,22 +32,22 @@ public class GamePresenter implements IPresenter {
         RED
     }
 
-    public GamePresenter(GestureManager gestureManager, IShader shader, Hud hud) {
+    public GamePresenter(GestureManager gestureManager, Hud hud, ShapeFactory shapeFactory) {
         mCurrentTurnColour = PEG_SELECT_COLOUR.RED;
         mPegSerialCount = 0;
         mGameStateListener = null;
         mNextHumanMove = -1;
-        mShapeFactory = new ShapeFactory(shader.requiresNormalData());
+        mShapeFactory = shapeFactory;
         mHud = hud;
         SceneFactory sceneFactory = new SceneFactory(mShapeFactory, new PulseManager(PHYSICS_FPS), gestureManager);
         mCurrentScene = sceneFactory.create(SceneFactory.TYPE.GAME_BOARD_SCENE, this, BOARD_VERTEX_DIVISOR);
         mMoveSphereName = null;
 
-        GameBoard gameBoard = new GameBoard();
+        mGameBoard = new GameBoard();
         mPlayer1 = new HumanPlayer(this);
-        mPlayer2 = new ComputerPlayer(gameBoard);
+        mPlayer2 = new ComputerPlayer(mGameBoard);
 
-        mTurnManager = new TurnManager(mPlayer1, mPlayer2, PEG_SELECT_COLOUR.RED, this, gameBoard);
+        mTurnManager = new TurnManager(mPlayer1, mPlayer2, PEG_SELECT_COLOUR.RED, this, mGameBoard);
     }
 
     @Override
@@ -121,6 +122,9 @@ public class GamePresenter implements IPresenter {
 
     public void acceptMove( int peg, int height ) {
         addSphereToPeg(peg, height);
+        int redScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.RED);
+        int whiteScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.WHITE);
+        mHud.updateScore(redScore, whiteScore);
     }
 
     private void addSphereToPeg( int peg, int posOnPeg ) {
@@ -137,10 +141,10 @@ public class GamePresenter implements IPresenter {
     private ModelObject createSphere( PEG_SELECT_COLOUR colour, int serialNum ) {
         float[] c;
         if (colour == PEG_SELECT_COLOUR.RED) {
-            c = new float[]{0.4f, 0.0f, 0.0f, 1.0f};
+            c = Colours.GAME_PIECE_RED;
         }
         else {
-            c = new float[]{0.9f, 0.9f, 0.9f, 1.0f};
+            c = Colours.GAME_PIECE_WHITE;
         }
 
         String strColour = (colour == PEG_SELECT_COLOUR.RED ? "red" : "white");

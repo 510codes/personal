@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import com.example.glttt.shader.IShader;
 import com.example.glttt.shader.ISpriteShader;
 import com.example.glttt.shader.ShaderFactory;
+import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.text.GLText;
 
 public class GLTTTSurfaceView extends GLSurfaceView
@@ -24,8 +25,9 @@ public class GLTTTSurfaceView extends GLSurfaceView
 
         mGestureManager = new GestureManager(context);
         GLText glText = new GLText(context.getAssets());
-        Hud hud = new Hud(glText);
-        mPresenter = new GamePresenter(mGestureManager, shader, hud);
+        ShapeFactory shapeFactory = new ShapeFactory(shader.requiresNormalData());
+        Hud hud = new Hud(shader, glText, shapeFactory);
+        mPresenter = new GamePresenter(mGestureManager, hud, shapeFactory);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);

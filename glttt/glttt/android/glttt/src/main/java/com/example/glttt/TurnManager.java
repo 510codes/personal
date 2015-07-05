@@ -41,8 +41,6 @@ public class TurnManager {
                     }
                 }
 
-                logScore();
-
                 mPresenter.initiateNextMove(mCurrentColour);
                 playerDone = false;
                 while (!playerDone) {
@@ -58,15 +56,7 @@ public class TurnManager {
                         } catch (InterruptedException e) {}
                     }
                 }
-
-                logScore();
             }
-        }
-
-        private void logScore() {
-            int redScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.RED);
-            int whiteScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.WHITE);
-            Log.d("LoopThread", "logScore(), red: " + redScore + ", white: " + whiteScore);
         }
 
         private void switchColour() {

@@ -253,7 +253,7 @@ public class GLText {
             letterX += (charWidths[c] + spaceX ) * scaleX;    // Advance X Position by Scaled Character Width
         }
 
-        batch.drawSprites(spriteShader, sprites, vpMatrix, textureId, colour);  // Draw the Character
+        batch.drawSprites(spriteShader, sprites, vpMatrix, textureId, colour);
 
     }
     public void draw(ISpriteShader spriteShader, String text, float x, float y, float z, float angleDegZ, float[] vpMatrix, float[] colour) {
@@ -274,9 +274,9 @@ public class GLText {
     //    angleDeg - angle to rotate the text
     // R: the total width of the text that was drawn
     public float drawC(ISpriteShader spriteShader, String text, float x, float y, float z, float angleDegX, float angleDegY, float angleDegZ, float[] vpMatrix, float[] colour)  {
-        float len = getLength( text );                  // Get Text Length
+        float len = getLength( text );
         draw( spriteShader, text, x - ( len / 2.0f ), y - ( getCharHeight() / 2.0f ), z, angleDegX, angleDegY, angleDegZ, vpMatrix, colour );  // Draw Text Centered
-        return len;                                     // Return Length
+        return len;
     }
     public float drawC(ISpriteShader spriteShader, String text, float x, float y, float z, float angleDegZ, float[] vpMatrix, float[] colour) {
         return drawC(spriteShader, text, x, y, z, 0, 0, angleDegZ, vpMatrix, colour);
@@ -285,17 +285,21 @@ public class GLText {
         return drawC(spriteShader, text, x, y, 0, angleDeg, vpMatrix, colour);
     }
     public float drawC(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour) {
-        float len = getLength( text );                  // Get Text Length
+        float len = getLength( text );
         return drawC(spriteShader, text, x - (len / 2.0f), y - ( getCharHeight() / 2.0f ), 0, vpMatrix, colour);
 
     }
     public float drawCX(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour)  {
-        float len = getLength( text );                  // Get Text Length
+        float len = getLength( text );
         draw( spriteShader, text, x - ( len / 2.0f ), y, vpMatrix, colour );            // Draw Text Centered (X-Axis Only)
-        return len;                                     // Return Length
+        return len;
     }
     public void drawCY(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour)  {
         draw( spriteShader, text, x, y - ( getCharHeight() / 2.0f ), vpMatrix, colour );  // Draw Text Centered (Y-Axis Only)
+    }
+    public void drawRJ(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour) {
+        float len = getLength( text );
+        draw( spriteShader, text, x - len, y, 0, 0, 0, 0, vpMatrix, colour );  // Draw Text Centered
     }
 
     //--Set Scale--//

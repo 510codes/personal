@@ -6,8 +6,6 @@ import com.example.glttt.shapes.Triangle;
 
 public class SceneFactory {
 
-    private static final float[] PEG_COLOUR_NORMAL = {0.55f, 0.55f, 0.48f, 0.3f};
-
     private static final float BOARD_MASS = 2.0f;
     private static final float BOARD_DAMPING_ACCELERATION = 400.0f;
     private static final float BOARD_VELOCITY_MIN = 10.0f;
@@ -124,26 +122,26 @@ public class SceneFactory {
             Triangle[] pegTris;
             ModelObject peg = new ModelObject("peg"+x);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesFront, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_front");
+            pegTris = mShapeFactory.createRectangle(pegVerticesFront, Colours.PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_front");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesBack, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_back");
+            pegTris = mShapeFactory.createRectangle(pegVerticesBack, Colours.PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_back");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesLeft, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_left");
+            pegTris = mShapeFactory.createRectangle(pegVerticesLeft, Colours.PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_left");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesRight, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_right");
+            pegTris = mShapeFactory.createRectangle(pegVerticesRight, Colours.PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_right");
             peg.add(pegTris);
 
-            pegTris = mShapeFactory.createRectangle(pegVerticesTop, PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_top");
+            pegTris = mShapeFactory.createRectangle(pegVerticesTop, Colours.PEG_COLOUR_NORMAL, vertexDivisor, "peg"+x+"_top");
             peg.add(pegTris);
 
             peg.setTranslation(PEG_POS[x][0] / vertexDivisor, 0, PEG_POS[x][1] / vertexDivisor);
             scene.add(peg);
         }
 
-        Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, new float[]{0.1f, 0.2f, 0.5f, 1.0f}, vertexDivisor, "board");
+        Triangle[] boardTris = mShapeFactory.createRectangle(boardVertices, Colours.BOARD_COLOUR, vertexDivisor, "board");
         PhysicsAttribs physicsAttribs = new PhysicsAttribs(BOARD_MASS, BOARD_VELOCITY_MIN, 0.0f, BOARD_DAMPING_ACCELERATION);
         ModelObject obj = new ModelObject("board", physicsAttribs, new BoardPhysicsAction(scene), false);
         obj.add(boardTris);
@@ -208,8 +206,8 @@ public class SceneFactory {
         //gl.glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
         //draw_message( 0.5, 200, 200, "Select your colour:" );
 
-        Triangle[] whiteSquareTris = mShapeFactory.createRectangle(whiteVertices, new float[]{0.9f, 0.9f, 0.9f, 1.0f}, vertexDivisor, "white");
-        Triangle[] redSquareTris = mShapeFactory.createRectangle(redVertices, new float[]{1.0f, 0.0f, 0.0f, 1.0f}, vertexDivisor, "red");
+        Triangle[] whiteSquareTris = mShapeFactory.createRectangle(whiteVertices, Colours.WHITE_SQUARE, vertexDivisor, "white");
+        Triangle[] redSquareTris = mShapeFactory.createRectangle(redVertices, Colours.RED_SQUARE, vertexDivisor, "red");
 
         ModelObject redSquare = new ModelObject("redSquare");
         redSquare.add( redSquareTris );
