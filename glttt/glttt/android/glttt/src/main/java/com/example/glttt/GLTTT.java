@@ -2,16 +2,19 @@ package com.example.glttt;
 
 import com.example.glttt.util.SystemUiHider;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -69,10 +72,23 @@ public class GLTTT extends Activity {
         View contentView = getWindow().findViewById(Window.ID_ANDROID_CONTENT);
         mSurfaceView = new GLTTTSurfaceView(this);
         Log.e("opengl", Boolean.toString(detectOpenGLES20()));
-        
-        setContentView(R.layout.activity_glttt);
 
-        //final View contentView = findViewById(R.id.main_textureview);
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        else {
+            View decorView = getWindow().getDecorView();
+            // Hide the status bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+            // Remember that you should never show the action bar if the
+            // status bar is hidden, so hide that too if necessary.
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.hide();
+            }
+        }
 
         setContentView(mSurfaceView);
         
