@@ -23,36 +23,27 @@ public class TurnManager {
         @Override
         public void run() {
             while (true) {
-                mPresenter.initiateNextMove(mCurrentColour);
-                boolean playerDone = false;
-                while (!playerDone) {
-                    int peg = mRedPlayer.getMove();
-                    int height = mGameBoard.moveOnPeg(peg, mCurrentColour);
-                    if (height != -1) {
-                        mPresenter.acceptMove(peg, height);
-                        switchColour();
-                        playerDone = true;
+                processTurnForPlayer(mRedPlayer);
+                processTurnForPlayer(mWhitePlayer);
+            }
+        }
 
-                        try {
-                            Thread.sleep(mRedPlayer.getDelayAfterMoveInMillis());
-                        } catch (InterruptedException e) {}
-                    }
-                }
+        private void processTurnForPlayer(IPlayer player) {
+            mPresenter.initiateNextMove(mCurrentColour);
+            boolean playerDone = false;
+            while (!playerDone) {
+                int peg = player.getMove(System.nanoTime());
+                int scoreBefore = mGameBoard.getCompleteRows(mCurrentColour);
+                int height = mGameBoard.moveOnPeg(peg, mCurrentColour);
+                if (height != -1) {
+                    int deltaScore = mGameBoard.getCompleteRows(mCurrentColour) - scoreBefore;
+                    mPresenter.acceptMove(peg, height, deltaScore, player, System.nanoTime());
+                    switchColour();
+                    playerDone = true;
 
-                mPresenter.initiateNextMove(mCurrentColour);
-                playerDone = false;
-                while (!playerDone) {
-                    int peg = mWhitePlayer.getMove();
-                    int height = mGameBoard.moveOnPeg(peg, mCurrentColour);
-                    if (height != -1) {
-                        mPresenter.acceptMove(peg, height);
-                        switchColour();
-
-                        playerDone = true;
-                        try {
-                            Thread.sleep(mWhitePlayer.getDelayAfterMoveInMillis());
-                        } catch (InterruptedException e) {}
-                    }
+                    try {
+                        Thread.sleep(player.getDelayAfterMoveInMillis());
+                    } catch (InterruptedException e) {}
                 }
             }
         }

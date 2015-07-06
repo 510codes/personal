@@ -8,6 +8,9 @@ import com.example.glttt.shapes.ShapeFactory;
 import com.example.glttt.shapes.Triangle;
 import com.example.glttt.text.GLText;
 
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 public class Hud {
     private int mRedScore;
     private int mWhiteScore;
@@ -20,8 +23,11 @@ public class Hud {
     private int mViewportWidth;
     private int mViewportHeight;
     private HudMessageQueue mMessageQueue;
+    private int mMessageBoxWidthInPixels;
 
     private static final long NANOS_PER_MS = 1000000;
+
+    private ArrayList<StringWithTime> mMessagesToProcess;
 
 
     public Hud( IShader shader, GLText glText, ShapeFactory shapeFactory ) {
@@ -33,7 +39,9 @@ public class Hud {
         mVPMatrix = new float[16];
         mViewportWidth = 0;
         mViewportHeight = 0;
-        mMessageQueue = new HudMessageQueue(8000 * NANOS_PER_MS);
+        mMessageQueue = new HudMessageQueue(15000 * NANOS_PER_MS);
+        mMessageBoxWidthInPixels = 0;
+        mMessagesToProcess = new ArrayList<StringWithTime>();
         Matrix.setIdentityM(mProjectionMatrix, 0);
         Matrix.setIdentityM(mViewMatrix, 0);
         Matrix.setIdentityM(mVPMatrix, 0);
@@ -74,22 +82,35 @@ public class Hud {
         mText.setScale(scaleX, scaleY);
     }
 
+    private float getMessageBoxLeft() {
+        float width = mViewportWidth / 1.5f;
+        return -width / 2;
+    }
+
+    private float getMessageBoxRight() {
+        float width = mViewportWidth / 1.5f;
+        return width / 2;
+    }
+
     private void drawMessages(ISpriteShader spriteShader, long currentTimeInNanos) {
         float saveScaleX = mText.getScaleX();
         float saveScaleY = mText.getScaleY();
 
         mText.setScale(1.2f);
 
+        processStrings(currentTimeInNanos);
+
         String[] msg = mMessageQueue.getMessages(currentTimeInNanos);
         float y = mViewportHeight / 2.0f;
         float height = (msg.length * mText.getHeight()) + (mText.getHeight() / 5.0f);
-        float width = mViewportWidth / 1.5f;
+        float left = getMessageBoxLeft();
+        float right = getMessageBoxRight();
 
         float[] vertices = {
-                -width / 2, y - height, 0,
-                width / 2, y - height, 0,
-                width / 2, y, 0,
-                -width / 2, y, 0
+                left, y - height, 0,
+                right, y - height, 0,
+                right, y, 0,
+                left, y, 0
         };
 
         Triangle[] tris = mShapeFactory.createRectangle(vertices, Colours.MSG_BOX_COLOUR, 1.0f, "msg_box_rect");
@@ -101,7 +122,7 @@ public class Hud {
         float msgY = y;
         for (int i=0; i<msg.length; ++i) {
             msgY -= mText.getHeight();
-            mText.draw(spriteShader, msg[i], -width / 2, msgY, mVPMatrix, Colours.SCORE_TEXT_WHITE);
+            mText.draw(spriteShader, msg[i], left + 5, msgY, mVPMatrix, Colours.SCORE_TEXT_WHITE);
         }
 
         mText.setScale(saveScaleX, saveScaleY);
@@ -126,14 +147,59 @@ public class Hud {
         //TODO: Is this wrong?
         Matrix.orthoM(mViewMatrix, 0,
                 -useForOrtho / 2,
-                useForOrtho/2,
-                -useForOrtho/2,
-                useForOrtho/2, 0.1f, 100f);
+                useForOrtho / 2,
+                -useForOrtho / 2,
+                useForOrtho / 2, 0.1f, 100f);
 
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+
+        int left = (int)getMessageBoxLeft();
+        int right = (int)getMessageBoxRight();
+
+        mMessageBoxWidthInPixels = right - left;
     }
 
-    public void addMessage(String s, long currentTimeInNanos) {
-        mMessageQueue.add(s, currentTimeInNanos);
+    public synchronized void addMessage(String s, long currentTimeInNanos) {
+        mMessagesToProcess.add(new StringWithTime(s, currentTimeInNanos));
+    }
+
+    private synchronized void processStrings(long currentTimeInNanos) {
+        for (StringWithTime swt : mMessagesToProcess) {
+            String s = swt.mString.trim();
+            StringTokenizer st = new StringTokenizer(s);
+            String curString = "";
+            while (st.hasMoreTokens()) {
+                String nextString = st.nextToken();
+                if (mText.getLength(curString + nextString) >= mMessageBoxWidthInPixels) {
+                    if (curString.length() == 0) {
+                        // will bleed over the edge....
+                        mMessageQueue.add(nextString, currentTimeInNanos);
+                    }
+                    else {
+                        mMessageQueue.add(curString, currentTimeInNanos);
+                        curString = nextString;
+                    }
+                }
+                else {
+                    curString += " " + nextString;
+                }
+            }
+
+            if (curString.length() > 0) {
+                mMessageQueue.add(curString, currentTimeInNanos);
+            }
+        }
+
+        mMessagesToProcess.clear();
+    }
+
+    private static class StringWithTime {
+        private final String mString;
+        private final long mTime;
+
+        StringWithTime(String s, long timeInNanos) {
+            mString = s;
+            mTime = timeInNanos;
+        }
     }
 }

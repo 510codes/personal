@@ -1,6 +1,7 @@
 package com.example.glttt;
 
 public interface IPlayer {
-    public int getMove();
-    public int getDelayAfterMoveInMillis();
+    int getMove(long currentTimeInNanos);
+    int getDelayAfterMoveInMillis();
+    String getName();
 }

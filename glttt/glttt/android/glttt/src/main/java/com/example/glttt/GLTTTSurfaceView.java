@@ -31,8 +31,8 @@ public class GLTTTSurfaceView extends GLSurfaceView
         mPresenter = new GamePresenter(mGestureManager, hud, shapeFactory);
 
         GameBoard gameBoard = new GameBoard();
-        IPlayer redPlayer = new HumanPlayer(mPresenter);
-        IPlayer whitePlayer = new ComputerPlayer(gameBoard);
+        IPlayer redPlayer = new HumanPlayer(mPresenter, "Red");
+        IPlayer whitePlayer = new ComputerPlayer(gameBoard, "White");
 
         mPresenter.startNewGame(gameBoard, redPlayer, whitePlayer, System.nanoTime());
 

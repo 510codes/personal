@@ -40,7 +40,7 @@ public class SceneFactory {
         mGestureManager = gestureManager;
     }
 
-    public static enum TYPE {
+    public enum TYPE {
         NO_SCENE,
         NEW_GAME_SCENE,
         GAME_BOARD_SCENE
@@ -147,7 +147,7 @@ public class SceneFactory {
         obj.add(boardTris);
         scene.add(obj);
 
-        Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 10, 10, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, vertexDivisor);
+        /*Triangle[] touchSphereTris = mShapeFactory.createSphere("touchsphere1", 4.0f, 10, 10, new float[]{0.6f, 0.6f, 0.0f, 1.0f}, vertexDivisor);
         obj = new ModelObject("touchsphere1");
         obj.setTranslation(-2.0f, 0.0f, -2.0f);
         obj.add(touchSphereTris);
@@ -163,7 +163,7 @@ public class SceneFactory {
         obj = new ModelObject("touchsphere3");
         obj.setTranslation(-2.0f, 0.0f, 2.0f);
         obj.add(touchSphereTris);
-        scene.add(obj);
+        scene.add(obj);*/
 
         // Position the eye behind the origin.
         final float eyeX = 0.0f;

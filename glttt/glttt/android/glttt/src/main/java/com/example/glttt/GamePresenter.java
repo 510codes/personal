@@ -23,6 +23,7 @@ public class GamePresenter implements IPresenter {
     private TurnManager mTurnManager;
     private GameBoard mGameBoard;
     private int mNextHumanMove;
+    private boolean mFirstHumanMove;
 
     public static enum PEG_SELECT_COLOUR {
         NONE,
@@ -45,6 +46,7 @@ public class GamePresenter implements IPresenter {
     public void startNewGame( GameBoard gameBoard, IPlayer redPlayer, IPlayer whitePlayer, long currentTimeInNanos ) {
         mGameBoard = gameBoard;
         mTurnManager = new TurnManager(redPlayer, whitePlayer, PEG_SELECT_COLOUR.RED, this, mGameBoard);
+        mFirstHumanMove = true;
         mHud.addMessage("The game begins!", currentTimeInNanos);
     }
 
@@ -101,8 +103,13 @@ public class GamePresenter implements IPresenter {
         addNewPegForMove(colour);
     }
 
-    public int getNextHumanMove() {
+    public int getNextHumanMove(long currentTimeInNanos) {
         int nextMove = -1;
+
+        if (mFirstHumanMove) {
+            mHud.addMessage("Drag the round piece to a peg to move!", currentTimeInNanos);
+            mFirstHumanMove = false;
+        }
 
         try {
             while (nextMove == -1) {
@@ -118,11 +125,23 @@ public class GamePresenter implements IPresenter {
         return nextMove;
     }
 
-    public void acceptMove( int peg, int height ) {
+    public void acceptMove( int peg, int height, int deltaScore, IPlayer player, long currentTimeInNanos ) {
         addSphereToPeg(peg, height);
         int redScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.RED);
         int whiteScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.WHITE);
         mHud.updateScore(redScore, whiteScore);
+        processScore(deltaScore, player.getName(), currentTimeInNanos);
+    }
+
+    private void processScore(int deltaScore, String name, long currentTimeInNanos) {
+        if (deltaScore > 0) {
+            if (deltaScore == 1 ) {
+                mHud.addMessage(name + " scores a row!", currentTimeInNanos);
+            }
+            else {
+                mHud.addMessage(name + " scores " + deltaScore + " rows!", currentTimeInNanos);
+            }
+        }
     }
 
     private void addSphereToPeg( int peg, int posOnPeg ) {
