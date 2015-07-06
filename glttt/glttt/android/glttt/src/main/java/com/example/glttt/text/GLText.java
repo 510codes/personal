@@ -285,8 +285,7 @@ public class GLText {
         return drawC(spriteShader, text, x, y, 0, angleDeg, vpMatrix, colour);
     }
     public float drawC(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour) {
-        float len = getLength( text );
-        return drawC(spriteShader, text, x - (len / 2.0f), y - ( getCharHeight() / 2.0f ), 0, vpMatrix, colour);
+        return drawC(spriteShader, text, x, y, 0, vpMatrix, colour);
 
     }
     public float drawCX(ISpriteShader spriteShader, String text, float x, float y, float[] vpMatrix, float[] colour)  {
