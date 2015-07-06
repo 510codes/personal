@@ -1,20 +1,22 @@
 package com.example.glttt;
 
+import android.util.Log;
+
 public class TurnManager {
 
     private final Thread mLoopThread;
 
     private static class LoopThread extends Thread {
-        private final IPlayer mRedPlayer;
-        private final IPlayer mWhitePlayer;
+        private final IPlayer mPlayer1;
+        private final IPlayer mPlayer2;
         private final GameBoard mGameBoard;
         private final GamePresenter mPresenter;
         private GamePresenter.PEG_SELECT_COLOUR mCurrentColour;
 
-        LoopThread( IPlayer redPlayer, IPlayer whitePlayer, GamePresenter.PEG_SELECT_COLOUR startColour,
+        LoopThread( IPlayer player1, IPlayer player2, GamePresenter.PEG_SELECT_COLOUR startColour,
                     GamePresenter presenter, GameBoard gameBoard ) {
-            mRedPlayer = redPlayer;
-            mWhitePlayer = whitePlayer;
+            mPlayer1 = player1;
+            mPlayer2 = player2;
             mGameBoard = gameBoard;
             mPresenter = presenter;
             mCurrentColour = startColour;
@@ -22,13 +24,15 @@ public class TurnManager {
 
         @Override
         public void run() {
-            while (true) {
-                processTurnForPlayer(mRedPlayer);
-                processTurnForPlayer(mWhitePlayer);
+            boolean done = false;
+
+            while (!done) {
+                processTurnForPlayer(mPlayer1);
+                done = processTurnForPlayer(mPlayer2);
             }
         }
 
-        private void processTurnForPlayer(IPlayer player) {
+        private boolean processTurnForPlayer(IPlayer player) {
             mPresenter.initiateNextMove(mCurrentColour);
             boolean playerDone = false;
             while (!playerDone) {
@@ -46,6 +50,8 @@ public class TurnManager {
                     } catch (InterruptedException e) {}
                 }
             }
+
+            return mGameBoard.isGameDone();
         }
 
         private void switchColour() {
@@ -58,8 +64,8 @@ public class TurnManager {
         }
     }
 
-    public TurnManager( IPlayer redPlayer, IPlayer whitePlayer, GamePresenter.PEG_SELECT_COLOUR startColour, GamePresenter presenter, GameBoard gameBoard ) {
-        mLoopThread = new LoopThread( redPlayer, whitePlayer, startColour, presenter, gameBoard );
+    public TurnManager( IPlayer player1, IPlayer player2, GamePresenter.PEG_SELECT_COLOUR startColour, GamePresenter presenter, GameBoard gameBoard ) {
+        mLoopThread = new LoopThread( player1, player2, startColour, presenter, gameBoard );
         mLoopThread.start();
     }
 }

@@ -12,6 +12,7 @@ public class Colours {
     public static final float[] BOARD_COLOUR = {0.1f, 0.2f, 0.5f, 1.0f};
 
     public static final float[] SCORE_BOX_COLOUR = { 2.0f, 2.0f, 0.0f, 1.0f };
+    public static final float[] MIDDLE_BOX_COLOUR = { 3.0f, 3.0f, 0.0f, 2.0f };
     public static final float[] MSG_BOX_COLOUR = { 2.0f, 0.0f, 0.0f, 1.0f };
     public static final float[] SCORE_TEXT_RED = {0.7f, 0.0f, 0.0f, 1.0f};
     public static final float[] SCORE_TEXT_WHITE = {0.9f, 0.9f, 0.9f, 1.0f};

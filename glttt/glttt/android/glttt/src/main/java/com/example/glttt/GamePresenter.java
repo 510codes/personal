@@ -43,9 +43,9 @@ public class GamePresenter implements IPresenter {
         mMoveSphereName = null;
     }
 
-    public void startNewGame( GameBoard gameBoard, IPlayer redPlayer, IPlayer whitePlayer, long currentTimeInNanos ) {
+    public void startNewGame( GameBoard gameBoard, IPlayer player1, IPlayer player2, PEG_SELECT_COLOUR player1Colour, long currentTimeInNanos ) {
         mGameBoard = gameBoard;
-        mTurnManager = new TurnManager(redPlayer, whitePlayer, PEG_SELECT_COLOUR.RED, this, mGameBoard);
+        mTurnManager = new TurnManager(player1, player2, player1Colour, this, mGameBoard);
         mFirstHumanMove = true;
         mHud.addMessage("The game begins!", currentTimeInNanos);
     }
@@ -91,7 +91,7 @@ public class GamePresenter implements IPresenter {
         mCurrentScene.draw(shader);
 
         spriteShader.switchTo();
-        mHud.draw(spriteShader, currentTimeInNanos);
+        mHud.draw(currentTimeInNanos);
     }
 
     @Override
@@ -131,6 +131,21 @@ public class GamePresenter implements IPresenter {
         int whiteScore = mGameBoard.getCompleteRows(GamePresenter.PEG_SELECT_COLOUR.WHITE);
         mHud.updateScore(redScore, whiteScore);
         processScore(deltaScore, player.getName(), currentTimeInNanos);
+
+        if (mGameBoard.isGameDone()) {
+            if (redScore > whiteScore) {
+                mHud.setMiddleText("Red wins!");
+                mHud.addMessage("Game over - red wins " + redScore + " - " + whiteScore, currentTimeInNanos);
+            }
+            else if (whiteScore > redScore) {
+                mHud.setMiddleText("White wins!");
+                mHud.addMessage("Game over - white wins " + whiteScore + " - " + redScore, currentTimeInNanos);
+            }
+            else {
+                mHud.setMiddleText("It's a tie!");
+                mHud.addMessage("Game over - tie " + redScore + " - " + whiteScore, currentTimeInNanos);
+            }
+        }
     }
 
     private void processScore(int deltaScore, String name, long currentTimeInNanos) {

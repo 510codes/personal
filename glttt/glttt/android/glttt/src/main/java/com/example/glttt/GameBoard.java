@@ -3,8 +3,10 @@ package com.example.glttt;
 public class GameBoard {
 
     private final GamePresenter.PEG_SELECT_COLOUR[][] mBoardState;
+    private int mTurnCount;
 
     public GameBoard() {
+        mTurnCount = 0;
         mBoardState = new GamePresenter.PEG_SELECT_COLOUR[8][3];
         for (int i=0; i<8; ++i) {
             for (int j=0; j<3; ++j) {
@@ -68,6 +70,7 @@ public class GameBoard {
         for (int i=0; i<3; ++i) {
             if (mBoardState[peg][i] == GamePresenter.PEG_SELECT_COLOUR.NONE) {
                 mBoardState[peg][i] = colour;
+                mTurnCount++;
                 return i;
             }
         }
@@ -77,5 +80,9 @@ public class GameBoard {
 
     public GamePresenter.PEG_SELECT_COLOUR getPegSpotColour( int peg, int height ) {
         return mBoardState[peg][height];
+    }
+
+    public boolean isGameDone() {
+        return mTurnCount == 24;
     }
 }

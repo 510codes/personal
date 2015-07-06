@@ -26,7 +26,7 @@ public class GLTTTSurfaceView extends GLSurfaceView
         mGestureManager = new GestureManager(context);
         GLText glText = new GLText(context.getAssets());
         ShapeFactory shapeFactory = new ShapeFactory(shader.requiresNormalData());
-        Hud hud = new Hud(shader, glText, shapeFactory);
+        Hud hud = new Hud(shader, spriteShader, glText, shapeFactory);
 
         mPresenter = new GamePresenter(mGestureManager, hud, shapeFactory);
 
@@ -34,7 +34,7 @@ public class GLTTTSurfaceView extends GLSurfaceView
         IPlayer redPlayer = new HumanPlayer(mPresenter, "Red");
         IPlayer whitePlayer = new ComputerPlayer(gameBoard, "White");
 
-        mPresenter.startNewGame(gameBoard, redPlayer, whitePlayer, System.nanoTime());
+        mPresenter.startNewGame(gameBoard, redPlayer, whitePlayer, GamePresenter.PEG_SELECT_COLOUR.RED, System.nanoTime());
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);

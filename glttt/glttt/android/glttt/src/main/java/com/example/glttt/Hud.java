@@ -15,6 +15,7 @@ public class Hud {
     private int mRedScore;
     private int mWhiteScore;
     private final IShader mShader;
+    private final ISpriteShader mSpriteShader;
     private final GLText mText;
     private final ShapeFactory mShapeFactory;
     private final float[] mProjectionMatrix;
@@ -24,14 +25,16 @@ public class Hud {
     private int mViewportHeight;
     private HudMessageQueue mMessageQueue;
     private int mMessageBoxWidthInPixels;
+    private String mMiddleText;
 
     private static final long NANOS_PER_MS = 1000000;
 
     private ArrayList<StringWithTime> mMessagesToProcess;
 
 
-    public Hud( IShader shader, GLText glText, ShapeFactory shapeFactory ) {
+    public Hud( IShader shader, ISpriteShader spriteShader, GLText glText, ShapeFactory shapeFactory ) {
         mShader = shader;
+        mSpriteShader = spriteShader;
         mText = glText;
         mShapeFactory = shapeFactory;
         mProjectionMatrix = new float[16];
@@ -42,6 +45,7 @@ public class Hud {
         mMessageQueue = new HudMessageQueue(15000 * NANOS_PER_MS);
         mMessageBoxWidthInPixels = 0;
         mMessagesToProcess = new ArrayList<StringWithTime>();
+        mMiddleText = null;
         Matrix.setIdentityM(mProjectionMatrix, 0);
         Matrix.setIdentityM(mViewMatrix, 0);
         Matrix.setIdentityM(mVPMatrix, 0);
@@ -52,7 +56,7 @@ public class Hud {
         mWhiteScore = whiteScore;
     }
 
-    public void draw( ISpriteShader spriteShader, long currentTimeInNanos ) {
+    public void draw( long currentTimeInNanos ) {
         float scaleX = mText.getScaleX();
         float scaleY = mText.getScaleY();
         mText.setScale(2.0f);
@@ -75,9 +79,10 @@ public class Hud {
 
         mShader.switchTo();
         scoreMsgBox.draw(mViewMatrix, mProjectionMatrix, mShader);
-        drawMessages(spriteShader, currentTimeInNanos);
-        mText.draw(spriteShader, "Red: " + mRedScore, leftx, y, mVPMatrix, Colours.SCORE_TEXT_RED);
-        mText.drawRJ(spriteShader, "White: " + mWhiteScore, rightx, y, mVPMatrix, Colours.SCORE_TEXT_WHITE);
+        drawMessages(currentTimeInNanos);
+        drawMiddleText();
+        mText.draw(mSpriteShader, "Red: " + mRedScore, leftx, y, mVPMatrix, Colours.SCORE_TEXT_RED);
+        mText.drawRJ(mSpriteShader, "White: " + mWhiteScore, rightx, y, mVPMatrix, Colours.SCORE_TEXT_WHITE);
 
         mText.setScale(scaleX, scaleY);
     }
@@ -92,13 +97,13 @@ public class Hud {
         return width / 2;
     }
 
-    private void drawMessages(ISpriteShader spriteShader, long currentTimeInNanos) {
+    private void drawMessages(long currentTimeInNanos) {
         float saveScaleX = mText.getScaleX();
         float saveScaleY = mText.getScaleY();
 
         mText.setScale(1.2f);
 
-        processStrings(currentTimeInNanos);
+        processStrings();
 
         String[] msg = mMessageQueue.getMessages(currentTimeInNanos);
         float y = mViewportHeight / 2.0f;
@@ -117,12 +122,12 @@ public class Hud {
         ModelObject msgBox = new ModelObject("msg_box");
         msgBox.add(tris);
         msgBox.draw(mViewMatrix, mProjectionMatrix, mShader);
-        spriteShader.switchTo();
+        mSpriteShader.switchTo();
 
         float msgY = y;
         for (int i=0; i<msg.length; ++i) {
             msgY -= mText.getHeight();
-            mText.draw(spriteShader, msg[i], left + 5, msgY, mVPMatrix, Colours.SCORE_TEXT_WHITE);
+            mText.draw(mSpriteShader, msg[i], left + 5, msgY, mVPMatrix, Colours.SCORE_TEXT_WHITE);
         }
 
         mText.setScale(saveScaleX, saveScaleY);
@@ -163,7 +168,43 @@ public class Hud {
         mMessagesToProcess.add(new StringWithTime(s, currentTimeInNanos));
     }
 
-    private synchronized void processStrings(long currentTimeInNanos) {
+    public void setMiddleText( String s ) {
+        mMiddleText = s;
+    }
+
+    private void drawMiddleText() {
+        if (mMiddleText != null) {
+            float saveScaleX = mText.getScaleX();
+            float saveScaleY = mText.getScaleY();
+
+            float y = -mText.getHeight() / 2.0f;
+            float leftx = -mViewportWidth / 2.0f;
+            float rightx = mViewportWidth / 2.0f;
+            float height = mText.getHeight();
+
+            float[] vertices = {
+                    leftx, y, 0,
+                    rightx, y, 0,
+                    rightx, y + height, 0,
+                    leftx, y + height, 0
+            };
+
+            Triangle[] tris = mShapeFactory.createRectangle(vertices, Colours.MIDDLE_BOX_COLOUR, 1.0f, "score_msg_box_rect");
+            ModelObject scoreMsgBox = new ModelObject("score_msg_box");
+            scoreMsgBox.add(tris);
+
+            mShader.switchTo();
+            scoreMsgBox.draw(mViewMatrix, mProjectionMatrix, mShader);
+
+            mSpriteShader.switchTo();
+            mText.setScale(3.0f);
+            mText.drawC(mSpriteShader, mMiddleText, 0, 0, mVPMatrix, Colours.SCORE_TEXT_RED);
+
+            mText.setScale(saveScaleX, saveScaleY);
+        }
+    }
+
+    private synchronized void processStrings() {
         for (StringWithTime swt : mMessagesToProcess) {
             String s = swt.mString.trim();
             StringTokenizer st = new StringTokenizer(s);
@@ -173,10 +214,10 @@ public class Hud {
                 if (mText.getLength(curString + nextString) >= mMessageBoxWidthInPixels) {
                     if (curString.length() == 0) {
                         // will bleed over the edge....
-                        mMessageQueue.add(nextString, currentTimeInNanos);
+                        mMessageQueue.add(nextString, swt.mTime);
                     }
                     else {
-                        mMessageQueue.add(curString, currentTimeInNanos);
+                        mMessageQueue.add(curString, swt.mTime);
                         curString = nextString;
                     }
                 }
@@ -186,7 +227,7 @@ public class Hud {
             }
 
             if (curString.length() > 0) {
-                mMessageQueue.add(curString, currentTimeInNanos);
+                mMessageQueue.add(curString, swt.mTime);
             }
         }
 
