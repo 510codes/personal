@@ -48,6 +48,16 @@ public class GameBoard {
         return n;
     }
 
+    public boolean isPegFull( int peg ) {
+        for (int i=0; i<3; ++i) {
+            if (mBoardState[peg][i] == GamePresenter.PEG_SELECT_COLOUR.NONE) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public int getCompleteRows( GamePresenter.PEG_SELECT_COLOUR colour )
     {
         int n;
