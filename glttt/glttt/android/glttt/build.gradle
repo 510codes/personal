@@ -7,6 +7,12 @@ buildscript {
 	}
 }
 
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
 apply plugin: 'com.android.application'
 
 android {
@@ -14,3 +20,11 @@ android {
 	buildToolsVersion "19.1.0"
 }
 
+dependencies {
+	compile fileTree(dir: 'libs', include: ['*.jar'])
+	testCompile 'junit:junit:4.12'
+	testCompile('org.robolectric:robolectric:3.0') {
+		exclude group: 'commons-logging', module: 'commons-logging'
+		exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+	}
+}
