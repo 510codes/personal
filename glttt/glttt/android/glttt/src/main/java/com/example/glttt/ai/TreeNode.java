@@ -183,8 +183,6 @@ public class TreeNode {
 
         double nodeRating = rate - oppRate;
 
-        nodeRating *= (1.0 / ((double)nodeLevel + 1.0));
-
         if (nodeLevel % 2 == 1) {
             for (int i=0; i<8; ++i) {
                 if (mChild[i] != null) {
@@ -215,7 +213,7 @@ public class TreeNode {
         }
 
         if (hasChild) {
-            nodeRating *= dom_child_rating;
+            nodeRating += dom_child_rating;
         }
 
         return nodeRating;

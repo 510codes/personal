@@ -86,6 +86,6 @@ public class TreeTest {
         System.out.println("added a row, size: " + tree.size() + ", completed level: " + tree.getMaxCompleteLevel());
 
         bestMove = tree.getBestMove();
-        //assertEquals(5, bestMove);
+        assertEquals(5, bestMove);
     }
 }
