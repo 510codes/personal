@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class TreeTest {
@@ -53,7 +53,39 @@ public class TreeTest {
             System.out.println("4. testGetBestMove(): added a node...");
         }
 
-        TreeNode bestMove = tree.getBestMove();
-        assertTrue(bestMove.isPegFull(5));
+        int bestMove = tree.getBestMove();
+        assertEquals(5, bestMove);
+
+        while (tree.addNode()) {
+
+        }
+        System.out.println("added a row, size: " + tree.size() + ", completed level: " + tree.getMaxCompleteLevel());
+
+        bestMove = tree.getBestMove();
+        assertEquals(5, bestMove);
+
+        while (tree.addNode()) {
+
+        }
+        System.out.println("added a row, size: " + tree.size() + ", completed level: " + tree.getMaxCompleteLevel());
+
+        bestMove = tree.getBestMove();
+        assertEquals(5, bestMove);
+
+        while (tree.addNode()) {
+
+        }
+        System.out.println("added a row, size: " + tree.size() + ", completed level: " + tree.getMaxCompleteLevel());
+
+        bestMove = tree.getBestMove();
+        assertEquals(5, bestMove);
+
+        while (tree.addNode()) {
+
+        }
+        System.out.println("added a row, size: " + tree.size() + ", completed level: " + tree.getMaxCompleteLevel());
+
+        bestMove = tree.getBestMove();
+        //assertEquals(5, bestMove);
     }
 }

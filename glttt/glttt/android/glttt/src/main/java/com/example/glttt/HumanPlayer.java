@@ -24,4 +24,9 @@ public class HumanPlayer implements IPlayer {
     public String getName() {
         return mName;
     }
+
+    @Override
+    public void opponentMove(int peg) {
+        // human player is not concerned with opponent move....
+    }
 }

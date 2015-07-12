@@ -27,12 +27,12 @@ public class TurnManager {
             boolean done = false;
 
             while (!done) {
-                processTurnForPlayer(mPlayer1);
-                done = processTurnForPlayer(mPlayer2);
+                processTurnForPlayer(mPlayer1, mPlayer2);
+                done = processTurnForPlayer(mPlayer2, mPlayer1);
             }
         }
 
-        private boolean processTurnForPlayer(IPlayer player) {
+        private boolean processTurnForPlayer(IPlayer player, IPlayer opponent) {
             mPresenter.initiateNextMove(mCurrentColour);
             boolean playerDone = false;
             while (!playerDone) {
@@ -44,6 +44,7 @@ public class TurnManager {
                     mPresenter.acceptMove(peg, height, deltaScore, player, System.nanoTime());
                     switchColour();
                     playerDone = true;
+                    opponent.opponentMove(peg);
 
                     try {
                         Thread.sleep(player.getDelayAfterMoveInMillis());

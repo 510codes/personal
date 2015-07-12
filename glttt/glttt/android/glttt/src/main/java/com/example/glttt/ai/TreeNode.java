@@ -1,5 +1,7 @@
 package com.example.glttt.ai;
 
+import android.util.Log;
+
 import com.example.glttt.GameBoard;
 import com.example.glttt.GamePresenter;
 
@@ -26,8 +28,6 @@ public class TreeNode {
         mGameBoard = new GameBoard(board);
         mChild = new TreeNode[8];
         mName = name;
-        System.out.println("building treenode: " + super.toString() + ", name: " + name);
-        printStackTrace(new Exception().getStackTrace());
     }
 
     public TreeNode( String name ) {
@@ -36,7 +36,6 @@ public class TreeNode {
 
     public TreeNode( GameBoard board ) {
         this(board, null);
-        System.out.println("treenode: " + super.toString() + ", parent: " + mParent);
     }
 
     public TreeNode( TreeNode parent, int childIndex ) {
@@ -49,7 +48,6 @@ public class TreeNode {
             throw new RuntimeException("child at index " + childIndex + " already exists");
         }
         mParent = parent;
-        System.out.println("treenode: " + super.toString() + ", parent: " + mParent);
         mParent.mChild[childIndex] = this;
     }
 
@@ -104,23 +102,11 @@ public class TreeNode {
     public int missingChild() {
         int mc = 0;
 
-        System.out.println("missingChild(): mChild[mc]: " + mChild[mc] + ", mGameBoard: " + mGameBoard);
         while (mc < 8 && (mChild[mc] != null || mGameBoard.isPegFull(mc))) {
-            System.out.println("missingChild(): (inside while) mChild[" + mc + "]: " + mChild[mc] + ", mGameBoard.isPegFull(" + mc + "): " + mGameBoard.isPegFull(mc));
             mc++;
-            System.out.println("missingChild(): (inside while) mc++, is now: " + mc);
-        }
-
-        if (mc < 8) {
-            System.out.println("missingChild(): (out of while loop) mChild[" + mc + "]: " + mChild[mc] + ", mGameBoard.isPegFull(" + mc + "): " + mGameBoard.isPegFull(mc));
-        }
-        else {
-            System.out.println("missingChild(): (out of while loop) mc: " + mc);
         }
 
         int retVal =  (mc < 8 ? mc : -1);
-
-        System.out.println("missingChild(): end, mc is " + mc + ", returning: " + retVal);
 
         return retVal;
     }
@@ -128,10 +114,8 @@ public class TreeNode {
     public TreeNode findIncomplete( int desiredLevel, int currentLevel, GamePresenter.PEG_SELECT_COLOUR rootMoveColour ) {
         TreeNode retNode = null;
 
-        System.out.println("findIncomplete(): enter, desiredLevel: " + desiredLevel + ", currentLevel: " + currentLevel);
         if (desiredLevel == currentLevel) {
             int mc = missingChild();
-            System.out.println("mc: " + mc);
             if (mc >= 0) {
                 retNode = this;
             }
@@ -142,7 +126,6 @@ public class TreeNode {
             while (i < 8 && fn2 == null) {
                 if (!mGameBoard.isPegFull(i)) {
                     if (mChild[i] == null) {
-                        System.out.println("TreeNode.findIncomplete(): about to build a treenode, this: " + this);
                         mChild[i] = new TreeNode(this, i);
                         mChild[i].mGameBoard.moveOnPeg(i, whosTurn(rootMoveColour, mChild[i].level()));
                     }
@@ -192,7 +175,14 @@ public class TreeNode {
         boolean hasChild = false;
         int nodeLevel = level();
 
-        double nodeRating = ((double)mGameBoard.rating(col, oppcol) * lineScoreWeight) - ((double)mGameBoard.rating(oppcol, col) * oppLineScoreWeight);
+        double rate = (double)mGameBoard.rating(col, oppcol);
+        rate *= lineScoreWeight;
+
+        double oppRate = (double)mGameBoard.rating(oppcol, col);
+        oppRate *= oppLineScoreWeight;
+
+        double nodeRating = rate - oppRate;
+
         nodeRating *= (1.0 / ((double)nodeLevel + 1.0));
 
         if (nodeLevel % 2 == 1) {
@@ -231,27 +221,29 @@ public class TreeNode {
         return nodeRating;
     }
 
-    public TreeNode getBestMove( GamePresenter.PEG_SELECT_COLOUR col, double lineScoreWeight, GamePresenter.PEG_SELECT_COLOUR oppcol, double oppLineScoreWeight ) {
+    public int getBestMove( GamePresenter.PEG_SELECT_COLOUR col, double lineScoreWeight, GamePresenter.PEG_SELECT_COLOUR oppcol, double oppLineScoreWeight ) {
         boolean first = true;
-        TreeNode bestNode = null;
         double bestRating = 0.0;
+        int bestChild = -1;
 
         for (int i=0; i<8; ++i) {
             if (mChild[i] != null) {
                 double r = mChild[i].rating(col, lineScoreWeight, oppcol, oppLineScoreWeight);
                 if (first) {
-                    bestNode = mChild[i];
+                    bestChild = i;
                     bestRating = r;
                     first = false;
                 }
                 else if (mChild[i].rating(col, lineScoreWeight, oppcol, oppLineScoreWeight) > bestRating) {
-                    bestNode = mChild[i];
+                    bestChild = i;
                     bestRating = r;
                 }
             }
         }
 
-        return bestNode;
+        //Log.d("TreeNode", "getBestMove() - returning best move: " + bestChild + ", rating: " + bestRating);
+        System.out.println("getBestMove() - returning best move: " + bestChild + ", rating: " + bestRating);
+        return bestChild;
     }
 
     public boolean isPegFull( int peg ) {

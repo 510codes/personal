@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
@@ -177,5 +178,24 @@ public class TreeNodeTest {
         TreeNode incompleteNode = rootNode.findIncomplete(1, 0, GamePresenter.PEG_SELECT_COLOUR.RED);
         assertNotEquals(rootNode, incompleteNode);
         assertEquals(2, rootNode.size());
+    }
+
+    @Test
+    public void testRating() {
+        TreeNode rootNode = new TreeNode();
+
+        rootNode.makeMove(0, GamePresenter.PEG_SELECT_COLOUR.RED);
+        rootNode.makeMove(1, GamePresenter.PEG_SELECT_COLOUR.WHITE);
+        rootNode.makeMove(0, GamePresenter.PEG_SELECT_COLOUR.RED);
+        rootNode.makeMove(2, GamePresenter.PEG_SELECT_COLOUR.WHITE);
+        rootNode.makeMove(0, GamePresenter.PEG_SELECT_COLOUR.RED);
+
+        double rating = rootNode.rating(GamePresenter.PEG_SELECT_COLOUR.RED, 1.0, GamePresenter.PEG_SELECT_COLOUR.WHITE, 0.9);
+        System.out.println("rating: " + rating);
+        assertTrue(rating > 0.0);
+
+        rating = rootNode.rating(GamePresenter.PEG_SELECT_COLOUR.WHITE, 1.0, GamePresenter.PEG_SELECT_COLOUR.RED, 0.9);
+        System.out.println("rating: " + rating);
+        assertTrue(rating < 0.0);
     }
 }

@@ -32,7 +32,7 @@ public class GLTTTSurfaceView extends GLSurfaceView
 
         GameBoard gameBoard = new GameBoard();
         IPlayer redPlayer = new HumanPlayer(mPresenter, "Red");
-        IPlayer whitePlayer = new ComputerPlayer(gameBoard, "White");
+        IPlayer whitePlayer = new ComputerPlayer(gameBoard, GamePresenter.PEG_SELECT_COLOUR.RED, "White");
 
         mPresenter.startNewGame(gameBoard, redPlayer, whitePlayer, GamePresenter.PEG_SELECT_COLOUR.RED, System.nanoTime());
 

@@ -60,14 +60,11 @@ public class GameBoard {
 
     public boolean isPegFull( int peg ) {
         for (int i=0; i<3; ++i) {
-            System.out.println("GameBoard.isPegFull(" + peg + "): mBoardState[" + peg + "][" + i + "]: " + mBoardState[peg][i]);
             if (mBoardState[peg][i] == GamePresenter.PEG_SELECT_COLOUR.NONE) {
-                System.out.println("GameBoard.isPegFull(" + peg + "): returning false");
                 return false;
             }
         }
 
-        System.out.println("GameBoard.isPegFull(" + peg + "): returning true");
         return true;
     }
 
