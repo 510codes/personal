@@ -76,7 +76,7 @@ public class ComputerPlayer implements IPlayer {
                 synchronized (this) {
                     notify();
                 }
-                boolean minBuild = false;
+                boolean minBuild = (mTree.getMaxCompleteLevel() >= MIN_BUILD_LEVEL);
                 while (!minBuild) {
                     while (mTree.addNode()) {
 
