@@ -3,15 +3,12 @@ package com.example.glttt.ai;
 import com.example.glttt.GamePresenter;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
-@RunWith(RobolectricTestRunner.class)
 public class TreeNodeTest {
 
     @Test

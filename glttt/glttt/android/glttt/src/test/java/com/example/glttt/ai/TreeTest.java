@@ -3,12 +3,9 @@ package com.example.glttt.ai;
 import com.example.glttt.GamePresenter;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-
 import static org.junit.Assert.assertEquals;
 
-@RunWith(RobolectricTestRunner.class)
+
 public class TreeTest {
 
     @Test

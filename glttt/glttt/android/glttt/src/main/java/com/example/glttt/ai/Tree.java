@@ -1,7 +1,5 @@
 package com.example.glttt.ai;
 
-import android.util.Log;
-
 import com.example.glttt.GamePresenter;
 
 public class Tree {
@@ -66,8 +64,6 @@ public class Tree {
         mRootNode = newRoot;
         mRootColour = newRootColour;
         mMaxCompleteLevel--;
-
-        Log.d("Tree", "makeMove() - move was made\n" + mRootNode.getBoardDisplay());
     }
 
     public int getBestMove() {
